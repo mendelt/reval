@@ -3,6 +3,11 @@ name = "reval"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
+license = "MIT/Apache-2.0"
+description = "Simple Rust expression evaluator"
+repository = "https://github.com/mendelt/reval"
+keywords = ["expression", "evaluator"]
+readme = "README.md"
 
 [dependencies]
