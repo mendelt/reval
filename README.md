@@ -1,2 +1,2 @@
-# reval
-Rust expression evaluator
+# Reval
+Simple rust expression evaluator
