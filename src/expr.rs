@@ -1,7 +1,6 @@
 use crate::value::Value;
 
-
-
+#[derive(Clone, Debug)]
 pub enum Expr {
     Value(Value),
     Reference(String),
@@ -20,13 +19,14 @@ impl Expr {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub enum UnaryOperator {
     Not,
     Sqrt,
     Reference,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum BinaryOperator {
     Add,
     Sub,
