@@ -1,26 +1,26 @@
 use std::collections::hash_map::HashMap;
 
-pub enum Expr {
-    Value(Value),
-    Reference(String),
-    Unary(UnaryOperator),
-    Binary(BinaryOperator),
-}
-
 pub enum Value {
     String(String),
-    Integer(i128),
-    Float(f64),
+    Number(Number),
     Bool(bool),
     Map(HashMap<String, Value>),
     Vec(Vec<Value>),
 }
 
+pub enum Number {
+    UInt(u128),
+    Int(i128),
+    Float(f64),
+}
+
 pub enum UnaryOperator {
     Not,
     Sqrt,
+    Reference,
 }
 
+#[derive(Clone, Copy)]
 pub enum BinaryOperator {
     Add,
     Sub,
@@ -32,11 +32,25 @@ pub enum BinaryOperator {
     GreaterThanEquals,
     LessThanEquals,
     Index,
+    Max,
+    Min,
+}
+
+pub enum Expr {
+    Value(Value),
+    Reference(String),
+    Unary(UnaryOperator),
+    Binary(BinaryOperator),
 }
 
 impl Expr {
-    pub fn evaluate(&self) -> Value {
-        todo!()
+    pub fn evaluate(self) -> Value {
+        match self {
+            Expr::Value(value) => value,
+            Expr::Reference(_) => todo!(),
+            Expr::Unary(_) => todo!(),
+            Expr::Binary(_) => todo!(),
+        }
     }
 }
 
