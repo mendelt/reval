@@ -11,11 +11,7 @@ pub enum Value {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Number {
-    UInt(u128),
     Int(i128),
     Float(f64),
 }
 
-pub mod ser {
-
-}
