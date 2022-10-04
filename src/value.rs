@@ -16,3 +16,6 @@ pub enum Number {
     Float(f64),
 }
 
+pub mod ser {
+
+}

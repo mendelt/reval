@@ -1,32 +1,30 @@
 use crate::value::Value;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
     Value(Value),
-    Reference(String),
-    Unary(UnaryOperator),
-    Binary(BinaryOperator),
+    Unary(UnaryOperator, Box<Expr>),
+    Binary(BinaryOperator, Box<Expr>, Box<Expr>),
 }
 
 impl Expr {
     pub fn evaluate(self) -> Value {
         match self {
             Expr::Value(value) => value,
-            Expr::Reference(_) => todo!(),
-            Expr::Unary(_) => todo!(),
-            Expr::Binary(_) => todo!(),
+            Expr::Unary(..) => todo!(),
+            Expr::Binary(..) => todo!(),
         }
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum UnaryOperator {
     Not,
     Sqrt,
     Reference,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BinaryOperator {
     Add,
     Sub,

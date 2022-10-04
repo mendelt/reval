@@ -11,3 +11,4 @@ keywords = ["expression", "evaluator"]
 readme = "README.md"
 
 [dependencies]
+nom = "7"
