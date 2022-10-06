@@ -1,3 +1,7 @@
+use crate::{
+    expr::Expr,
+    value::{Number, Value},
+};
 use nom::{
     branch::alt,
     bytes::complete::is_not,
@@ -8,23 +12,8 @@ use nom::{
     IResult,
 };
 
-use crate::{
-    expr::Expr,
-    value::{Number, Value},
-};
-
-pub fn parse(input: &str) -> Expr {
-    let (remaining, expr) = expr(input).unwrap();
-    assert!(remaining.is_empty());
-    expr
-}
-
-fn expr(input: &str) -> IResult<&str, Expr> {
-    map(value, |value| Expr::Value(value))(input)
-}
-
-fn value(input: &str) -> IResult<&str, Value> {
-    alt((number_value, string_value))(input)
+pub fn value(input: &str) -> IResult<&str, Expr> {
+    map(alt((number_value, string_value)), Expr::Value)(input)
 }
 
 fn number_value(input: &str) -> IResult<&str, Value> {
@@ -50,6 +39,7 @@ fn string_value(input: &str) -> IResult<&str, Value> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::{expr::Expr, parse::parse};
 
     #[test]
     fn should_parse_integer() {
@@ -65,7 +55,10 @@ mod test {
     #[test]
     #[ignore]
     fn should_parse_float() {
-        assert_eq!(parse("38e-1"), Expr::Value(Value::Number(Number::Float(3.8))))
+        assert_eq!(
+            parse("38e-1"),
+            Expr::Value(Value::Number(Number::Float(3.8)))
+        )
     }
 
     #[test]
@@ -100,3 +93,4 @@ mod test {
         );
     }
 }
+
