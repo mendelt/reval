@@ -1,4 +1,4 @@
-use crate::value::{Number, Value};
+use crate::value::Value;
 use nom::{
     branch::alt,
     bytes::complete::is_not,
@@ -14,13 +14,10 @@ pub fn value(input: &str) -> IResult<&str, Value> {
 }
 
 fn number_value(input: &str) -> IResult<&str, Value> {
-    map(
-        alt((
-            map(map_res(recognize(digit1), str::parse), Number::Int),
-            map(double, Number::Float),
-        )),
-        Value::Number,
-    )(input)
+    alt((
+        map(map_res(recognize(digit1), str::parse), Value::Int),
+        map(double, Value::Float),
+    ))(input)
 }
 
 fn string_value(input: &str) -> IResult<&str, Value> {
@@ -40,22 +37,19 @@ mod test {
 
     #[test]
     fn should_parse_integer() {
-        assert_eq!(parse("15"), Expr::Value(Value::Number(Number::Int(15))));
+        assert_eq!(parse("15"), Expr::Value(Value::Int(15)));
     }
 
     #[test]
     #[ignore]
     fn should_parse_negative_integer() {
-        assert_eq!(parse("-6"), Expr::Value(Value::Number(Number::Int(-6))))
+        assert_eq!(parse("-6"), Expr::Value(Value::Int(-6)))
     }
 
     #[test]
     #[ignore]
     fn should_parse_float() {
-        assert_eq!(
-            parse("38e-1"),
-            Expr::Value(Value::Number(Number::Float(3.8)))
-        )
+        assert_eq!(parse("38e-1"), Expr::Value(Value::Float(3.8)))
     }
 
     #[test]

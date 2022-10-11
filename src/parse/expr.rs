@@ -36,7 +36,7 @@ fn value_expr(input: &str) -> IResult<&str, Expr> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::value::{Number, Value};
+    use crate::value::{ Value};
 
     #[test]
     fn should_parse_multiplication() {
@@ -47,8 +47,8 @@ mod test {
             parsed,
             Expr::Binary(
                 BinaryOperator::Mult,
-                Box::new(Expr::Value(Value::Number(Number::Int(1)))),
-                Box::new(Expr::Value(Value::Number(Number::Int(4)))),
+                Box::new(Expr::Value(Value::Int(1))),
+                Box::new(Expr::Value(Value::Int(4))),
             )
         );
     }
@@ -62,8 +62,8 @@ mod test {
             parsed,
             Expr::Binary(
                 BinaryOperator::Add,
-                Box::new(Expr::Value(Value::Number(Number::Int(1)))),
-                Box::new(Expr::Value(Value::Number(Number::Int(4)))),
+                Box::new(Expr::Value(Value::Int(1))),
+                Box::new(Expr::Value(Value::Int(4))),
             ),
         );
     }
