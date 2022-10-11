@@ -1,4 +1,3 @@
-use crate::expr::BinaryOperator;
 use crate::expr::Expr;
 use crate::parse::value::value;
 use nom::{
@@ -13,7 +12,7 @@ fn mul_expr(input: &str) -> IResult<&str, Expr> {
     alt((
         map(
             separated_pair(add_expr, char('*'), mul_expr),
-            |(left, right)| Expr::Binary(BinaryOperator::Mult, Box::new(left), Box::new(right)),
+            |(left, right)| Expr::Mult( Box::new(left), Box::new(right)),
         ),
         add_expr,
     ))(input)
@@ -23,7 +22,7 @@ fn add_expr(input: &str) -> IResult<&str, Expr> {
     alt((
         map(
             separated_pair(value_expr, char('+'), add_expr),
-            |(left, right)| Expr::Binary(BinaryOperator::Add, Box::new(left), Box::new(right)),
+            |(left, right)| Expr::Add( Box::new(left), Box::new(right)),
         ),
         value_expr,
     ))(input)
@@ -36,7 +35,7 @@ fn value_expr(input: &str) -> IResult<&str, Expr> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::value::{ Value};
+    use crate::value::Value;
 
     #[test]
     fn should_parse_multiplication() {
@@ -45,8 +44,7 @@ mod test {
         assert!(rest.is_empty());
         assert_eq!(
             parsed,
-            Expr::Binary(
-                BinaryOperator::Mult,
+            Expr::Mult(
                 Box::new(Expr::Value(Value::Int(1))),
                 Box::new(Expr::Value(Value::Int(4))),
             )
@@ -60,8 +58,7 @@ mod test {
         assert!(rest.is_empty());
         assert_eq!(
             parsed,
-            Expr::Binary(
-                BinaryOperator::Add,
+            Expr::Add(
                 Box::new(Expr::Value(Value::Int(1))),
                 Box::new(Expr::Value(Value::Int(4))),
             ),
