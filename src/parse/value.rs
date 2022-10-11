@@ -1,7 +1,4 @@
-use crate::{
-    expr::Expr,
-    value::{Number, Value},
-};
+use crate::value::{Number, Value};
 use nom::{
     branch::alt,
     bytes::complete::is_not,
@@ -12,8 +9,8 @@ use nom::{
     IResult,
 };
 
-pub fn value(input: &str) -> IResult<&str, Expr> {
-    map(alt((number_value, string_value)), Expr::Value)(input)
+pub fn value(input: &str) -> IResult<&str, Value> {
+    alt((number_value, string_value))(input)
 }
 
 fn number_value(input: &str) -> IResult<&str, Value> {
@@ -93,4 +90,3 @@ mod test {
         );
     }
 }
-
