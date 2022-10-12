@@ -1,8 +1,6 @@
 use crate::expr::Expr;
 use crate::parse::value::value;
-use nom::{
-    branch::alt, character::complete::char, combinator::map, sequence::separated_pair, IResult,
-};
+use nom::{branch::alt, bytes::complete::tag, combinator::map, sequence::separated_pair, IResult};
 
 pub fn expr(input: &str) -> IResult<&str, Expr> {
     mul_expr(input)
@@ -11,8 +9,8 @@ pub fn expr(input: &str) -> IResult<&str, Expr> {
 fn mul_expr(input: &str) -> IResult<&str, Expr> {
     alt((
         map(
-            separated_pair(add_expr, char('*'), mul_expr),
-            |(left, right)| Expr::Mult( Box::new(left), Box::new(right)),
+            separated_pair(add_expr, tag("*"), mul_expr),
+            |(left, right)| Expr::Mult(Box::new(left), Box::new(right)),
         ),
         add_expr,
     ))(input)
@@ -21,8 +19,8 @@ fn mul_expr(input: &str) -> IResult<&str, Expr> {
 fn add_expr(input: &str) -> IResult<&str, Expr> {
     alt((
         map(
-            separated_pair(value_expr, char('+'), add_expr),
-            |(left, right)| Expr::Add( Box::new(left), Box::new(right)),
+            separated_pair(value_expr, tag("+"), add_expr),
+            |(left, right)| Expr::Add(Box::new(left), Box::new(right)),
         ),
         value_expr,
     ))(input)
