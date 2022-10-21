@@ -1,7 +1,9 @@
+use std::str::FromStr;
+
 use crate::value::Value;
 use nom::{
     branch::alt,
-    bytes::complete::is_not,
+    bytes::complete::{is_not, tag},
     character::complete::{char, digit1},
     combinator::{map, map_res, recognize},
     number::complete::double,
@@ -10,7 +12,7 @@ use nom::{
 };
 
 pub fn value(input: &str) -> IResult<&str, Value> {
-    alt((int_value, string_value))(input)
+    alt((bool_value, alt((int_value, string_value))))(input)
 }
 
 fn int_value(input: &str) -> IResult<&str, Value> {
@@ -21,7 +23,7 @@ fn int_value(input: &str) -> IResult<&str, Value> {
 }
 
 #[cfg(test)]
-mod when_parsing_integers {
+mod when_parsing_integer_value {
     use super::*;
 
     #[test]
@@ -39,6 +41,31 @@ mod when_parsing_integers {
     #[ignore]
     fn should_parse_float() {
         // assert_eq!(parse("38e-1"), Expr::Value(Value::Float(3.8)))
+    }
+}
+
+fn bool_value(input: &str) -> IResult<&str, Value> {
+    map(map_res(alt((tag("true"), tag("false"))), FromStr::from_str), Value::Bool)(input)
+}
+
+#[cfg(test)]
+mod when_parsing_bool_value {
+    use super::*;
+
+    #[test]
+    fn should_parse_true() {
+        assert_eq!(bool_value("true").unwrap().1, Value::Bool(true));
+        // assert_eq!(bool_value("true").unwrap().1, Value::Bool(true));
+    }
+
+    #[test]
+    fn should_parse_false() {
+        assert_eq!(bool_value("false").unwrap().1, Value::Bool(false));
+    }
+
+    #[test]
+    fn should_not_parse_non_bool() {
+        assert!(bool_value("stuff").is_err());
     }
 }
 

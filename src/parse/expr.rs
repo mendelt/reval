@@ -27,7 +27,7 @@ fn add_expr(input: &str) -> IResult<&str, Expr> {
 }
 
 fn value_expr(input: &str) -> IResult<&str, Expr> {
-    map(value, |value| Expr::Value(value))(input)
+    map(value, Expr::Value)(input)
 }
 
 #[cfg(test)]
