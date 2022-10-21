@@ -14,11 +14,7 @@ pub enum Expr {
     LessThan(Box<Expr>, Box<Expr>),
     LessThanEquals(Box<Expr>, Box<Expr>),
     Index(Box<Expr>, Box<Expr>),
-    Max(Box<Expr>, Box<Expr>),
-    Min(Box<Expr>, Box<Expr>),
-
     Not(Box<Expr>),
-    Sqrt(Box<Expr>),
 }
 
 impl Expr {
@@ -36,10 +32,7 @@ impl Expr {
             Expr::LessThan(_, _) => todo!(),
             Expr::LessThanEquals(_, _) => todo!(),
             Expr::Index(_, _) => todo!(),
-            Expr::Max(_, _) => todo!(),
-            Expr::Min(_, _) => todo!(),
             Expr::Not(_) => todo!(),
-            Expr::Sqrt(_) => todo!(),
         }
     }
 }
