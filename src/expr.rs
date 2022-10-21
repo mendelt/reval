@@ -3,6 +3,8 @@ use crate::value::Value;
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
     Value(Value),
+    Index(Box<Expr>, Box<Expr>),
+    Not(Box<Expr>),
     Mult(Box<Expr>, Box<Expr>),
     Div(Box<Expr>, Box<Expr>),
     Add(Box<Expr>, Box<Expr>),
@@ -13,14 +15,14 @@ pub enum Expr {
     GreaterThanEquals(Box<Expr>, Box<Expr>),
     LessThan(Box<Expr>, Box<Expr>),
     LessThanEquals(Box<Expr>, Box<Expr>),
-    Index(Box<Expr>, Box<Expr>),
-    Not(Box<Expr>),
 }
 
 impl Expr {
     pub fn evaluate(self) -> Value {
         match self {
             Expr::Value(value) => value,
+            Expr::Index(_, _) => todo!(),
+            Expr::Not(_) => todo!(),
             Expr::Mult(_, _) => todo!(),
             Expr::Div(_, _) => todo!(),
             Expr::Add(_, _) => todo!(),
@@ -31,8 +33,6 @@ impl Expr {
             Expr::GreaterThanEquals(_, _) => todo!(),
             Expr::LessThan(_, _) => todo!(),
             Expr::LessThanEquals(_, _) => todo!(),
-            Expr::Index(_, _) => todo!(),
-            Expr::Not(_) => todo!(),
         }
     }
 }

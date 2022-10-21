@@ -45,7 +45,10 @@ mod when_parsing_integer_value {
 }
 
 fn bool_value(input: &str) -> IResult<&str, Value> {
-    map(map_res(alt((tag("true"), tag("false"))), FromStr::from_str), Value::Bool)(input)
+    map(
+        map_res(alt((tag("true"), tag("false"))), FromStr::from_str),
+        Value::Bool,
+    )(input)
 }
 
 #[cfg(test)]
