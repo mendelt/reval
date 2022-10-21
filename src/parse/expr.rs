@@ -6,24 +6,14 @@ use nom::{
 };
 
 pub fn expr(input: &str) -> IResult<&str, Expr> {
-    mult_expr(input)
+    sub_expr(input)
 }
 
-fn mult_expr(input: &str) -> IResult<&str, Expr> {
+fn sub_expr(input: &str) -> IResult<&str, Expr> {
     alt((
         map(
-            binary_expr(div_expr, tag("*"), mult_expr),
-            |(left, right)| Expr::Mult(Box::new(left), Box::new(right)),
-        ),
-        div_expr,
-    ))(input)
-}
-
-fn div_expr(input: &str) -> IResult<&str, Expr> {
-    alt((
-        map(
-            binary_expr(add_expr, tag("/"), div_expr),
-            |(left, right)| Expr::Div(Box::new(left), Box::new(right)),
+            binary_expr(add_expr, tag("-"), add_expr),
+            |(left, right)| Expr::Sub(Box::new(left), Box::new(right)),
         ),
         add_expr,
     ))(input)
@@ -32,18 +22,28 @@ fn div_expr(input: &str) -> IResult<&str, Expr> {
 fn add_expr(input: &str) -> IResult<&str, Expr> {
     alt((
         map(
-            binary_expr(sub_expr, tag("+"), add_expr),
+            binary_expr(div_expr, tag("+"), add_expr),
             |(left, right)| Expr::Add(Box::new(left), Box::new(right)),
         ),
-        sub_expr,
+        div_expr,
     ))(input)
 }
 
-fn sub_expr(input: &str) -> IResult<&str, Expr> {
+fn div_expr(input: &str) -> IResult<&str, Expr> {
     alt((
         map(
-            binary_expr(value_expr, tag("-"), add_expr),
-            |(left, right)| Expr::Sub(Box::new(left), Box::new(right)),
+            binary_expr(mult_expr, tag("/"), div_expr),
+            |(left, right)| Expr::Div(Box::new(left), Box::new(right)),
+        ),
+        mult_expr,
+    ))(input)
+}
+
+fn mult_expr(input: &str) -> IResult<&str, Expr> {
+    alt((
+        map(
+            binary_expr(value_expr, tag("*"), mult_expr),
+            |(left, right)| Expr::Mult(Box::new(left), Box::new(right)),
         ),
         value_expr,
     ))(input)
@@ -78,7 +78,7 @@ where
 }
 
 #[cfg(test)]
-mod test {
+mod when_parsing_expression {
     use super::*;
     use crate::value::Value;
 
@@ -136,5 +136,31 @@ mod test {
                 Box::new(Expr::Value(Value::Int(4))),
             ),
         );
+    }
+
+    #[test]
+    fn should_parse_correct_precedence() {
+        let (rest, parsed) = expr("14*128+4/5*3-1").unwrap();
+
+        assert_eq!(
+            parsed,
+            Expr::Sub(
+                Box::new(Expr::Add(
+                    Box::new(Expr::Mult(
+                        Box::new(Expr::Value(Value::Int(14))),
+                        Box::new(Expr::Value(Value::Int(128)))
+                    )),
+                    Box::new(Expr::Div(
+                        Box::new(Expr::Value(Value::Int(4))),
+                        Box::new(Expr::Mult(
+                            Box::new(Expr::Value(Value::Int(5))),
+                            Box::new(Expr::Value(Value::Int(3)))
+                        ))
+                    ))
+                )),
+                Box::new(Expr::Value(Value::Int(1)))
+            )
+        );
+        assert_eq!(rest, "");
     }
 }
