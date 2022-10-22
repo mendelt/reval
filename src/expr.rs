@@ -35,4 +35,60 @@ impl Expr {
             Expr::LessThanEquals(_, _) => todo!(),
         }
     }
+
+    pub fn value(value: impl Into<Value>) -> Self {
+        Expr::Value(value.into())
+    }
+
+    pub fn index(left: Expr, right: Expr) -> Self {
+        Expr::Index(Box::new(left), Box::new(right))
+    }
+
+    #[allow(clippy::should_implement_trait)]
+    pub fn not(expr: Expr) -> Self {
+        Expr::Not(Box::new(expr))
+    }
+
+    pub fn mult(left: Expr, right: Expr) -> Self {
+        Expr::Mult(Box::new(left), Box::new(right))
+    }
+
+    #[allow(clippy::should_implement_trait)]
+    pub fn div(left: Expr, right: Expr) -> Self {
+        Expr::Div(Box::new(left), Box::new(right))
+    }
+
+    #[allow(clippy::should_implement_trait)]
+    pub fn add(left: Expr, right: Expr) -> Self {
+        Expr::Add(Box::new(left), Box::new(right))
+    }
+
+    #[allow(clippy::should_implement_trait)]
+    pub fn sub(left: Expr, right: Expr) -> Self {
+        Expr::Sub(Box::new(left), Box::new(right))
+    }
+
+    pub fn eq(left: Expr, right: Expr) -> Self {
+        Expr::Equals(Box::new(left), Box::new(right))
+    }
+
+    pub fn neq(left: Expr, right: Expr) -> Self {
+        Expr::NotEquals(Box::new(left), Box::new(right))
+    }
+
+    pub fn gt(left: Expr, right: Expr) -> Self {
+        Expr::GreaterThan(Box::new(left), Box::new(right))
+    }
+
+    pub fn gte(left: Expr, right: Expr) -> Self {
+        Expr::GreaterThanEquals(Box::new(left), Box::new(right))
+    }
+
+    pub fn lt(left: Expr, right: Expr) -> Self {
+        Expr::LessThan(Box::new(left), Box::new(right))
+    }
+
+    pub fn lte(left: Expr, right: Expr) -> Self {
+        Expr::LessThanEquals(Box::new(left), Box::new(right))
+    }
 }
