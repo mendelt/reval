@@ -11,30 +11,13 @@ pub fn expr(input: &str) -> IResult<&str, Expr> {
 
 #[cfg(test)]
 mod when_parsing_expressions {
-    use super::*;
+    use super::{test_util::should_parse, *};
     use crate::value::Value;
 
     #[test]
-    fn should_parse_div() {
-        let (rest, parsed) = expr("1/15").unwrap();
-
-        assert!(rest.is_empty());
-        assert_eq!(
-            parsed,
-            Expr::Div(
-                Box::new(Expr::Value(Value::Int(1))),
-                Box::new(Expr::Value(Value::Int(15))),
-            )
-        );
-    }
-
-    #[test]
     fn should_parse_add() {
-        let (rest, parsed) = expr("1 +4").unwrap();
-
-        assert!(rest.is_empty());
-        assert_eq!(
-            parsed,
+        should_parse(
+            add_expr("1+4"),
             Expr::Add(
                 Box::new(Expr::Value(Value::Int(1))),
                 Box::new(Expr::Value(Value::Int(4))),
@@ -44,11 +27,8 @@ mod when_parsing_expressions {
 
     #[test]
     fn should_parse_sub() {
-        let (rest, parsed) = expr("121-4").unwrap();
-
-        assert!(rest.is_empty());
-        assert_eq!(
-            parsed,
+        should_parse(
+            sub_expr("121-4"),
             Expr::Sub(
                 Box::new(Expr::Value(Value::Int(121))),
                 Box::new(Expr::Value(Value::Int(4))),
@@ -111,6 +91,28 @@ fn div_expr(input: &str) -> IResult<&str, Expr> {
         ),
         mult_expr,
     ))(input)
+}
+
+#[cfg(test)]
+mod when_parsing_div {
+    use super::{test_util::should_parse, *};
+    use crate::value::Value;
+
+    #[test]
+    fn should_parse_expr() {
+        should_parse(
+            div_expr("1/15"),
+            Expr::Div(
+                Box::new(Expr::Value(Value::Int(1))),
+                Box::new(Expr::Value(Value::Int(15))),
+            ),
+        );
+    }
+
+    #[test]
+    fn should_failover() {
+        should_parse(div_expr("1"), Expr::Value(Value::Int(1)));
+    }
 }
 
 fn mult_expr(input: &str) -> IResult<&str, Expr> {
