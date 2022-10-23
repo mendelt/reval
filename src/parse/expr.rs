@@ -7,7 +7,37 @@ use nom::{
 
 /// Parse a full expression
 pub fn expr(input: &str) -> IResult<&str, Expr> {
-    sub_expr(input)
+    lte_expr(input)
+}
+
+/// Parse less than or equals expression or failover to less than
+fn lte_expr(input: &str) -> IResult<&str, Expr> {
+    alt((binary_expr(lt_expr, "<=", lte_expr, Expr::lte), lt_expr))(input)
+}
+
+/// Parse less than expression or failover to greater than or equals
+fn lt_expr(input: &str) -> IResult<&str, Expr> {
+    alt((binary_expr(gte_expr, "<", lt_expr, Expr::lt), gte_expr))(input)
+}
+
+/// Parse greater than or equals expression or failover to greater than
+fn gte_expr(input: &str) -> IResult<&str, Expr> {
+    alt((binary_expr(gt_expr, ">=", gte_expr, Expr::gte), gt_expr))(input)
+}
+
+/// Parse greater than expression or failover to not equal
+fn gt_expr(input: &str) -> IResult<&str, Expr> {
+    alt((binary_expr(neq_expr, ">", gt_expr, Expr::gt), neq_expr))(input)
+}
+
+/// Parse not equal expression or failover to equal
+fn neq_expr(input: &str) -> IResult<&str, Expr> {
+    alt((binary_expr(eq_expr, "!=", neq_expr, Expr::neq), eq_expr))(input)
+}
+
+/// Parse equal expression or failover to subtraction
+fn eq_expr(input: &str) -> IResult<&str, Expr> {
+    alt((binary_expr(sub_expr, "==", eq_expr, Expr::eq), sub_expr))(input)
 }
 
 /// Parse subtraction expression or failover to addition
@@ -27,15 +57,21 @@ fn div_expr(input: &str) -> IResult<&str, Expr> {
 
 /// Parse multiplication expression or faiover to parentheses
 fn mult_expr(input: &str) -> IResult<&str, Expr> {
-    alt((
-        binary_expr(parentheses_expr, "*", mult_expr, Expr::mult),
-        parentheses_expr,
-    ))(input)
+    alt((binary_expr(not_expr, "*", mult_expr, Expr::mult), not_expr))(input)
+}
+
+/// TODO: Implement negation parsing
+fn not_expr(input: &str) -> IResult<&str, Expr> {
+    par_expr(input)
 }
 
 /// Parse parentheses expression or failover to value
-fn parentheses_expr(input: &str) -> IResult<&str, Expr> {
-    alt((delimited(tag("("), expr, tag(")")), value_expr))(input)
+fn par_expr(input: &str) -> IResult<&str, Expr> {
+    alt((delimited(tag("("), expr, tag(")")), idx_expr))(input)
+}
+
+fn idx_expr(input: &str) -> IResult<&str, Expr> {
+    value_expr(input)
 }
 
 /// Parse value expression
@@ -130,6 +166,12 @@ mod when_parsing_expressions {
                 Expr::sub(Expr::value(1), Expr::value(5)),
             ),
         );
+    }
+
+    #[ignore]
+    #[test]
+    fn should_parse_nested_parentheses() {
+        todo!()
     }
 
     /// Helper function to test parsing, checks if the Result of a parse-
