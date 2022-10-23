@@ -26,12 +26,31 @@ mod when_parsing_expressions {
             ),
         );
     }
+
+    #[test]
+    fn should_ignore_space_newlines() {
+        should_parse(
+            expr("3 * 4\r\n    + 8\r\n  "),
+            Expr::add(Expr::mult(Expr::value(3), Expr::value(4)), Expr::value(8)),
+        );
+    }
+
+    #[test]
+    fn should_override_precedence_with_parentheses() {
+        should_parse(
+            expr("(3+2)*(1-5)"),
+            Expr::mult(
+                Expr::add(Expr::value(3), Expr::value(2)),
+                Expr::sub(Expr::value(1), Expr::value(5)),
+            ),
+        );
+    }
 }
 
 fn sub_expr(input: &str) -> IResult<&str, Expr> {
     alt((
         map(
-            binary_expr(add_expr, tag("-"), add_expr),
+            binary_expr(add_expr, tag("-"), sub_expr),
             |(left, right)| Expr::sub(left, right),
         ),
         add_expr,
@@ -109,7 +128,7 @@ mod when_parsing_div {
 fn mult_expr(input: &str) -> IResult<&str, Expr> {
     alt((
         map(
-            binary_expr(value_expr, tag("*"), mult_expr),
+            binary_expr(parenthesis_expr, tag("*"), mult_expr),
             |(left, right)| Expr::mult(left, right),
         ),
         parenthesis_expr,
