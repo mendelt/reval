@@ -4,22 +4,25 @@ use crate::value::Value;
 use nom::{
     branch::alt,
     bytes::complete::{is_not, tag},
-    character::complete::{char, digit1},
-    combinator::{map, map_res, recognize},
-    number::complete::double,
-    sequence::delimited,
+    character::complete::{char, digit0, digit1},
+    combinator::{map, map_res, opt, recognize},
+    sequence::{delimited, pair, tuple},
     IResult,
 };
 
 pub fn value(input: &str) -> IResult<&str, Value> {
-    alt((bool_value, alt((int_value, string_value))))(input)
+    alt((
+        bool_value,
+        alt((float_value, alt((int_value, string_value)))),
+    ))(input)
 }
 
 fn int_value(input: &str) -> IResult<&str, Value> {
-    alt((
-        map(map_res(recognize(digit1), str::parse), Value::Int),
-        map(double, Value::Float),
-    ))(input)
+    map(map_res(recognize_int, str::parse), Value::Int)(input)
+}
+
+fn recognize_int(input: &str) -> IResult<&str, &str> {
+    recognize(map(pair(opt(alt((char('+'), char('-')))), digit1), |_| ()))(input)
 }
 
 #[cfg(test)]
@@ -28,19 +31,51 @@ mod when_parsing_integer_value {
 
     #[test]
     fn should_parse_integer() {
-        assert_eq!(int_value("15").unwrap().1, Value::Int(15));
+        assert_eq!(value("15").unwrap().1, Value::Int(15));
     }
 
     #[test]
-    #[ignore]
     fn should_parse_negative_integer() {
-        assert_eq!(int_value("-6").unwrap().1, Value::Int(-6))
+        assert_eq!(value("-6").unwrap().1, Value::Int(-6))
+    }
+}
+
+fn float_value(input: &str) -> IResult<&str, Value> {
+    map(map_res(recognize_float, str::parse), Value::Float)(input)
+}
+
+fn recognize_float(input: &str) -> IResult<&str, &str> {
+    recognize(tuple((
+        opt(alt((char('+'), char('-')))),
+        alt((
+            map(tuple((digit0, char('.'), digit1)), |_| ()),
+            map(tuple((char('.'), digit1)), |_| ()),
+        )),
+        opt(tuple((
+            alt((char('e'), char('E'))),
+            opt(alt((char('+'), char('-')))),
+            digit1,
+        ))),
+    )))(input)
+}
+
+#[cfg(test)]
+mod when_parsing_float_value {
+    use super::*;
+
+    #[test]
+    fn should_parse_simple_float() {
+        assert_eq!(value("5.0").unwrap().1, Value::Float(5.0));
     }
 
     #[test]
-    #[ignore]
-    fn should_parse_float() {
-        // assert_eq!(parse("38e-1"), Expr::Value(Value::Float(3.8)))
+    fn should_parse_negative_float() {
+        assert_eq!(value("-5.0").unwrap().1, Value::Float(-5.0));
+    }
+
+    #[test]
+    fn should_parse_exponent() {
+        assert_eq!(value("38.0e-1").unwrap().1, Value::Float(3.8))
     }
 }
 
