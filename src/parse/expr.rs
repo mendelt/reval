@@ -28,7 +28,7 @@ mod when_parsing_expressions {
     }
 
     #[test]
-    fn should_ignore_space_newlines() {
+    fn should_ignore_space_and_newlines() {
         should_parse(
             expr("3 * 4\r\n    + 8\r\n  "),
             Expr::add(Expr::mult(Expr::value(3), Expr::value(4)), Expr::value(8)),
@@ -48,13 +48,7 @@ mod when_parsing_expressions {
 }
 
 fn sub_expr(input: &str) -> IResult<&str, Expr> {
-    alt((
-        map(
-            binary_expr(add_expr, tag("-"), sub_expr),
-            |(left, right)| Expr::sub(left, right),
-        ),
-        add_expr,
-    ))(input)
+    alt((binary_expr(add_expr, "-", sub_expr, Expr::sub), add_expr))(input)
 }
 
 #[cfg(test)]
@@ -76,13 +70,7 @@ mod when_parsing_sub {
 }
 
 fn add_expr(input: &str) -> IResult<&str, Expr> {
-    alt((
-        map(
-            binary_expr(div_expr, tag("+"), add_expr),
-            |(left, right)| Expr::add(left, right),
-        ),
-        div_expr,
-    ))(input)
+    alt((binary_expr(div_expr, "+", add_expr, Expr::add), div_expr))(input)
 }
 
 #[cfg(test)]
@@ -101,13 +89,7 @@ mod when_parsing_add {
 }
 
 fn div_expr(input: &str) -> IResult<&str, Expr> {
-    alt((
-        map(
-            binary_expr(mult_expr, tag("/"), div_expr),
-            |(left, right)| Expr::div(left, right),
-        ),
-        mult_expr,
-    ))(input)
+    alt((binary_expr(mult_expr, "/", div_expr, Expr::div), mult_expr))(input)
 }
 
 #[cfg(test)]
@@ -127,10 +109,7 @@ mod when_parsing_div {
 
 fn mult_expr(input: &str) -> IResult<&str, Expr> {
     alt((
-        map(
-            binary_expr(parenthesis_expr, tag("*"), mult_expr),
-            |(left, right)| Expr::mult(left, right),
-        ),
+        binary_expr(parenthesis_expr, "*", mult_expr, Expr::mult),
         parenthesis_expr,
     ))(input)
 }
@@ -176,26 +155,28 @@ fn value_expr(input: &str) -> IResult<&str, Expr> {
     map(value, Expr::Value)(input)
 }
 
-pub fn binary_expr<'a, O1, O2, O3, E: ParseError<&'a str>, F, G, H>(
+fn binary_expr<'a, O1, O2, E, F, G, H>(
     mut left: F,
-    mut sep: G,
-    mut right: H,
-) -> impl FnMut(&'a str) -> IResult<&'a str, (O1, O3), E>
+    sep: &'static str,
+    mut right: G,
+    expr: H,
+) -> impl FnMut(&'a str) -> IResult<&'a str, Expr, E>
 where
+    E: ParseError<&'a str>,
     F: Parser<&'a str, O1, E>,
     G: Parser<&'a str, O2, E>,
-    H: Parser<&'a str, O3, E>,
+    H: Fn(O1, O2) -> Expr,
 {
     move |input: &'a str| {
         let (input, _) = multispace0(input)?;
         let (input, o1) = left.parse(input)?;
         let (input, _) = multispace0(input)?;
-        let (input, _) = sep.parse(input)?;
+        let (input, _) = tag(sep)(input)?;
         let (input, _) = multispace0(input)?;
         let (input, o2) = right.parse(input)?;
         let (input, _) = multispace0(input)?;
 
-        Ok((input, (o1, o2)))
+        Ok((input, expr(o1, o2)))
     }
 }
 
