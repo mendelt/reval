@@ -13,4 +13,12 @@ readme = "README.md"
 publish = false
 
 [dependencies]
-nom = "7"
+nom = { version="7", optional=true }
+serde = { version = "1", features = ["derive"], optional=true }
+serde_json = { version="1", optional=true }
+
+[features]
+default = ["json_parser", "serde_value"]
+nom_parser = ["dep:nom"]
+json_parser = ["dep:serde", "dep:serde_json"]
+serde_value = ["dep:serde"]

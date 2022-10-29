@@ -128,4 +128,12 @@ impl Expr {
     pub fn lte(left: Expr, right: Expr) -> Self {
         Expr::LessThanEquals(Box::new(left), Box::new(right))
     }
+
+    pub fn and(left: Expr, right: Expr) -> Self {
+        Expr::And(Box::new(left), Box::new(right))
+    }
+
+    pub fn or(left: Expr, right: Expr) -> Self {
+        Expr::Or(Box::new(left), Box::new(right))
+    }
 }
