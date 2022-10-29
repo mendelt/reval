@@ -1,8 +1,13 @@
 use crate::expr::Expr;
 use crate::parse::value::value;
 use nom::{
-    branch::alt, bytes::complete::tag, character::complete::multispace0, combinator::map,
-    error::ParseError, sequence::delimited, IResult, Parser,
+    branch::alt,
+    bytes::complete::tag,
+    character::complete::multispace0,
+    combinator::{map, map_res},
+    error::ParseError,
+    sequence::delimited,
+    IResult, Parser,
 };
 
 /// Parse a full expression
@@ -62,16 +67,22 @@ fn mult_expr(input: &str) -> IResult<&str, Expr> {
 
 /// TODO: Implement negation parsing
 fn not_expr(input: &str) -> IResult<&str, Expr> {
-    par_expr(input)
+    par_expr(input)  // TODO
 }
 
 /// Parse parentheses expression or failover to value
 fn par_expr(input: &str) -> IResult<&str, Expr> {
-    alt((delimited(tag("("), expr, tag(")")), idx_expr))(input)
+    alt((
+        map_res(
+            delimited(tag("("), take_until_unbalanced('(', ')'), tag(")")),
+            |val| expr(val).map(|parsed| parsed.1),
+        ),
+        idx_expr,
+    ))(input)
 }
 
 fn idx_expr(input: &str) -> IResult<&str, Expr> {
-    value_expr(input)
+    value_expr(input)  // TODO
 }
 
 /// Parse value expression
@@ -106,11 +117,88 @@ where
     }
 }
 
+pub fn take_until_unbalanced(
+    opening_bracket: char,
+    closing_bracket: char,
+) -> impl Fn(&str) -> IResult<&str, &str> {
+    move |i: &str| {
+        let mut index = 0;
+        let mut bracket_counter = 0;
+        while let Some(n) = &i[index..].find(&[opening_bracket, closing_bracket, '\\'][..]) {
+            index += n;
+            let mut it = i[index..].chars();
+            match it.next().unwrap_or_default() {
+                c if c == '\\' => {
+                    // Skip the escape char `\`.
+                    index += '\\'.len_utf8();
+                    // Skip also the following char.
+                    let c = it.next().unwrap_or_default();
+                    index += c.len_utf8();
+                }
+                c if c == opening_bracket => {
+                    bracket_counter += 1;
+                    index += opening_bracket.len_utf8();
+                }
+                c if c == closing_bracket => {
+                    // Closing bracket.
+                    bracket_counter -= 1;
+                    index += closing_bracket.len_utf8();
+                }
+                // Can not happen.
+                _ => unreachable!(),
+            };
+            // We found the unmatched closing bracket.
+            if bracket_counter == -1 {
+                // We do not consume it.
+                index -= closing_bracket.len_utf8();
+                return Ok((&i[index..], &i[0..index]));
+            };
+        }
+
+        if bracket_counter == 0 {
+            Ok(("", i))
+        } else {
+            Err(nom::Err::Error(nom::error::Error::from_error_kind(
+                i,
+                nom::error::ErrorKind::TakeUntil,
+            )))
+        }
+    }
+}
+
 #[cfg(test)]
 mod when_parsing_expressions {
     use super::*;
 
-    // TODO! Add tests for missing operations
+    #[test]
+    fn should_parse_less_than_equal() {
+        should_parse(expr("12<=4"), Expr::lte(Expr::value(12), Expr::value(4)));
+    }
+
+    #[test]
+    fn should_parse_less_than() {
+        should_parse(expr("1<4"), Expr::lt(Expr::value(1), Expr::value(4)));
+    }
+
+    #[test]
+    fn should_parse_greater_than_equal() {
+        should_parse(expr("1>=15"), Expr::gte(Expr::value(1), Expr::value(15)));
+    }
+
+    #[test]
+    fn should_parse_greater_than() {
+        should_parse(expr("1>4"), Expr::gt(Expr::value(1), Expr::value(4)));
+    }
+
+    #[test]
+    fn should_parse_not_equal() {
+        should_parse(expr("14!=8"), Expr::neq(Expr::value(14), Expr::value(8)));
+    }
+
+    #[test]
+    fn should_parse_equal() {
+        should_parse(expr("2==8"), Expr::eq(Expr::value(2), Expr::value(8)));
+    }
 
     #[test]
     fn should_parse_subtraction() {
