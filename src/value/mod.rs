@@ -1,3 +1,9 @@
+#[cfg(feature = "value_serializer")]
+pub mod ser;
+
+#[cfg(feature = "value_serializer")]
+mod string_ser;
+
 use std::collections::hash_map::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
