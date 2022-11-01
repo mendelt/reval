@@ -20,7 +20,10 @@ pub enum Error {
 }
 
 impl serde::ser::Error for Error {
-    fn custom<T>(msg:T) -> Self where T:std::fmt::Display {
+    fn custom<T>(msg: T) -> Self
+    where
+        T: std::fmt::Display,
+    {
         todo!()
     }
 }
@@ -97,7 +100,7 @@ impl Serializer for ValueSerializer {
         Ok(Value::String(value.to_string()))
     }
 
-    fn serialize_bytes(self, v: &[u8]) -> Result<Self::Ok, Self::Error> {
+    fn serialize_bytes(self, value: &[u8]) -> Result<Self::Ok, Self::Error> {
         todo!()
     }
 
@@ -357,4 +360,3 @@ impl SerializeStructVariant for SerializeStructVariantValue {
         Ok(Value::Map(map))
     }
 }
-

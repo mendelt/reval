@@ -67,7 +67,7 @@ fn mult_expr(input: &str) -> IResult<&str, Expr> {
 
 /// TODO: Implement negation parsing
 fn not_expr(input: &str) -> IResult<&str, Expr> {
-    par_expr(input)  // TODO
+    par_expr(input) // TODO
 }
 
 /// Parse parentheses expression or failover to value
@@ -82,7 +82,7 @@ fn par_expr(input: &str) -> IResult<&str, Expr> {
 }
 
 fn idx_expr(input: &str) -> IResult<&str, Expr> {
-    value_expr(input)  // TODO
+    value_expr(input) // TODO
 }
 
 /// Parse value expression
