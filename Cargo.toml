@@ -2,7 +2,7 @@
 name = "reval"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.60"
 authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
 license = "MIT/Apache-2.0"
 description = "Simple Rust expression evaluator"
