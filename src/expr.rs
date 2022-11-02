@@ -1,4 +1,15 @@
+use std::collections::HashMap;
+
+use displaydoc::Display;
+use thiserror::Error;
+
 use crate::value::Value;
+
+#[derive(Debug, Error, Display)]
+pub enum Error {
+    /// An invalid type was encountered evaluating the expression
+    InvalidValueType,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
@@ -52,24 +63,26 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn evaluate(self) -> Value {
+    pub fn evaluate(self, facts: &HashMap<String, Value>) -> Result<Value, Error> {
         match self {
-            Expr::Value(value) => value,
-            Expr::Reference(_) => todo!(),
-            Expr::Index(_, _) => todo!(),
-            Expr::Not(_) => todo!(),
-            Expr::Mult(_, _) => todo!(),
-            Expr::Div(_, _) => todo!(),
-            Expr::Add(_, _) => todo!(),
-            Expr::Sub(_, _) => todo!(),
-            Expr::Equals(_, _) => todo!(),
-            Expr::NotEquals(_, _) => todo!(),
-            Expr::GreaterThan(_, _) => todo!(),
-            Expr::GreaterThanEquals(_, _) => todo!(),
-            Expr::LessThan(_, _) => todo!(),
-            Expr::LessThanEquals(_, _) => todo!(),
-            Expr::And(_, _) => todo!(),
-            Expr::Or(_, _) => todo!(),
+            Expr::Value(value) => Ok(value),
+            Expr::Reference(_name) => todo!(), // Ok(facts.get(&name).clone()),
+            Expr::Index(value, idx) => index(value.evaluate(facts)?, idx.evaluate(facts)?),
+            Expr::Not(value) => not(value.evaluate(facts)?),
+            Expr::Mult(left, right) => mult(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::Div(left, right) => div(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::Add(left, right) => add(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::Sub(left, right) => sub(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::Equals(left, right) => Ok(Value::Bool(left == right)),
+            Expr::NotEquals(left, right) => Ok(Value::Bool(left != right)),
+            Expr::GreaterThan(left, right) => gt(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::GreaterThanEquals(left, right) => {
+                gte(left.evaluate(facts)?, right.evaluate(facts)?)
+            }
+            Expr::LessThan(left, right) => lt(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::LessThanEquals(left, right) => lte(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::And(left, right) => and(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::Or(left, right) => or(left.evaluate(facts)?, right.evaluate(facts)?),
         }
     }
 
@@ -135,5 +148,94 @@ impl Expr {
 
     pub fn or(left: Expr, right: Expr) -> Self {
         Expr::Or(Box::new(left), Box::new(right))
+    }
+}
+
+fn index(value: Value, idx: Value) -> Result<Value, Error> {
+    match (value, idx) {
+        (Value::Map(map), Value::String(field)) => Ok(map.get(&field).unwrap().clone()),
+        (Value::Vec(vec), Value::Int(index)) => Ok(vec.get(index as usize).unwrap().clone()),
+        (_, _) => Err(Error::InvalidValueType),
+    }
+}
+
+fn not(value: Value) -> Result<Value, Error> {
+    match value {
+        Value::Bool(value) => Ok(Value::Bool(!value)),
+        _ => Err(Error::InvalidValueType),
+    }
+}
+
+fn mult(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left * right)),
+        (Value::Float(left), Value::Int(right)) => Ok(Value::Float(left * right as f64)),
+        (Value::Int(left), Value::Float(right)) => Ok(Value::Float(left as f64 * right)),
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left * right)),
+
+        _ => Err(Error::InvalidValueType),
+    }
+}
+
+fn div(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left / right)),
+        (Value::Float(left), Value::Int(right)) => Ok(Value::Float(left / right as f64)),
+        (Value::Int(left), Value::Float(right)) => Ok(Value::Float(left as f64 / right)),
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left / right)),
+
+        _ => Err(Error::InvalidValueType),
+    }
+}
+
+fn add(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left + right)),
+        (Value::Float(left), Value::Int(right)) => Ok(Value::Float(left + right as f64)),
+        (Value::Int(left), Value::Float(right)) => Ok(Value::Float(left as f64 + right)),
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left + right)),
+
+        _ => Err(Error::InvalidValueType),
+    }
+}
+
+fn sub(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left - right)),
+        (Value::Float(left), Value::Int(right)) => Ok(Value::Float(left - right as f64)),
+        (Value::Int(left), Value::Float(right)) => Ok(Value::Float(left as f64 - right)),
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left - right)),
+
+        _ => Err(Error::InvalidValueType),
+    }
+}
+
+fn gt(_left: Value, _right: Value) -> Result<Value, Error> {
+    todo!()
+}
+
+fn gte(_left: Value, _right: Value) -> Result<Value, Error> {
+    todo!()
+}
+
+fn lt(_left: Value, _right: Value) -> Result<Value, Error> {
+    todo!()
+}
+
+fn lte(_left: Value, _right: Value) -> Result<Value, Error> {
+    todo!()
+}
+
+fn and(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left & right)),
+        _ => Err(Error::InvalidValueType),
+    }
+}
+
+fn or(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left & right)),
+        _ => Err(Error::InvalidValueType),
     }
 }
