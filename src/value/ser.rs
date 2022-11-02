@@ -360,3 +360,34 @@ impl SerializeStructVariant for SerializeStructVariantValue {
         Ok(Value::Map(map))
     }
 }
+
+#[cfg(test)]
+mod when_serializing_to_value {
+    use super::*;
+    use serde::Serialize;
+
+    #[test]
+    fn should_serialize_bool() {
+        assert_eq!(true.serialize(ValueSerializer).unwrap(), Value::Bool(true));
+    }
+
+    #[test]
+    fn should_serialize_int() {
+        assert_eq!(8u8.serialize(ValueSerializer).unwrap(), Value::Int(8));
+    }
+
+    #[test]
+    fn should_serialize_string() {
+        assert_eq!("String val".serialize(ValueSerializer).unwrap(), Value::String("String val".to_owned()))
+    }
+
+    #[test]
+    fn should_serialize_char_to_string() {
+        assert_eq!('c'.serialize(ValueSerializer).unwrap(), Value::String("c".to_owned()))
+    }
+
+    #[test]
+    fn should_serialize_tuple() {
+        assert_eq!((-16, "Test").serialize(ValueSerializer).unwrap(), Value::Int(8));
+    }
+}
