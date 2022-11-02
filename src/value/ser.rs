@@ -20,7 +20,7 @@ pub enum Error {
 }
 
 impl serde::ser::Error for Error {
-    fn custom<T>(msg: T) -> Self
+    fn custom<T>(_msg: T) -> Self
     where
         T: std::fmt::Display,
     {
@@ -93,14 +93,14 @@ impl Serializer for ValueSerializer {
     }
 
     fn serialize_char(self, value: char) -> Result<Self::Ok, Self::Error> {
-        todo!()
+        Ok(Value::String(value.to_string()))
     }
 
     fn serialize_str(self, value: &str) -> Result<Self::Ok, Self::Error> {
         Ok(Value::String(value.to_string()))
     }
 
-    fn serialize_bytes(self, value: &[u8]) -> Result<Self::Ok, Self::Error> {
+    fn serialize_bytes(self, _value: &[u8]) -> Result<Self::Ok, Self::Error> {
         todo!()
     }
 
@@ -108,7 +108,7 @@ impl Serializer for ValueSerializer {
         todo!()
     }
 
-    fn serialize_some<T: ?Sized>(self, value: &T) -> Result<Self::Ok, Self::Error>
+    fn serialize_some<T: ?Sized>(self, _value: &T) -> Result<Self::Ok, Self::Error>
     where
         T: serde::Serialize,
     {
@@ -119,23 +119,23 @@ impl Serializer for ValueSerializer {
         todo!()
     }
 
-    fn serialize_unit_struct(self, name: &'static str) -> Result<Self::Ok, Self::Error> {
+    fn serialize_unit_struct(self, _name: &'static str) -> Result<Self::Ok, Self::Error> {
         todo!()
     }
 
     fn serialize_unit_variant(
         self,
-        name: &'static str,
-        variant_index: u32,
-        variant: &'static str,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
     ) -> Result<Self::Ok, Self::Error> {
         todo!()
     }
 
     fn serialize_newtype_struct<T: ?Sized>(
         self,
-        name: &'static str,
-        value: &T,
+        _name: &'static str,
+        _value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
         T: serde::Serialize,
@@ -145,10 +145,10 @@ impl Serializer for ValueSerializer {
 
     fn serialize_newtype_variant<T: ?Sized>(
         self,
-        name: &'static str,
-        variant_index: u32,
-        variant: &'static str,
-        value: &T,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        _value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
         T: serde::Serialize,
@@ -156,50 +156,50 @@ impl Serializer for ValueSerializer {
         todo!()
     }
 
-    fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq, Self::Error> {
+    fn serialize_seq(self, _len: Option<usize>) -> Result<Self::SerializeSeq, Self::Error> {
         todo!()
     }
 
-    fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple, Self::Error> {
+    fn serialize_tuple(self, _len: usize) -> Result<Self::SerializeTuple, Self::Error> {
         todo!()
     }
 
     fn serialize_tuple_struct(
         self,
-        name: &'static str,
-        len: usize,
+        _name: &'static str,
+        _len: usize,
     ) -> Result<Self::SerializeTupleStruct, Self::Error> {
         todo!()
     }
 
     fn serialize_tuple_variant(
         self,
-        name: &'static str,
-        variant_index: u32,
-        variant: &'static str,
-        len: usize,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        _len: usize,
     ) -> Result<Self::SerializeTupleVariant, Self::Error> {
         todo!()
     }
 
-    fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
+    fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
         todo!()
     }
 
     fn serialize_struct(
         self,
-        name: &'static str,
-        len: usize,
+        _name: &'static str,
+        _len: usize,
     ) -> Result<Self::SerializeStruct, Self::Error> {
         todo!()
     }
 
     fn serialize_struct_variant(
         self,
-        name: &'static str,
-        variant_index: u32,
-        variant: &'static str,
-        len: usize,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        _len: usize,
     ) -> Result<Self::SerializeStructVariant, Self::Error> {
         todo!()
     }
@@ -378,16 +378,35 @@ mod when_serializing_to_value {
 
     #[test]
     fn should_serialize_string() {
-        assert_eq!("String val".serialize(ValueSerializer).unwrap(), Value::String("String val".to_owned()))
+        assert_eq!(
+            "String val".serialize(ValueSerializer).unwrap(),
+            Value::String("String val".to_owned())
+        )
     }
 
     #[test]
     fn should_serialize_char_to_string() {
-        assert_eq!('c'.serialize(ValueSerializer).unwrap(), Value::String("c".to_owned()))
+        assert_eq!(
+            'c'.serialize(ValueSerializer).unwrap(),
+            Value::String("c".to_owned())
+        )
     }
 
+    #[ignore]
     #[test]
-    fn should_serialize_tuple() {
-        assert_eq!((-16, "Test").serialize(ValueSerializer).unwrap(), Value::Int(8));
+    fn should_serialize_sequence_as_vec() {
+        assert_eq!(
+            [-16, 8].serialize(ValueSerializer).unwrap(),
+            Value::Vec(vec![Value::Int(-16), Value::Int(8)])
+        );
+    }
+
+    #[ignore]
+    #[test]
+    fn should_serialize_tuple_as_vec() {
+        assert_eq!(
+            (-16, "Test").serialize(ValueSerializer).unwrap(),
+            Value::Vec(vec![Value::Int(-16), Value::String("Test".to_owned())])
+        );
     }
 }
