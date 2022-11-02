@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use displaydoc::Display;
 use thiserror::Error;
 
@@ -9,6 +7,9 @@ use crate::value::Value;
 pub enum Error {
     /// An invalid type was encountered evaluating the expression
     InvalidValueType,
+
+    /// Missing value
+    MissingValue(String),
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -63,10 +64,10 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn evaluate(self, facts: &HashMap<String, Value>) -> Result<Value, Error> {
+    pub fn evaluate(self, facts: &Value) -> Result<Value, Error> {
         match self {
             Expr::Value(value) => Ok(value),
-            Expr::Reference(_name) => todo!(), // Ok(facts.get(&name).clone()),
+            Expr::Reference(name) => reference(facts, name), // Ok(facts.get(&name).clone()),
             Expr::Index(value, idx) => index(value.evaluate(facts)?, idx.evaluate(facts)?),
             Expr::Not(value) => not(value.evaluate(facts)?),
             Expr::Mult(left, right) => mult(left.evaluate(facts)?, right.evaluate(facts)?),
@@ -149,6 +150,14 @@ impl Expr {
     pub fn or(left: Expr, right: Expr) -> Self {
         Expr::Or(Box::new(left), Box::new(right))
     }
+}
+
+fn reference(facts: &Value, name: String) -> Result<Value, Error> {
+    match facts {
+        value if &name == "facts" => Ok(value),
+        Value::Map(facts) => facts.get(&name).ok_or(Error::MissingValue(name.to_owned())),
+        _ => Err(Error::InvalidValueType),
+    }.map(Clone::clone)
 }
 
 fn index(value: Value, idx: Value) -> Result<Value, Error> {
