@@ -1,5 +1,10 @@
 use crate::expr::Expr;
 use serde::{Deserialize, Serialize};
+use serde_json::Error;
+
+pub fn parse(input: &str) -> Result<Expr, Error> {
+    serde_json::from_str::<ParseExpr>(input).map(Into::<Expr>::into)
+}
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 enum ParseExpr {
@@ -57,21 +62,18 @@ impl From<ParseExpr> for Expr {
 #[cfg(test)]
 mod when_parsing_json_expr {
     use super::*;
-    use serde_json::from_str;
+    use crate::expr::Expr;
 
     #[test]
     fn should_parse_string_value() {
-        assert_eq!(
-            from_str::<ParseExpr>(r#"{"String":"test"}"#).unwrap(),
-            ParseExpr::String("test".to_string())
-        );
+        assert_eq!(parse(r#"{"String":"test"}"#).unwrap(), Expr::value("test"));
     }
 
     #[test]
     fn should_parse_add_expr() {
         assert_eq!(
-            from_str::<ParseExpr>(r#"{"Add": [{"Int": 4}, {"Int": 3}]}"#).unwrap(),
-            ParseExpr::Add(Box::new(ParseExpr::Int(4)), Box::new(ParseExpr::Int(3)))
+            parse(r#"{"Add": [{"Int": 4}, {"Int": 3}]}"#).unwrap(),
+            Expr::add(Expr::value(4), Expr::value(3))
         );
     }
 }
