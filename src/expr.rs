@@ -155,17 +155,25 @@ impl Expr {
 fn reference(facts: &Value, name: String) -> Result<Value, Error> {
     match facts {
         value if &name == "facts" => Ok(value),
-        Value::Map(facts) => facts.get(&name).ok_or(Error::MissingValue(name.to_owned())),
+        Value::Map(facts) => facts
+            .get(&name)
+            .ok_or_else(|| Error::MissingValue(name.to_owned())),
         _ => Err(Error::InvalidValueType),
-    }.map(Clone::clone)
+    }
+    .map(Clone::clone)
 }
 
 fn index(value: Value, idx: Value) -> Result<Value, Error> {
-    match (value, idx) {
-        (Value::Map(map), Value::String(field)) => Ok(map.get(&field).unwrap().clone()),
-        (Value::Vec(vec), Value::Int(index)) => Ok(vec.get(index as usize).unwrap().clone()),
+    match (&value, idx) {
+        (Value::Map(map), Value::String(field)) => map
+            .get(&field)
+            .ok_or_else(|| Error::MissingValue(field.to_owned())),
+        (Value::Vec(vec), Value::Int(index)) => vec
+            .get(index as usize)
+            .ok_or_else(|| Error::MissingValue(index.to_string())),
         (_, _) => Err(Error::InvalidValueType),
     }
+    .map(Clone::clone)
 }
 
 fn not(value: Value) -> Result<Value, Error> {

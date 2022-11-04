@@ -14,6 +14,7 @@ pub enum Value {
     Bool(bool),
     Map(HashMap<String, Value>),
     Vec(Vec<Value>),
+    None,
 }
 
 impl Value {
@@ -49,5 +50,14 @@ impl From<f64> for Value {
 impl From<bool> for Value {
     fn from(value: bool) -> Self {
         Value::Bool(value)
+    }
+}
+
+impl From<Option<Value>> for Value {
+    fn from(option: Option<Value>) -> Self {
+        match option {
+            Some(value) => value,
+            None => Value::None,
+        }
     }
 }
