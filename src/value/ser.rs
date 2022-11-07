@@ -156,12 +156,14 @@ impl Serializer for ValueSerializer {
         todo!()
     }
 
-    fn serialize_seq(self, _len: Option<usize>) -> Result<Self::SerializeSeq, Self::Error> {
-        todo!()
+    fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq, Self::Error> {
+        Ok(SerializeVecValue {
+            vec: Vec::with_capacity(len.unwrap_or(0)),
+        })
     }
 
-    fn serialize_tuple(self, _len: usize) -> Result<Self::SerializeTuple, Self::Error> {
-        todo!()
+    fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple, Self::Error> {
+        self.serialize_seq(Some(len))
     }
 
     fn serialize_tuple_struct(
@@ -183,15 +185,18 @@ impl Serializer for ValueSerializer {
     }
 
     fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
-        todo!()
+        Ok(SerializeMapValue {
+            map: HashMap::new(),
+            next_key: None,
+        })
     }
 
     fn serialize_struct(
         self,
         _name: &'static str,
-        _len: usize,
+        len: usize,
     ) -> Result<Self::SerializeStruct, Self::Error> {
-        todo!()
+        self.serialize_map(Some(len))
     }
 
     fn serialize_struct_variant(
@@ -363,6 +368,8 @@ impl SerializeStructVariant for SerializeStructVariantValue {
 
 #[cfg(test)]
 mod when_serializing_to_value {
+    use std::collections::BTreeMap;
+
     use super::*;
     use serde::Serialize;
 
@@ -392,21 +399,54 @@ mod when_serializing_to_value {
         )
     }
 
-    #[ignore]
     #[test]
-    fn should_serialize_sequence_as_vec() {
+    fn should_serialize_sequence_to_vec() {
         assert_eq!(
             [-16, 8].serialize(ValueSerializer).unwrap(),
             Value::Vec(vec![Value::Int(-16), Value::Int(8)])
         );
     }
 
-    #[ignore]
     #[test]
-    fn should_serialize_tuple_as_vec() {
+    fn should_serialize_tuple_to_vec() {
         assert_eq!(
             (-16, "Test").serialize(ValueSerializer).unwrap(),
             Value::Vec(vec![Value::Int(-16), Value::String("Test".to_owned())])
         );
+    }
+
+    #[test]
+    fn should_serialize_map() {
+        assert_eq!(
+            BTreeMap::from([("key", "value")])
+                .serialize(ValueSerializer)
+                .unwrap(),
+            Value::Map(HashMap::from([(
+                "key".to_owned(),
+                Value::String("value".to_owned())
+            )]))
+        );
+    }
+
+    #[test]
+    fn should_serialize_struct_to_map() {
+        #[derive(Serialize)]
+        struct Data {
+            age: u16,
+            name: String,
+        }
+
+        assert_eq!(
+            Data {
+                age: 21,
+                name: "Frank".to_string()
+            }
+            .serialize(ValueSerializer)
+            .unwrap(),
+            Value::Map(HashMap::from([
+                ("age".to_owned(), Value::Int(21)),
+                ("name".to_owned(), Value::String("Frank".to_owned())),
+            ]))
+        )
     }
 }
