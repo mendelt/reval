@@ -105,22 +105,22 @@ impl Serializer for ValueSerializer {
     }
 
     fn serialize_none(self) -> Result<Self::Ok, Self::Error> {
-        todo!()
+        self.serialize_unit()
     }
 
-    fn serialize_some<T: ?Sized>(self, _value: &T) -> Result<Self::Ok, Self::Error>
+    fn serialize_some<T: ?Sized>(self, value: &T) -> Result<Self::Ok, Self::Error>
     where
         T: serde::Serialize,
     {
-        todo!()
+        value.serialize(self)
     }
 
     fn serialize_unit(self) -> Result<Self::Ok, Self::Error> {
-        todo!()
+        Ok(Value::None)
     }
 
     fn serialize_unit_struct(self, _name: &'static str) -> Result<Self::Ok, Self::Error> {
-        todo!()
+        self.serialize_unit()
     }
 
     fn serialize_unit_variant(
@@ -375,19 +375,19 @@ mod when_serializing_to_value {
 
     #[test]
     fn should_serialize_bool() {
-        assert_eq!(true.serialize(ValueSerializer).unwrap(), Value::Bool(true));
+        assert_eq!(true.serialize(ValueSerializer).unwrap(), true.into());
     }
 
     #[test]
     fn should_serialize_int() {
-        assert_eq!(8u8.serialize(ValueSerializer).unwrap(), Value::Int(8));
+        assert_eq!(8u8.serialize(ValueSerializer).unwrap(), 8.into());
     }
 
     #[test]
     fn should_serialize_string() {
         assert_eq!(
             "String val".serialize(ValueSerializer).unwrap(),
-            Value::String("String val".to_owned())
+            "String val".into()
         )
     }
 
@@ -397,6 +397,33 @@ mod when_serializing_to_value {
             'c'.serialize(ValueSerializer).unwrap(),
             Value::String("c".to_owned())
         )
+    }
+
+    #[test]
+    fn should_serialize_none_option_as_none() {
+        let value: Option<String> = None;
+        assert_eq!(value.serialize(ValueSerializer).unwrap(), Value::None)
+    }
+
+    #[test]
+    fn should_serialize_some_option_as_inner_type() {
+        assert_eq!(
+            Some("Value".to_owned()).serialize(ValueSerializer).unwrap(),
+            "Value".into()
+        )
+    }
+
+    #[test]
+    fn should_serialize_unit_to_none() {
+        assert_eq!(().serialize(ValueSerializer).unwrap(), Value::None)
+    }
+
+    #[test]
+    fn should_serialize_unit_struct_to_none() {
+        #[derive(Serialize)]
+        struct Nothing;
+
+        assert_eq!(Nothing {}.serialize(ValueSerializer).unwrap(), Value::None)
     }
 
     #[test]
@@ -439,7 +466,7 @@ mod when_serializing_to_value {
         assert_eq!(
             Data {
                 age: 21,
-                name: "Frank".to_string()
+                name: "Frank".to_owned()
             }
             .serialize(ValueSerializer)
             .unwrap(),
