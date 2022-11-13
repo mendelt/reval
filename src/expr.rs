@@ -227,20 +227,48 @@ fn sub(left: Value, right: Value) -> Result<Value, Error> {
     }
 }
 
-fn gt(_left: Value, _right: Value) -> Result<Value, Error> {
-    todo!()
+fn gt(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left > right)),
+        (Value::Float(left), Value::Int(right)) => Ok(Value::Bool(left > right as f64)),
+        (Value::Int(left), Value::Float(right)) => Ok(Value::Bool(left as f64 > right)),
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left > right)),
+
+        _ => Err(Error::InvalidValueType),
+    }
 }
 
-fn gte(_left: Value, _right: Value) -> Result<Value, Error> {
-    todo!()
+fn gte(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left >= right)),
+        (Value::Float(left), Value::Int(right)) => Ok(Value::Bool(left >= right as f64)),
+        (Value::Int(left), Value::Float(right)) => Ok(Value::Bool(left as f64 >= right)),
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left >= right)),
+
+        _ => Err(Error::InvalidValueType),
+    }
 }
 
-fn lt(_left: Value, _right: Value) -> Result<Value, Error> {
-    todo!()
+fn lt(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left < right)),
+        (Value::Float(left), Value::Int(right)) => Ok(Value::Bool(left < right as f64)),
+        (Value::Int(left), Value::Float(right)) => Ok(Value::Bool((left as f64) < right)),
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left < right)),
+
+        _ => Err(Error::InvalidValueType),
+    }
 }
 
-fn lte(_left: Value, _right: Value) -> Result<Value, Error> {
-    todo!()
+fn lte(left: Value, right: Value) -> Result<Value, Error> {
+    match (left, right) {
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left <= right)),
+        (Value::Float(left), Value::Int(right)) => Ok(Value::Bool(left <= right as f64)),
+        (Value::Int(left), Value::Float(right)) => Ok(Value::Bool(left as f64 <= right)),
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left <= right)),
+
+        _ => Err(Error::InvalidValueType),
+    }
 }
 
 fn and(left: Value, right: Value) -> Result<Value, Error> {
