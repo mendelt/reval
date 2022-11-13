@@ -64,9 +64,9 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn evaluate(self, facts: &Value) -> Result<Value, Error> {
+    pub fn evaluate(&self, facts: &Value) -> Result<Value, Error> {
         match self {
-            Expr::Value(value) => Ok(value),
+            Expr::Value(value) => Ok(value.clone()),
             Expr::Reference(name) => reference(facts, name), // Ok(facts.get(&name).clone()),
             Expr::Index(value, idx) => index(value.evaluate(facts)?, idx.evaluate(facts)?),
             Expr::Not(value) => not(value.evaluate(facts)?),
@@ -152,11 +152,11 @@ impl Expr {
     }
 }
 
-fn reference(facts: &Value, name: String) -> Result<Value, Error> {
+fn reference(facts: &Value, name: &str) -> Result<Value, Error> {
     match facts {
-        value if &name == "facts" => Ok(value),
+        value if name == "facts" => Ok(value),
         Value::Map(facts) => facts
-            .get(&name)
+            .get(name)
             .ok_or_else(|| Error::MissingValue(name.to_owned())),
         _ => Err(Error::InvalidValueType),
     }
