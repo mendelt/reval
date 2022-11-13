@@ -11,18 +11,18 @@ Data can even be nested so complex data can be passed into Reval expressions.
 
 To make it easy to construct input data from your own datatypes the Reval crate implements a serde serializer for Value types. So any type that implements `serde::Serialize` can be serialized into a `reval::Value` without writing any code.
 
-```rust, ignore
+```rust
 use reval::{value::Value, value::ser::ValueSerializer, parse_json::parse};
 use serde::Serialize;
 
-let expr = parse(r#"{"Gt": [{"Ref": "age"}, {"Int": 21}]}"#).unwrap();
+let rule = parse(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#).unwrap();
 
 #[derive(Serialize)]
 struct Data { age: u16 }
 
-let facts = Data {age: 21}.serialize(ValueSerializer).unwrap();
+let facts = Data {age: 16}.serialize(ValueSerializer).unwrap();
 
-assert_eq!(expr.evaluate(&facts).unwrap(), true.into());
+assert_eq!(rule.evaluate(&facts).unwrap(), false.into());
 
 ```
 

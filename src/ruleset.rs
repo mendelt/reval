@@ -4,20 +4,29 @@ use crate::{
 };
 
 /// A rule is an expression with a name
+#[derive(Debug, Clone, PartialEq)]
 pub struct Rule {
-    _name: String,
+    name: String,
     expr: Expr,
 }
 
-/// A set of expressions
-pub struct RuleSet {
-    rules: Vec<Rule>,
+impl Rule {
+    pub fn new(name: impl Into<String>, expr: Expr) -> Self {
+        Self {
+            name: name.into(),
+            expr,
+        }
+    }
+
+    pub fn evaluate(&self, facts: &Value) -> Result<Value, Error> {
+        self.expr.evaluate(facts)
+    }
 }
 
-impl Default for RuleSet {
-    fn default() -> Self {
-        Self { rules: Vec::new() }
-    }
+/// A set of expressions
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct RuleSet {
+    rules: Vec<Rule>,
 }
 
 impl RuleSet {
