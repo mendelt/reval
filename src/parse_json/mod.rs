@@ -30,9 +30,9 @@ enum ParseExpr {
     Ref(String),
     Idx(Box<ParseExpr>, Box<ParseExpr>),
     Not(Box<ParseExpr>),
-    Mult(Box<ParseExpr>, Box<ParseExpr>),
+    Mult(Vec<ParseExpr>),
     Div(Box<ParseExpr>, Box<ParseExpr>),
-    Add(Box<ParseExpr>, Box<ParseExpr>),
+    Add(Vec<ParseExpr>),
     Sub(Box<ParseExpr>, Box<ParseExpr>),
     Eq(Box<ParseExpr>, Box<ParseExpr>),
     Neq(Box<ParseExpr>, Box<ParseExpr>),
@@ -40,13 +40,15 @@ enum ParseExpr {
     Gte(Box<ParseExpr>, Box<ParseExpr>),
     Lt(Box<ParseExpr>, Box<ParseExpr>),
     Lte(Box<ParseExpr>, Box<ParseExpr>),
-    And(Box<ParseExpr>, Box<ParseExpr>),
-    Or(Box<ParseExpr>, Box<ParseExpr>),
+    And(Vec<ParseExpr>),
+    Or(Vec<ParseExpr>),
 }
 
-impl From<ParseExpr> for Expr {
-    fn from(value: ParseExpr) -> Expr {
-        match value {
+impl TryFrom<ParseExpr> for Expr {
+    type Error = Error;
+
+    fn try_from(value: ParseExpr) -> Result<Self, Self::Error> {
+        Ok(match value {
             ParseExpr::String(value) => Expr::Value(value.into()),
             ParseExpr::Int(value) => Expr::Value(value.into()),
             ParseExpr::Float(value) => Expr::Value(value.into()),
@@ -54,22 +56,45 @@ impl From<ParseExpr> for Expr {
             // ParseExpr::Map(value) => Expr::Value(Value::Map(value.into_iter().map(|(key, value)| (key, value.into())).collect())),
             // ParseExpr::Vec(_) => todo!(),
             ParseExpr::Ref(name) => Expr::Reference(name),
-            ParseExpr::Idx(left, right) => Expr::index((*left).into(), (*right).into()),
-            ParseExpr::Not(value) => Expr::not((*value).into()),
-            ParseExpr::Mult(left, right) => Expr::mult((*left).into(), (*right).into()),
-            ParseExpr::Div(left, right) => Expr::div((*left).into(), (*right).into()),
-            ParseExpr::Add(left, right) => Expr::add((*left).into(), (*right).into()),
-            ParseExpr::Sub(left, right) => Expr::sub((*left).into(), (*right).into()),
-            ParseExpr::Eq(left, right) => Expr::eq((*left).into(), (*right).into()),
-            ParseExpr::Neq(left, right) => Expr::neq((*left).into(), (*right).into()),
-            ParseExpr::Gt(left, right) => Expr::gt((*left).into(), (*right).into()),
-            ParseExpr::Gte(left, right) => Expr::gte((*left).into(), (*right).into()),
-            ParseExpr::Lt(left, right) => Expr::lt((*left).into(), (*right).into()),
-            ParseExpr::Lte(left, right) => Expr::lte((*left).into(), (*right).into()),
-            ParseExpr::And(left, right) => Expr::and((*left).into(), (*right).into()),
-            ParseExpr::Or(left, right) => Expr::or((*left).into(), (*right).into()),
-        }
+            ParseExpr::Idx(left, right) => Expr::index((*left).try_into()?, (*right).try_into()?),
+            ParseExpr::Not(value) => Expr::not((*value).try_into()?),
+            ParseExpr::Mult(exprs) => operands(exprs, Expr::mult)?,
+            ParseExpr::Div(left, right) => Expr::div((*left).try_into()?, (*right).try_into()?),
+            ParseExpr::Add(exprs) => operands(exprs, Expr::add)?,
+            ParseExpr::Sub(left, right) => Expr::sub((*left).try_into()?, (*right).try_into()?),
+            ParseExpr::Eq(left, right) => Expr::eq((*left).try_into()?, (*right).try_into()?),
+            ParseExpr::Neq(left, right) => Expr::neq((*left).try_into()?, (*right).try_into()?),
+            ParseExpr::Gt(left, right) => Expr::gt((*left).try_into()?, (*right).try_into()?),
+            ParseExpr::Gte(left, right) => Expr::gte((*left).try_into()?, (*right).try_into()?),
+            ParseExpr::Lt(left, right) => Expr::lt((*left).try_into()?, (*right).try_into()?),
+            ParseExpr::Lte(left, right) => Expr::lte((*left).try_into()?, (*right).try_into()?),
+            ParseExpr::And(exprs) => operands(exprs, Expr::and)?,
+            ParseExpr::Or(exprs) => operands(exprs, Expr::or)?,
+        })
     }
+}
+
+/// Recursively destructure a parse expression with a list of sub-expressions into a nested Expr
+fn operands(
+    expressions: Vec<ParseExpr>,
+    operator: impl Fn(Expr, Expr) -> Expr,
+) -> Result<Expr, Error> {
+    if expressions.len() < 2 {
+        Err(Error::"Invalid expression: too few operands");
+    } else if expressions.len() == 2 {
+        Ok(operator(expressions[0].try_into()?, expressions[1].try_into()?)
+    } else {
+        Ok(operator(
+            expressions[0].try_into()?,
+            destr_parse_expr(expressions, operator), // TODO: use tail of expressions
+        ))
+    }
+
+    // match expressions {
+    //     [left, right] => operator((*left).into(), (*right).into()),
+    //     [head, tail @ ..] => operator((*head).into(), destr_parse_expr(tail, operator)),
+    //     _ => panic!("Stuff"),
+    // }
 }
 
 #[cfg(test)]
