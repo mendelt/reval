@@ -127,9 +127,9 @@ impl Serializer for ValueSerializer {
         self,
         _name: &'static str,
         _variant_index: u32,
-        _variant: &'static str,
+        variant: &'static str,
     ) -> Result<Self::Ok, Self::Error> {
-        todo!()
+        self.serialize_str(variant)
     }
 
     fn serialize_newtype_struct<T: ?Sized>(
@@ -147,13 +147,15 @@ impl Serializer for ValueSerializer {
         self,
         _name: &'static str,
         _variant_index: u32,
-        _variant: &'static str,
-        _value: &T,
+        variant: &'static str,
+        value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
         T: serde::Serialize,
     {
-        todo!()
+        let mut values = HashMap::new();
+        values.insert(String::from(variant), value.serialize(self)?);
+        Ok(Value::Map(values))
     }
 
     fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq, Self::Error> {
@@ -178,10 +180,13 @@ impl Serializer for ValueSerializer {
         self,
         _name: &'static str,
         _variant_index: u32,
-        _variant: &'static str,
-        _len: usize,
+        variant: &'static str,
+        len: usize,
     ) -> Result<Self::SerializeTupleVariant, Self::Error> {
-        todo!()
+        Ok(SerializeTupleVariantValue {
+            name: String::from(variant),
+            vec: Vec::with_capacity(len),
+        })
     }
 
     fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
@@ -203,10 +208,13 @@ impl Serializer for ValueSerializer {
         self,
         _name: &'static str,
         _variant_index: u32,
-        _variant: &'static str,
+        variant: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeStructVariant, Self::Error> {
-        todo!()
+        Ok(SerializeStructVariantValue {
+            name: String::from(variant),
+            map: HashMap::new(),
+        })
     }
 }
 
@@ -443,15 +451,85 @@ mod when_serializing_to_value {
     }
 
     #[test]
+    fn should_serialize_enum_unit_variant_as_str() {
+        #[derive(Serialize)]
+        enum TestEnum {
+            Variant,
+        }
+
+        assert_serialized(TestEnum::Variant, "Variant".into());
+    }
+
+    #[test]
+    fn should_serialize_enum_val_variant() {
+        #[derive(Serialize)]
+        enum TestEnum {
+            Variant(u64),
+        }
+
+        assert_serialized(
+            TestEnum::Variant(14),
+            Value::Map(HashMap::from([("Variant".to_owned(), Value::Int(14))])),
+        );
+    }
+
+    #[test]
+    fn should_serialize_enum_tuple_variant() {
+        #[derive(Serialize)]
+        enum TestEnum {
+            Variant(u64, String),
+        }
+
+        assert_serialized(
+            TestEnum::Variant(14, "Test".to_owned()),
+            Value::Map(HashMap::from([(
+                "Variant".to_owned(),
+                Value::Vec(vec![Value::Int(14), Value::String("Test".to_owned())]),
+            )])),
+        );
+    }
+
+    #[test]
+    fn should_serialize_enum_struct_variant() {
+        #[derive(Serialize)]
+        enum TestEnum {
+            Variant { value: u64 },
+        }
+
+        assert_serialized(
+            TestEnum::Variant { value: 16 },
+            Value::Map(HashMap::from([(
+                "Variant".to_owned(),
+                Value::Map(HashMap::from([("value".to_owned(), Value::Int(16))])),
+            )])),
+        );
+    }
+
+    #[test]
+    fn should_serialize_enum_with_tagged_variants() {
+        #[derive(Serialize)]
+        #[serde(tag = "type")]
+        enum TestEnum {
+            Variant { value: u64 },
+        }
+
+        assert_serialized(
+            TestEnum::Variant { value: 16 },
+            Value::Map(HashMap::from([
+                ("type".to_owned(), Value::String("Variant".to_owned())),
+                ("value".to_owned(), Value::Int(16)),
+            ])),
+        );
+    }
+
+    #[test]
     fn should_serialize_map() {
-        assert_eq!(
-            BTreeMap::from([("key", "value")])
-                .serialize(ValueSerializer)
-                .unwrap(),
+        assert_serialized(
+            BTreeMap::from([("key", "value")]),
             Value::Map(HashMap::from([(
                 "key".to_owned(),
-                Value::String("value".to_owned())
-            )]))
+                Value::String("value".to_owned()),
+            )])),
         );
     }
 
@@ -463,17 +541,20 @@ mod when_serializing_to_value {
             name: String,
         }
 
-        assert_eq!(
+        assert_serialized(
             Data {
                 age: 21,
-                name: "Frank".to_owned()
-            }
-            .serialize(ValueSerializer)
-            .unwrap(),
+                name: "Frank".to_owned(),
+            },
             Value::Map(HashMap::from([
                 ("age".to_owned(), Value::Int(21)),
                 ("name".to_owned(), Value::String("Frank".to_owned())),
-            ]))
+            ])),
         )
+    }
+
+    /// Helper method that tests if serializing a value yields the expected result
+    fn assert_serialized(value: impl Serialize, expected: Value) {
+        assert_eq!(value.serialize(ValueSerializer).unwrap(), expected);
     }
 }
