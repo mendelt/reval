@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Writing rules documentation
+- Documentation for rules writers
+- Into implementation from `Value` to `Expr`
 
 
 ## [0.5.0] - 2022-01-04

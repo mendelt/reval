@@ -190,3 +190,9 @@ impl Expr {
         Expr::Or(Box::new(left), Box::new(right))
     }
 }
+
+impl From<Value> for Expr {
+    fn from(value: Value) -> Self {
+        Expr::Value(value)
+    }
+}
