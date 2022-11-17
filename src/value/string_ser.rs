@@ -2,6 +2,9 @@ use serde::{ser::Impossible, Serializer};
 
 use super::ser::Error;
 
+/// Serializer that only serializes String values, this can be useful for
+/// serializing map keys for example. Will raise an error when serializing
+/// anything other than a String
 pub struct StringSerializer;
 
 impl Serializer for StringSerializer {

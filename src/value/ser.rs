@@ -100,8 +100,10 @@ impl Serializer for ValueSerializer {
         Ok(Value::String(value.to_string()))
     }
 
-    fn serialize_bytes(self, _value: &[u8]) -> Result<Self::Ok, Self::Error> {
-        todo!()
+    fn serialize_bytes(self, value: &[u8]) -> Result<Self::Ok, Self::Error> {
+        Ok(Value::Vec(
+            value.iter().map(|&b| Value::Int(b.into())).collect(),
+        ))
     }
 
     fn serialize_none(self) -> Result<Self::Ok, Self::Error> {
@@ -135,12 +137,12 @@ impl Serializer for ValueSerializer {
     fn serialize_newtype_struct<T: ?Sized>(
         self,
         _name: &'static str,
-        _value: &T,
+        value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
         T: serde::Serialize,
     {
-        todo!()
+        value.serialize(self)
     }
 
     fn serialize_newtype_variant<T: ?Sized>(
@@ -171,9 +173,9 @@ impl Serializer for ValueSerializer {
     fn serialize_tuple_struct(
         self,
         _name: &'static str,
-        _len: usize,
+        len: usize,
     ) -> Result<Self::SerializeTupleStruct, Self::Error> {
-        todo!()
+        self.serialize_seq(Some(len))
     }
 
     fn serialize_tuple_variant(
@@ -383,47 +385,51 @@ mod when_serializing_to_value {
 
     #[test]
     fn should_serialize_bool() {
-        assert_eq!(true.serialize(ValueSerializer).unwrap(), true.into());
+        assert_serialized(true, true.into());
     }
 
     #[test]
     fn should_serialize_int() {
-        assert_eq!(8u8.serialize(ValueSerializer).unwrap(), 8.into());
+        assert_serialized(8u8, 8.into());
     }
 
     #[test]
     fn should_serialize_string() {
-        assert_eq!(
-            "String val".serialize(ValueSerializer).unwrap(),
-            "String val".into()
-        )
+        assert_serialized("String val", "String val".into())
     }
 
     #[test]
     fn should_serialize_char_to_string() {
-        assert_eq!(
-            'c'.serialize(ValueSerializer).unwrap(),
-            Value::String("c".to_owned())
-        )
+        assert_serialized('c', Value::String("c".to_owned()))
     }
 
     #[test]
-    fn should_serialize_none_option_as_none() {
+    fn should_serialize_byte_arrays_to_vec() {
+        assert_serialized(&[3u8, 5], Value::Vec(vec![3.into(), 5.into()]))
+    }
+
+    #[test]
+    fn should_serialize_none_option() {
         let value: Option<String> = None;
-        assert_eq!(value.serialize(ValueSerializer).unwrap(), Value::None)
+        assert_serialized(value, Value::None)
     }
 
     #[test]
-    fn should_serialize_some_option_as_inner_type() {
-        assert_eq!(
-            Some("Value".to_owned()).serialize(ValueSerializer).unwrap(),
-            "Value".into()
-        )
+    fn should_serialize_some_option_to_inner_type() {
+        assert_serialized(Some("Value".to_owned()), "Value".into())
+    }
+
+    #[test]
+    fn should_serialize_newtype_struct_to_inner() {
+        #[derive(Serialize)]
+        struct NewType(String);
+
+        assert_serialized(NewType("Test".to_owned()), "Test".into());
     }
 
     #[test]
     fn should_serialize_unit_to_none() {
-        assert_eq!(().serialize(ValueSerializer).unwrap(), Value::None)
+        assert_serialized((), Value::None)
     }
 
     #[test]
@@ -431,22 +437,30 @@ mod when_serializing_to_value {
         #[derive(Serialize)]
         struct Nothing;
 
-        assert_eq!(Nothing {}.serialize(ValueSerializer).unwrap(), Value::None)
+        assert_serialized(Nothing {}, Value::None)
     }
 
     #[test]
     fn should_serialize_sequence_to_vec() {
-        assert_eq!(
-            [-16, 8].serialize(ValueSerializer).unwrap(),
-            Value::Vec(vec![Value::Int(-16), Value::Int(8)])
-        );
+        assert_serialized([-16, 8], Value::Vec(vec![Value::Int(-16), Value::Int(8)]));
     }
 
     #[test]
     fn should_serialize_tuple_to_vec() {
-        assert_eq!(
-            (-16, "Test").serialize(ValueSerializer).unwrap(),
-            Value::Vec(vec![Value::Int(-16), Value::String("Test".to_owned())])
+        assert_serialized(
+            (-16, "Test"),
+            Value::Vec(vec![Value::Int(-16), Value::String("Test".to_owned())]),
+        );
+    }
+
+    #[test]
+    fn should_serialize_tuple_struct_to_vec() {
+        #[derive(Serialize)]
+        struct TupleStruct(i16, String);
+
+        assert_serialized(
+            TupleStruct(4, "18".to_owned()),
+            Value::Vec(vec![4.into(), "18".into()]),
         );
     }
 
