@@ -1,7 +1,4 @@
-use crate::{
-    expr::{Error, Expr},
-    value::Value,
-};
+use crate::{expr::Expr, value::Value, Error};
 
 /// A rule is an expression with a name
 #[derive(Debug, Clone, PartialEq)]
