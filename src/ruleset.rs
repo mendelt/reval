@@ -1,4 +1,4 @@
-use crate::{expr::Expr, value::Value, Error};
+use crate::{expr::Expr, function::UserFunctions, Result, Value};
 
 /// A rule is an expression with a name
 #[derive(Debug, Clone, PartialEq)]
@@ -14,23 +14,38 @@ impl Rule {
             expr,
         }
     }
-
-    pub fn evaluate(&self, facts: &Value) -> Result<Value, Error> {
-        self.expr.evaluate(facts)
-    }
 }
 
 /// A set of expressions
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Default)]
 pub struct RuleSet {
     rules: Vec<Rule>,
+    functions: UserFunctions,
 }
 
 impl RuleSet {
-    pub fn evaluate(&self, facts: &Value) -> Result<Vec<Value>, Error> {
-        self.rules
-            .iter()
-            .map(|rule| rule.expr.evaluate(facts))
-            .collect()
+    pub async fn evaluate(&self, facts: &Value) -> Result<Vec<Value>> {
+        let mut context = EvalContext {
+            functions: &self.functions,
+        };
+
+        let mut results = Vec::new();
+
+        for rule in self.rules.iter() {
+            results.push(rule.expr.evaluate(&mut context, facts).await?);
+        }
+
+        Ok(results)
+    }
+}
+
+/// Evaluation context
+pub struct EvalContext<'a> {
+    functions: &'a UserFunctions,
+}
+
+impl<'a> EvalContext<'a> {
+    pub async fn call(&mut self, function: &str, params: Value) -> Result<Value> {
+        self.functions.call(function, params).await
     }
 }

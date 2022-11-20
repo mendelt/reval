@@ -15,6 +15,12 @@ pub enum Error {
 
     /// Unknown value {0}
     UnknownValue(String),
+
+    /// Error executing user function {0}; {1}
+    UserFunctionError(String, anyhow::Error),
+
+    /// No user function with name {0}
+    UnknownUserFunction(String),
 }
 
 impl Error {

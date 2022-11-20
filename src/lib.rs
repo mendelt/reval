@@ -24,6 +24,7 @@
 
 pub mod error;
 pub mod expr;
+pub mod function;
 #[cfg(feature = "nom_parser")]
 pub mod parse;
 #[cfg(feature = "json_parser")]
@@ -33,3 +34,4 @@ pub mod value;
 
 pub use error::{Error, Result};
 pub use ruleset::RuleSet;
+pub use value::Value;

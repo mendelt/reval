@@ -1,12 +1,17 @@
-use crate::{value::Value, Error, Result};
+use async_recursion::async_recursion;
+
+use crate::{ruleset::EvalContext, value::Value, Error, Result};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
     /// A literal value
     Value(Value),
 
-    /// A reference to a value
+    /// Reference expressions are used to access parameters passed in to the expression
     Reference(String),
+
+    /// Function expressions evaluate user functions by name
+    Function(String, Box<Expr>),
 
     /// Indexes a dictionary or an array value
     Index(Box<Expr>, Box<Expr>),
@@ -52,26 +57,66 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn evaluate(&self, facts: &Value) -> Result<Value> {
+    #[async_recursion]
+    pub async fn evaluate<'a>(
+        &self,
+        context: &mut EvalContext<'a>,
+        facts: &Value,
+    ) -> Result<Value> {
         match self {
             Expr::Value(value) => Ok(value.clone()),
-            Expr::Reference(name) => reference(facts, name), // Ok(facts.get(&name).clone()),
-            Expr::Index(value, idx) => index(value.evaluate(facts)?, idx.evaluate(facts)?),
-            Expr::Not(value) => not(value.evaluate(facts)?),
-            Expr::Mult(left, right) => mult(left.evaluate(facts)?, right.evaluate(facts)?),
-            Expr::Div(left, right) => div(left.evaluate(facts)?, right.evaluate(facts)?),
-            Expr::Add(left, right) => add(left.evaluate(facts)?, right.evaluate(facts)?),
-            Expr::Sub(left, right) => sub(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::Reference(name) => reference(facts, name),
+            Expr::Index(value, idx) => index(
+                value.evaluate(context, facts).await?,
+                idx.evaluate(context, facts).await?,
+            ),
+            Expr::Function(name, value) => {
+                let param = value.evaluate(context, facts).await?;
+                context.call(name, param).await
+            }
+            Expr::Not(value) => not(value.evaluate(context, facts).await?),
+            Expr::Mult(left, right) => mult(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::Div(left, right) => div(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::Add(left, right) => add(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::Sub(left, right) => sub(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
             Expr::Equals(left, right) => Ok(Value::Bool(left == right)),
             Expr::NotEquals(left, right) => Ok(Value::Bool(left != right)),
-            Expr::GreaterThan(left, right) => gt(left.evaluate(facts)?, right.evaluate(facts)?),
-            Expr::GreaterThanEquals(left, right) => {
-                gte(left.evaluate(facts)?, right.evaluate(facts)?)
-            }
-            Expr::LessThan(left, right) => lt(left.evaluate(facts)?, right.evaluate(facts)?),
-            Expr::LessThanEquals(left, right) => lte(left.evaluate(facts)?, right.evaluate(facts)?),
-            Expr::And(left, right) => and(left.evaluate(facts)?, right.evaluate(facts)?),
-            Expr::Or(left, right) => or(left.evaluate(facts)?, right.evaluate(facts)?),
+            Expr::GreaterThan(left, right) => gt(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::GreaterThanEquals(left, right) => gte(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::LessThan(left, right) => lt(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::LessThanEquals(left, right) => lte(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::And(left, right) => and(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::Or(left, right) => or(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
         }
     }
 
