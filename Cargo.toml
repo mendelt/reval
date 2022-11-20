@@ -10,8 +10,6 @@ repository = "https://github.com/mendelt/reval"
 keywords = ["expression", "evaluator"]
 readme = "README.md"
 
-publish = false
-
 [dependencies]
 async-recursion = "1"
 async-trait = "0.1"
