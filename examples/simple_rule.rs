@@ -7,8 +7,7 @@ async fn main() {
         parse_json(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#)
             .unwrap();
 
-    let mut ruleset = RuleSet::default();
-    ruleset.add_rule(rule);
+    let ruleset = ruleset().with_rule(rule).build();
 
     #[derive(Serialize)]
     struct Data {

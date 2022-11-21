@@ -7,24 +7,7 @@ use crate::{
     value::{ser::ValueSerializer, Value},
 };
 
-/// A rule is an expression with a name
-#[derive(Debug, Clone, PartialEq)]
-pub struct Rule {
-    name: String,
-    expr: Expr,
-}
-
-impl Rule {
-    pub fn new(name: impl Into<String>, expr: Expr) -> Self {
-        Self {
-            name: name.into(),
-            expr,
-        }
-    }
-}
-
 /// A set of expressions
-#[derive(Default)]
 pub struct RuleSet {
     rules: Vec<Rule>,
     functions: UserFunctions,
@@ -63,13 +46,63 @@ impl RuleSet {
     }
 }
 
+pub fn ruleset() -> Builder {
+    Builder {
+        rules: Vec::new(),
+        functions: UserFunctions::default(),
+    }
+}
+
+pub struct Builder {
+    rules: Vec<Rule>,
+    functions: UserFunctions,
+}
+
+impl Builder {
+    pub fn with_rule(mut self, rule: Rule) -> Builder {
+        self.rules.push(rule);
+        self
+    }
+
+    pub fn with_function(
+        &mut self,
+        name: &str,
+        function: impl UserFunction + Send + Sync + 'static,
+    ) {
+        self.functions.add(name, function)
+    }
+
+    pub fn build(self) -> RuleSet {
+        RuleSet {
+            rules: self.rules,
+            functions: self.functions,
+        }
+    }
+}
+
+/// A rule is an expression with a name
+#[derive(Debug, Clone, PartialEq)]
+pub struct Rule {
+    name: String,
+    expr: Expr,
+}
+
+impl Rule {
+    pub fn new(name: impl Into<String>, expr: Expr) -> Self {
+        Self {
+            name: name.into(),
+            expr,
+        }
+    }
+}
+
 /// Evaluation context
 pub struct EvalContext<'a> {
     functions: &'a UserFunctions,
 }
 
 impl<'a> EvalContext<'a> {
-    pub async fn call(&mut self, function: &str, params: Value) -> Result<Value> {
+    pub(crate) async fn call(&mut self, function: &str, params: Value) -> Result<Value> {
         self.functions.call(function, params).await
     }
 }

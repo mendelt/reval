@@ -14,8 +14,7 @@
 //! # tokio_test::block_on(async {
 //! let rule =
 //!     parse_json(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#).unwrap();
-//! let mut ruleset = RuleSet::default();
-//! ruleset.add_rule(rule);
+//! let ruleset = ruleset().with_rule(rule).build();
 //!
 //! #[derive(Serialize)]
 //! struct Data {
@@ -40,7 +39,7 @@ pub mod value;
 
 pub mod prelude {
     pub use crate::error::{Error, Result};
-    pub use crate::ruleset::RuleSet;
+    pub use crate::ruleset::ruleset;
     pub use crate::value::Value;
 
     #[cfg(feature = "nom_parser")]

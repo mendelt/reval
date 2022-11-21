@@ -15,7 +15,7 @@ pub trait UserFunction {
 
 /// Stores user-functions by name
 #[derive(Default)]
-pub struct UserFunctions {
+pub(crate) struct UserFunctions {
     functions: HashMap<String, Box<dyn UserFunction + Send + Sync>>,
 }
 
