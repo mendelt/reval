@@ -22,6 +22,10 @@ serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
 thiserror = "1"
 
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+tokio-test = "0.4"
+
 [features]
 default = ["json_parser", "value_serializer"]
 nom_parser = ["dep:nom"]
