@@ -1,6 +1,6 @@
 use crate::{
+    error::{Error, Result},
     value::{string_ser::StringSerializer, Value},
-    Error, Result,
 };
 use serde::{
     ser::{

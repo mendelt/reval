@@ -1,7 +1,8 @@
 use crate::{
+    error::Result,
     expr::Expr,
     function::{UserFunction, UserFunctions},
-    Result, Value,
+    value::Value,
 };
 
 /// A rule is an expression with a name

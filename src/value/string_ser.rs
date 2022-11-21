@@ -1,4 +1,4 @@
-use crate::{Error, Result};
+use crate::error::{Error, Result};
 use serde::{ser::Impossible, Serializer};
 
 /// Serializer that only serializes String values, this can be useful for

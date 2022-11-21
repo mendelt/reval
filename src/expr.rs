@@ -1,6 +1,9 @@
+use crate::{
+    error::{Error, Result},
+    ruleset::EvalContext,
+    value::Value,
+};
 use async_recursion::async_recursion;
-
-use crate::{ruleset::EvalContext, value::Value, Error, Result};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {

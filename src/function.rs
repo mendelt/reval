@@ -1,9 +1,11 @@
 //! User function related types
 
-use std::{collections::HashMap, result};
-
-use crate::{Error, Result, Value};
+use crate::{
+    error::{Error, Result},
+    value::Value,
+};
 use async_trait::async_trait;
+use std::{collections::HashMap, result};
 
 #[async_trait]
 pub trait UserFunction {

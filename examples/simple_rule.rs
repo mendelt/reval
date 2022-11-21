@@ -1,10 +1,11 @@
-use reval::{parse_json::parse, value::ser::ValueSerializer, RuleSet};
+use reval::{prelude::*, value::ser::ValueSerializer};
 use serde::Serialize;
 
 #[tokio::main]
 async fn main() {
     let rule =
-        parse(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#).unwrap();
+        parse_json(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#)
+            .unwrap();
 
     let mut ruleset = RuleSet::default();
     ruleset.add_rule(rule);

@@ -8,12 +8,12 @@
 //! To make it easy to construct input data from your own datatypes the Reval crate implements a serde serializer for Value types. So any type that implements `serde::Serialize` can be serialized into a `reval::Value` without writing any code.
 //!
 //! ```rust
-//! use reval::{parse_json::parse, value::ser::ValueSerializer, RuleSet};
+//! use reval::{prelude::*, value::ser::ValueSerializer};
 //! use serde::Serialize;
 //!
 //! # tokio_test::block_on(async {
 //! let rule =
-//!     parse(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#).unwrap();
+//!     parse_json(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#).unwrap();
 //! let mut ruleset = RuleSet::default();
 //! ruleset.add_rule(rule);
 //!
@@ -38,6 +38,14 @@ pub mod parse_json;
 pub mod ruleset;
 pub mod value;
 
-pub use error::{Error, Result};
-pub use ruleset::RuleSet;
-pub use value::Value;
+pub mod prelude {
+    pub use crate::error::{Error, Result};
+    pub use crate::ruleset::RuleSet;
+    pub use crate::value::Value;
+
+    #[cfg(feature = "nom_parser")]
+    pub use crate::parse::parse;
+
+    #[cfg(feature = "json_parser")]
+    pub use crate::parse_json::parse_json;
+}
