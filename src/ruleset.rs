@@ -1,8 +1,10 @@
+use serde::Serialize;
+
 use crate::{
     error::Result,
     expr::Expr,
     function::{UserFunction, UserFunctions},
-    value::Value,
+    value::{ser::ValueSerializer, Value},
 };
 
 /// A rule is an expression with a name
@@ -41,7 +43,12 @@ impl RuleSet {
         self.functions.add(name, function)
     }
 
-    pub async fn evaluate(&self, facts: &Value) -> Result<Vec<Value>> {
+    pub async fn evaluate(&self, facts: &impl Serialize) -> Result<Vec<Value>> {
+        self.evaluate_value(&facts.serialize(ValueSerializer)?)
+            .await
+    }
+
+    pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Value>> {
         let mut context = EvalContext {
             functions: &self.functions,
         };

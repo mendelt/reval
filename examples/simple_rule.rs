@@ -1,4 +1,4 @@
-use reval::{prelude::*, value::ser::ValueSerializer};
+use reval::prelude::*;
 use serde::Serialize;
 
 #[tokio::main]
@@ -14,7 +14,7 @@ async fn main() {
     struct Data {
         age: u16,
     }
-    let facts = Data { age: 16 }.serialize(ValueSerializer).unwrap();
+    let facts = Data { age: 16 };
 
     assert_eq!(ruleset.evaluate(&facts).await.unwrap(), vec![false.into()]);
 }

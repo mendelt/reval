@@ -8,7 +8,7 @@
 //! To make it easy to construct input data from your own datatypes the Reval crate implements a serde serializer for Value types. So any type that implements `serde::Serialize` can be serialized into a `reval::Value` without writing any code.
 //!
 //! ```rust
-//! use reval::{prelude::*, value::ser::ValueSerializer};
+//! use reval::prelude::*;
 //! use serde::Serialize;
 //!
 //! # tokio_test::block_on(async {
@@ -21,7 +21,7 @@
 //! struct Data {
 //!     age: u16,
 //! }
-//! let facts = Data { age: 16 }.serialize(ValueSerializer).unwrap();
+//! let facts = Data { age: 16 };
 //!
 //! assert_eq!(ruleset.evaluate(&facts).await.unwrap(), vec![false.into()]);
 //! # })
