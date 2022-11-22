@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2]
+
 ### Changed
 
 - Added Ruleset and UserFunction to prelude
@@ -39,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement a `RuleSet` as an entry point for executing a set of rules on a piece of data 
 - async `UserFunction` support
 
-[unreleased]: https://github.com/mendelt/reval/compare/v0.1.1...HEAD
+[unreleased]: https://github.com/mendelt/reval/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/mendelt/reval/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/mendelt/reval/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/mendelt/reval/releases/tag/v0.1.0
