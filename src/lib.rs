@@ -13,7 +13,7 @@
 //!
 //! # tokio_test::block_on(async {
 //! let rule =
-//!     parse_json(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#).unwrap();
+//!     Rule::parse_json(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#).unwrap();
 //! let ruleset = ruleset().with_rule(rule).build();
 //!
 //! #[derive(Serialize)]
@@ -41,12 +41,9 @@ pub use error::{Error, Result};
 
 pub mod prelude {
     pub use crate::function::UserFunction;
-    pub use crate::ruleset::{ruleset, RuleSet};
+    pub use crate::ruleset::{ruleset, Rule, RuleSet};
     pub use crate::value::Value;
 
     #[cfg(feature = "nom_parser")]
     pub use crate::parse::parse;
-
-    #[cfg(feature = "json_parser")]
-    pub use crate::parse_json::parse_json;
 }

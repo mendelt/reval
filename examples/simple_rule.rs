@@ -4,7 +4,7 @@ use serde::Serialize;
 #[tokio::main]
 async fn main() {
     let rule =
-        parse_json(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#)
+        Rule::parse_json(r#"{"name": "age check", "expr": {"gt": [{"ref": "age"}, {"int": 21}]}}"#)
             .unwrap();
 
     let ruleset = ruleset().with_rule(rule).build();

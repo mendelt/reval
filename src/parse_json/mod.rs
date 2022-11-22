@@ -2,8 +2,10 @@ use crate::{expr::Expr, ruleset::Rule};
 use serde::{Deserialize, Serialize};
 use serde_json::Error;
 
-pub fn parse_json(input: &str) -> Result<Rule, Error> {
-    serde_json::from_str::<ParseRule>(input).map(Into::<Rule>::into)
+impl Rule {
+    pub fn parse_json(input: &str) -> Result<Rule, Error> {
+        serde_json::from_str::<ParseRule>(input).map(Into::<Rule>::into)
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -80,7 +82,7 @@ mod when_parsing_json_expr {
     #[test]
     fn should_parse_string_value() {
         assert_eq!(
-            parse_json(r#"{"name": "testrule", "expr": {"string": "test"}}"#).unwrap(),
+            Rule::parse_json(r#"{"name": "testrule", "expr": {"string": "test"}}"#).unwrap(),
             Rule::new("testrule", Expr::value("test"))
         );
     }
@@ -88,7 +90,7 @@ mod when_parsing_json_expr {
     #[test]
     fn should_parse_add_expr() {
         assert_eq!(
-            parse_json(r#"{"name": "testrule", "expr": {"add": [{"int": 4}, {"int": 3}]}}"#)
+            Rule::parse_json(r#"{"name": "testrule", "expr": {"add": [{"int": 4}, {"int": 3}]}}"#)
                 .unwrap(),
             Rule::new("testrule", Expr::add(Expr::value(4), Expr::value(3)))
         );
