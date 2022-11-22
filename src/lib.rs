@@ -37,9 +37,11 @@ pub mod parse_json;
 pub mod ruleset;
 pub mod value;
 
+pub use error::{Error, Result};
+
 pub mod prelude {
-    pub use crate::error::{Error, Result};
-    pub use crate::ruleset::ruleset;
+    pub use crate::function::UserFunction;
+    pub use crate::ruleset::{ruleset, RuleSet};
     pub use crate::value::Value;
 
     #[cfg(feature = "nom_parser")]

@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-..
+### Changed
+
+- Added Ruleset and UserFunction to prelude
+- Removed Error types from prelude
 
 ## [0.1.1] - 2022-11-22
 
