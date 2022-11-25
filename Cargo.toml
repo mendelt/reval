@@ -7,6 +7,7 @@ authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
 license = "MIT/Apache-2.0"
 description = "Simple Rust expression evaluator"
 repository = "https://github.com/mendelt/reval"
+documentation = "https://docs.rs/reval/latest/reval/"
 keywords = ["expression", "evaluator"]
 readme = "README.md"
 

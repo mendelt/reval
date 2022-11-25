@@ -1,3 +1,5 @@
+//! Parse rules written using the Reval DSL
+
 mod expr;
 mod value;
 

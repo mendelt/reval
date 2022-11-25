@@ -1,3 +1,5 @@
+//! The `Value` type encodes data that can be passed in or out from expressions
+
 #[cfg(feature = "value_serializer")]
 pub mod ser;
 

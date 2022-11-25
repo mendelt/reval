@@ -1,10 +1,12 @@
-use std::result;
+//! Reval error types
 
 use displaydoc::Display as DisplayDoc;
+use std::result;
 
-/// Result type for anything reval
+/// Result type for anything Reval
 pub type Result<T> = result::Result<T, Error>;
 
+/// Anything that can go wrong in Reval should be represented here
 #[derive(Debug, DisplayDoc, thiserror::Error)]
 pub enum Error {
     /// An error occured serializing to a value; {0}

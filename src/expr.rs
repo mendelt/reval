@@ -5,21 +5,22 @@ use crate::{
 };
 use async_recursion::async_recursion;
 
+/// The Reval expression abstract syntax tree
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
     /// A literal value
     Value(Value),
 
-    /// Reference expressions are used to access parameters passed in to the expression
+    /// Access a parameter passed in to the expression
     Reference(String),
 
-    /// Function expressions evaluate user functions by name
+    /// Evaluate a user functions by name
     Function(String, Box<Expr>),
 
-    /// Indexes a dictionary or an array value
+    /// Index a dictionary or an array value
     Index(Box<Expr>, Box<Expr>),
 
-    /// Negates a subexpression !true evaluates to false
+    /// Negate a subexpression !true evaluates to false
     Not(Box<Expr>),
 
     /// Multiply two subexpressions

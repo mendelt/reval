@@ -1,4 +1,4 @@
-//! User function related types
+//! User functions
 
 use crate::{
     error::{Error, Result},
@@ -7,6 +7,7 @@ use crate::{
 use async_trait::async_trait;
 use std::{collections::HashMap, result};
 
+/// User functions should implement this type
 #[async_trait]
 pub trait UserFunction {
     /// Call the userfunction, parameters are passed in as a Value

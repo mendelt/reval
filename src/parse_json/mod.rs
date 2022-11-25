@@ -1,8 +1,11 @@
+//! Parse rules writting in the Reval json format
+
 use crate::{expr::Expr, ruleset::Rule};
 use serde::{Deserialize, Serialize};
 use serde_json::Error;
 
 impl Rule {
+    /// Parse a rule written in the Reval json format
     pub fn parse_json(input: &str) -> Result<Rule, Error> {
         serde_json::from_str::<ParseRule>(input).map(Into::<Rule>::into)
     }

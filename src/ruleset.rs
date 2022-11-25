@@ -1,4 +1,4 @@
-use serde::Serialize;
+//! Manage and evaluate a set of rules or expressions using RuleSets
 
 use crate::{
     error::Result,
@@ -6,8 +6,9 @@ use crate::{
     function::{UserFunction, UserFunctions},
     value::{ser::ValueSerializer, Value},
 };
+use serde::Serialize;
 
-/// A set of expressions
+/// The RuleSet type can
 pub struct RuleSet {
     rules: Vec<Rule>,
     functions: UserFunctions,
