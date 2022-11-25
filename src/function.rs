@@ -16,7 +16,7 @@ pub trait UserFunction {
 
 /// Stores user-functions by name
 #[derive(Default)]
-pub(crate) struct UserFunctions {
+pub struct UserFunctions {
     functions: HashMap<String, Box<dyn UserFunction + Send + Sync>>,
 }
 
@@ -34,5 +34,22 @@ impl UserFunctions {
 
     pub fn add<F: UserFunction + Send + Sync + 'static>(&mut self, name: &str, function: F) {
         self.functions.insert(name.to_owned(), Box::new(function));
+    }
+}
+
+impl<'a> From<&'a UserFunctions> for FunctionContext<'a> {
+    fn from(functions: &'a UserFunctions) -> Self {
+        Self { functions }
+    }
+}
+
+/// Function state during rule invocations
+pub(crate) struct FunctionContext<'a> {
+    functions: &'a UserFunctions,
+}
+
+impl<'a> FunctionContext<'a> {
+    pub(crate) async fn call(&mut self, function: &str, params: Value) -> Result<Value> {
+        self.functions.call(function, params).await
     }
 }

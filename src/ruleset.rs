@@ -33,9 +33,7 @@ impl RuleSet {
     }
 
     pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Value>> {
-        let mut context = EvalContext {
-            functions: &self.functions,
-        };
+        let mut context = (&self.functions).into();
 
         let mut results = Vec::new();
 
@@ -66,11 +64,12 @@ impl Builder {
     }
 
     pub fn with_function(
-        &mut self,
+        mut self,
         name: &str,
         function: impl UserFunction + Send + Sync + 'static,
-    ) {
-        self.functions.add(name, function)
+    ) -> Builder {
+        self.functions.add(name, function);
+        self
     }
 
     pub fn build(self) -> RuleSet {
@@ -94,16 +93,5 @@ impl Rule {
             name: name.into(),
             expr,
         }
-    }
-}
-
-/// Evaluation context
-pub struct EvalContext<'a> {
-    functions: &'a UserFunctions,
-}
-
-impl<'a> EvalContext<'a> {
-    pub(crate) async fn call(&mut self, function: &str, params: Value) -> Result<Value> {
-        self.functions.call(function, params).await
     }
 }

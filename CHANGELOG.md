@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- User Function example and doctest
+- Parse function call for json rules
+- Some better documentation
+
+
 ## [0.1.2]
 
 ### Changed
@@ -14,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Ruleset and UserFunction to prelude
 - Removed Error types from prelude
 - Moved `parse_json` into the `Rule` type
+
 
 ## [0.1.1] - 2022-11-22
 

@@ -1,6 +1,6 @@
 use crate::{
     error::{Error, Result},
-    ruleset::EvalContext,
+    function::FunctionContext,
     value::Value,
 };
 use async_recursion::async_recursion;
@@ -62,9 +62,9 @@ pub enum Expr {
 
 impl Expr {
     #[async_recursion]
-    pub async fn evaluate<'a>(
+    pub(crate) async fn evaluate<'a>(
         &self,
-        context: &mut EvalContext<'a>,
+        context: &mut FunctionContext<'a>,
         facts: &Value,
     ) -> Result<Value> {
         match self {
@@ -126,6 +126,10 @@ impl Expr {
 
     pub fn value(value: impl Into<Value>) -> Self {
         Expr::Value(value.into())
+    }
+
+    pub fn func(name: String, param: Expr) -> Self {
+        Expr::Function(name, Box::new(param))
     }
 
     pub fn index(left: Expr, right: Expr) -> Self {
