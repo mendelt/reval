@@ -9,12 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- TryFrom<> implementations to convert Value into primitive types
 - User Function example and doctest
 - Parse function call for json rules
 - Some better documentation
 
-
-## [0.1.2]
+## [0.1.2] - 2022-11-22
 
 ### Changed
 

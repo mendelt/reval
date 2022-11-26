@@ -6,6 +6,7 @@ pub mod ser;
 #[cfg(feature = "value_serializer")]
 mod string_ser;
 
+use crate::Error;
 use std::collections::hash_map::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -31,6 +32,20 @@ impl From<String> for Value {
     }
 }
 
+impl TryFrom<Value> for String {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::String(value) => Ok(value),
+            _ => Err(Error::UnexpectedValueType(
+                value,
+                "Value::String".to_owned(),
+            )),
+        }
+    }
+}
+
 impl From<&str> for Value {
     fn from(value: &str) -> Self {
         Value::String(value.to_string())
@@ -43,15 +58,48 @@ impl From<i128> for Value {
     }
 }
 
+impl TryFrom<Value> for i128 {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Int(value) => Ok(value),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Int".to_owned())),
+        }
+    }
+}
+
 impl From<f64> for Value {
     fn from(value: f64) -> Self {
         Value::Float(value)
     }
 }
 
+impl TryFrom<Value> for f64 {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Float(value) => Ok(value),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Float".to_owned())),
+        }
+    }
+}
+
 impl From<bool> for Value {
     fn from(value: bool) -> Self {
         Value::Bool(value)
+    }
+}
+
+impl TryFrom<Value> for bool {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Bool(value) => Ok(value),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Bool".to_owned())),
+        }
     }
 }
 
