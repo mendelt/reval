@@ -5,14 +5,39 @@ use crate::{
     value::Value,
 };
 use async_trait::async_trait;
+use displaydoc::Display as DisplayDoc;
 use std::{collections::HashMap, result};
 
-/// User functions should implement this type
+/// User functions should implement this trait
 #[async_trait]
 pub trait UserFunction {
     /// Call the userfunction, parameters are passed in as a Value
-    async fn call(&self, params: Value) -> result::Result<Value, anyhow::Error>;
+    async fn call(&self, params: Value) -> FunctionResult;
 }
+
+/// Error type returned from UserFunction
+#[derive(Debug, DisplayDoc, thiserror::Error)]
+pub enum FunctionError {
+    /// Invalid parameter {0:?}: Expected {1},
+    InvalidParameter(Value, String),
+
+    /// Unspecified er
+    Unspecified(#[from] anyhow::Error),
+}
+
+impl From<Error> for FunctionError {
+    fn from(error: Error) -> Self {
+        match error {
+            Error::UnexpectedValueType(value, expected) => {
+                FunctionError::InvalidParameter(value, expected)
+            }
+            err => FunctionError::Unspecified(err.into()),
+        }
+    }
+}
+
+/// Result type returned from UserFunction
+pub type FunctionResult = result::Result<Value, FunctionError>;
 
 /// Stores user-functions by name
 #[derive(Default)]

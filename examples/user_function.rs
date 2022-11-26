@@ -18,14 +18,9 @@ async fn main() {
     struct FakeId;
     #[async_trait::async_trait]
     impl UserFunction for FakeId {
-        async fn call(&self, param: Value) -> anyhow::Result<Value> {
-            match param {
-                Value::Int(age) => Ok((age + 5).into()),
-                _ => Err(anyhow::anyhow!(
-                    "Invalid value {:?}, expected Value::Int",
-                    param
-                )),
-            }
+        async fn call(&self, param: Value) -> FunctionResult {
+            let age: i128 = param.try_into()?;
+            Ok((age * 2).into())
         }
     }
 

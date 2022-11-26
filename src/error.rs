@@ -1,5 +1,6 @@
 //! Reval error types
 
+use crate::{function, value::Value};
 use displaydoc::Display as DisplayDoc;
 use std::result;
 
@@ -15,11 +16,14 @@ pub enum Error {
     /// Tried to perform an operation on a value with an invalid type
     InvalidType,
 
+    /// Unexpected value {0:?}, expected {1}
+    UnexpectedValueType(Value, String),
+
     /// Unknown value {0}
     UnknownValue(String),
 
     /// Error executing user function {0}; {1}
-    UserFunctionError(String, anyhow::Error),
+    UserFunctionError(String, function::FunctionError),
 
     /// No user function with name {0}
     UnknownUserFunction(String),

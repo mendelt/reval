@@ -58,14 +58,9 @@
 //! struct FakeId;
 //! #[async_trait::async_trait]
 //! impl UserFunction for FakeId {
-//!     async fn call(&self, param: Value) -> anyhow::Result<Value> {
-//!         match param {
-//!             Value::Int(age) => Ok((age + 5).into()),
-//!             _ => Err(anyhow::anyhow!(
-//!                 "Invalid value {:?}, expected Value::Int",
-//!                 param
-//!             )),
-//!         }
+//!     async fn call(&self, param: Value) -> FunctionResult {
+//!        let age: i128 = param.try_into()?;
+//!        Ok((age * 2).into())
 //!     }
 //! }
 //! // Set up an "age check" rule that checks if the "age" input field is
@@ -108,7 +103,7 @@ pub mod value;
 pub use error::{Error, Result};
 
 pub mod prelude {
-    pub use crate::function::UserFunction;
+    pub use crate::function::{FunctionResult, UserFunction};
     pub use crate::ruleset::{ruleset, Rule, RuleSet};
     pub use crate::value::Value;
 
