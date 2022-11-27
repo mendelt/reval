@@ -6,6 +6,8 @@ pub mod ser;
 #[cfg(feature = "value_serializer")]
 mod string_ser;
 
+use rust_decimal::Decimal;
+
 use crate::Error;
 use std::collections::hash_map::HashMap;
 
@@ -14,6 +16,7 @@ pub enum Value {
     String(String),
     Int(i128),
     Float(f64),
+    Decimal(Decimal),
     Bool(bool),
     Map(HashMap<String, Value>),
     Vec(Vec<Value>),
@@ -82,6 +85,26 @@ impl TryFrom<Value> for f64 {
         match value {
             Value::Float(value) => Ok(value),
             _ => Err(Error::UnexpectedValueType(value, "Value::Float".to_owned())),
+        }
+    }
+}
+
+impl From<Decimal> for Value {
+    fn from(value: Decimal) -> Self {
+        Value::Decimal(value)
+    }
+}
+
+impl TryFrom<Value> for Decimal {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Decimal(value) => Ok(value),
+            _ => Err(Error::UnexpectedValueType(
+                value,
+                "Value::Decimal".to_owned(),
+            )),
         }
     }
 }

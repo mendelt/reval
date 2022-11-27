@@ -1,6 +1,7 @@
 //! Parse rules writting in the Reval json format
 
 use crate::{expr::Expr, ruleset::Rule};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::Error;
 
@@ -29,9 +30,8 @@ enum ParseExpr {
     String(String),
     Int(i128),
     Float(f64),
+    Decimal(Decimal),
     Bool(bool),
-    // Map(HashMap<String, ParseExpr>),
-    // Vec(Vec<ParseExpr>),
     Ref(String),
     Func(String, Box<ParseExpr>),
     Idx(Box<ParseExpr>, Box<ParseExpr>),
@@ -56,9 +56,8 @@ impl From<ParseExpr> for Expr {
             ParseExpr::String(value) => Expr::Value(value.into()),
             ParseExpr::Int(value) => Expr::Value(value.into()),
             ParseExpr::Float(value) => Expr::Value(value.into()),
+            ParseExpr::Decimal(value) => Expr::Value(value.into()),
             ParseExpr::Bool(value) => Expr::Value(value.into()),
-            // ParseExpr::Map(value) => Expr::Value(Value::Map(value.into_iter().map(|(key, value)| (key, value.into())).collect())),
-            // ParseExpr::Vec(_) => todo!(),
             ParseExpr::Ref(name) => Expr::Reference(name),
             ParseExpr::Func(name, param) => Expr::func(name, (*param).into()),
             ParseExpr::Idx(left, right) => Expr::index((*left).into(), (*right).into()),
