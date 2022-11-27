@@ -17,8 +17,20 @@ pub enum Expr {
     /// Index a dictionary or an array value
     Index(Box<Expr>, Box<Expr>),
 
-    /// Negate a subexpression !true evaluates to false
+    /// Invert a boolean subexpression !true evaluates to false
     Not(Box<Expr>),
+
+    /// Invert the sign of a numerical value
+    Neg(Box<Expr>),
+
+    /// Cast numerical values to int
+    Int(Box<Expr>),
+
+    /// Cast numerical values to float
+    Float(Box<Expr>),
+
+    /// Cast numerical values to decimal
+    Dec(Box<Expr>),
 
     /// Multiply two subexpressions
     Mult(Box<Expr>, Box<Expr>),
@@ -58,70 +70,107 @@ pub enum Expr {
 }
 
 impl Expr {
+    /// Value expression constructor
     pub fn value(value: impl Into<Value>) -> Self {
         Expr::Value(value.into())
     }
 
+    /// Function expression constructor
     pub fn func(name: String, param: Expr) -> Self {
         Expr::Function(name, Box::new(param))
     }
 
+    /// Index expression constructor
     pub fn index(left: Expr, right: Expr) -> Self {
         Expr::Index(Box::new(left), Box::new(right))
     }
 
+    /// Not expression constructor
     #[allow(clippy::should_implement_trait)]
     pub fn not(expr: Expr) -> Self {
         Expr::Not(Box::new(expr))
     }
 
+    /// Neg expression constructor
+    #[allow(clippy::should_implement_trait)]
+    pub fn neg(expr: Expr) -> Self {
+        Expr::Neg(Box::new(expr))
+    }
+
+    /// Int-cast expression constructor
+    pub fn int(expr: Expr) -> Self {
+        Expr::Int(Box::new(expr))
+    }
+
+    /// Float-cast expression constructor
+    pub fn float(expr: Expr) -> Self {
+        Expr::Float(Box::new(expr))
+    }
+
+    /// Decimal-cast expression constructor
+    pub fn dec(expr: Expr) -> Self {
+        Expr::Dec(Box::new(expr))
+    }
+
+    /// Multiply-expression constructor
     pub fn mult(left: Expr, right: Expr) -> Self {
         Expr::Mult(Box::new(left), Box::new(right))
     }
 
+    /// Divide-expression constructor
     #[allow(clippy::should_implement_trait)]
     pub fn div(left: Expr, right: Expr) -> Self {
         Expr::Div(Box::new(left), Box::new(right))
     }
 
+    /// Add-expression constructor
     #[allow(clippy::should_implement_trait)]
     pub fn add(left: Expr, right: Expr) -> Self {
         Expr::Add(Box::new(left), Box::new(right))
     }
 
+    /// Subtract-expression constructor
     #[allow(clippy::should_implement_trait)]
     pub fn sub(left: Expr, right: Expr) -> Self {
         Expr::Sub(Box::new(left), Box::new(right))
     }
 
+    /// Equals-expression constructor
     pub fn eq(left: Expr, right: Expr) -> Self {
         Expr::Equals(Box::new(left), Box::new(right))
     }
 
+    /// Not-equals expression constructor
     pub fn neq(left: Expr, right: Expr) -> Self {
         Expr::NotEquals(Box::new(left), Box::new(right))
     }
 
+    /// Greater-than expression constructor
     pub fn gt(left: Expr, right: Expr) -> Self {
         Expr::GreaterThan(Box::new(left), Box::new(right))
     }
 
+    /// Greater-than-or-equals expression constructor
     pub fn gte(left: Expr, right: Expr) -> Self {
         Expr::GreaterThanEquals(Box::new(left), Box::new(right))
     }
 
+    /// Less-than expression constructor
     pub fn lt(left: Expr, right: Expr) -> Self {
         Expr::LessThan(Box::new(left), Box::new(right))
     }
 
+    /// Less-than-or-equals expression constructor
     pub fn lte(left: Expr, right: Expr) -> Self {
         Expr::LessThanEquals(Box::new(left), Box::new(right))
     }
 
+    /// And expression constructor
     pub fn and(left: Expr, right: Expr) -> Self {
         Expr::And(Box::new(left), Box::new(right))
     }
 
+    /// Or expression constructor
     pub fn or(left: Expr, right: Expr) -> Self {
         Expr::Or(Box::new(left), Box::new(right))
     }

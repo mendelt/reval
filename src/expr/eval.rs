@@ -2,7 +2,7 @@
 //!
 use crate::{error::Result, expr::Expr, function::FunctionContext, value::Value, Error};
 use async_recursion::async_recursion;
-use rust_decimal::Decimal;
+use rust_decimal::prelude::*;
 
 impl Expr {
     #[async_recursion]
@@ -23,6 +23,10 @@ impl Expr {
                 context.call(name, param).await
             }
             Expr::Not(value) => not(value.evaluate(context, facts).await?),
+            Expr::Neg(value) => neg(value.evaluate(context, facts).await?),
+            Expr::Int(value) => int(value.evaluate(context, facts).await?),
+            Expr::Float(value) => float(value.evaluate(context, facts).await?),
+            Expr::Dec(value) => dec(value.evaluate(context, facts).await?),
             Expr::Mult(left, right) => mult(
                 left.evaluate(context, facts).await?,
                 right.evaluate(context, facts).await?,
@@ -96,6 +100,63 @@ fn index(value: Value, idx: Value) -> Result<Value> {
 fn not(value: Value) -> Result<Value> {
     match value {
         Value::Bool(value) => Ok(Value::Bool(!value)),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn neg(value: Value) -> Result<Value> {
+    match value {
+        Value::Int(value) => Ok(Value::Int(-value)),
+        Value::Float(value) => Ok(Value::Float(-value)),
+        Value::Decimal(value) => Ok(Value::Decimal(-value)),
+
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn int(value: Value) -> Result<Value> {
+    match value.clone() {
+        Value::Int(_) => Ok(value),
+        Value::Float(val) => Ok((val as i128).into()),
+        Value::Decimal(val) => val
+            .to_i128()
+            .ok_or_else(|| Error::InvalidCast(value, "Value::Int".to_owned()))
+            .map(Value::Int),
+        Value::String(val) => i128::from_str(&val)
+            .map(Value::Int)
+            .map_err(|_| Error::InvalidCast(value, "Value::Int".to_owned())),
+
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn float(value: Value) -> Result<Value> {
+    match value.clone() {
+        Value::Int(val) => Ok((val as f64).into()),
+        Value::Float(_) => Ok(value),
+        Value::Decimal(val) => val
+            .to_f64()
+            .ok_or_else(|| Error::InvalidCast(value, "Value::Float".to_owned()))
+            .map(Value::Float),
+        Value::String(val) => f64::from_str(&val)
+            .map(Value::Float)
+            .map_err(|_| Error::InvalidCast(value, "Value::Float".to_owned())),
+
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn dec(value: Value) -> Result<Value> {
+    match value.clone() {
+        Value::Int(val) => Ok(Value::Decimal(val.into())),
+        Value::Float(val) => Decimal::try_from(val)
+            .map(Value::Decimal)
+            .map_err(|_| Error::InvalidCast(value, "Value::Float".to_owned())),
+        Value::Decimal(_) => Ok(value),
+        Value::String(val) => Decimal::from_str(&val)
+            .map(Value::Decimal)
+            .map_err(|_| Error::InvalidCast(value, "Value::Decimal".to_owned())),
+
         _ => Err(Error::InvalidType),
     }
 }

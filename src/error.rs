@@ -16,6 +16,9 @@ pub enum Error {
     /// Tried to perform an operation on a value with an invalid type
     InvalidType,
 
+    /// Cannot cast {0:?} to {1}
+    InvalidCast(Value, String),
+
     /// Unexpected value {0:?}, expected {1}
     UnexpectedValueType(Value, String),
 
