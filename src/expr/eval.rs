@@ -1,5 +1,5 @@
-//! Evaluate Expr
-//!
+//! Evaluate Expressions
+
 use crate::{error::Result, expr::Expr, function::FunctionContext, value::Value, Error};
 use async_recursion::async_recursion;
 use rust_decimal::prelude::*;
@@ -163,17 +163,9 @@ fn dec(value: Value) -> Result<Value> {
 
 fn mult(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left * right)),
-        (Value::Float(left), Value::Int(right)) => Ok(Value::Float(left * right as f64)),
-        (Value::Int(left), Value::Float(right)) => Ok(Value::Float(left as f64 * right)),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left * right)),
-        (Value::Int(left), Value::Decimal(right)) => {
-            Ok(Value::Decimal(Into::<Decimal>::into(left) * right))
-        }
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left * right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left * right)),
-        (Value::Decimal(left), Value::Int(right)) => {
-            Ok(Value::Decimal(left * Into::<Decimal>::into(right)))
-        }
 
         _ => Err(Error::InvalidType),
     }
@@ -181,17 +173,9 @@ fn mult(left: Value, right: Value) -> Result<Value> {
 
 fn div(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left / right)),
-        (Value::Float(left), Value::Int(right)) => Ok(Value::Float(left / right as f64)),
-        (Value::Int(left), Value::Float(right)) => Ok(Value::Float(left as f64 / right)),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left / right)),
-        (Value::Int(left), Value::Decimal(right)) => {
-            Ok(Value::Decimal(Into::<Decimal>::into(left) / right))
-        }
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left / right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left / right)),
-        (Value::Decimal(left), Value::Int(right)) => {
-            Ok(Value::Decimal(left / Into::<Decimal>::into(right)))
-        }
 
         _ => Err(Error::InvalidType),
     }
@@ -199,102 +183,60 @@ fn div(left: Value, right: Value) -> Result<Value> {
 
 fn add(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left + right)),
-        (Value::Float(left), Value::Int(right)) => Ok(Value::Float(left + right as f64)),
-        (Value::Int(left), Value::Float(right)) => Ok(Value::Float(left as f64 + right)),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left + right)),
-        (Value::Int(left), Value::Decimal(right)) => {
-            Ok(Value::Decimal(Into::<Decimal>::into(left) + right))
-        }
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left + right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left + right)),
-        (Value::Decimal(left), Value::Int(right)) => {
-            Ok(Value::Decimal(left + Into::<Decimal>::into(right)))
-        }
+
         _ => Err(Error::InvalidType),
     }
 }
 
 fn sub(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left - right)),
-        (Value::Float(left), Value::Int(right)) => Ok(Value::Float(left - right as f64)),
-        (Value::Int(left), Value::Float(right)) => Ok(Value::Float(left as f64 - right)),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left - right)),
-        (Value::Int(left), Value::Decimal(right)) => {
-            Ok(Value::Decimal(Into::<Decimal>::into(left) - right))
-        }
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left - right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left - right)),
-        (Value::Decimal(left), Value::Int(right)) => {
-            Ok(Value::Decimal(left - Into::<Decimal>::into(right)))
-        }
+
         _ => Err(Error::InvalidType),
     }
 }
 
 fn gt(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left > right)),
-        (Value::Float(left), Value::Int(right)) => Ok(Value::Bool(left > right as f64)),
-        (Value::Int(left), Value::Float(right)) => Ok(Value::Bool(left as f64 > right)),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left > right)),
-        (Value::Int(left), Value::Decimal(right)) => {
-            Ok(Value::Bool(Into::<Decimal>::into(left) > right))
-        }
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left > right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left > right)),
-        (Value::Decimal(left), Value::Int(right)) => {
-            Ok(Value::Bool(left > Into::<Decimal>::into(right)))
-        }
+
         _ => Err(Error::InvalidType),
     }
 }
 
 fn gte(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left >= right)),
-        (Value::Float(left), Value::Int(right)) => Ok(Value::Bool(left >= right as f64)),
-        (Value::Int(left), Value::Float(right)) => Ok(Value::Bool(left as f64 >= right)),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left >= right)),
-        (Value::Int(left), Value::Decimal(right)) => {
-            Ok(Value::Bool(Into::<Decimal>::into(left) >= right))
-        }
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left >= right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left >= right)),
-        (Value::Decimal(left), Value::Int(right)) => {
-            Ok(Value::Bool(left >= Into::<Decimal>::into(right)))
-        }
+
         _ => Err(Error::InvalidType),
     }
 }
 
 fn lt(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left < right)),
-        (Value::Float(left), Value::Int(right)) => Ok(Value::Bool(left < right as f64)),
-        (Value::Int(left), Value::Float(right)) => Ok(Value::Bool((left as f64) < right)),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left < right)),
-        (Value::Int(left), Value::Decimal(right)) => {
-            Ok(Value::Bool(Into::<Decimal>::into(left) < right))
-        }
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left < right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left < right)),
-        (Value::Decimal(left), Value::Int(right)) => {
-            Ok(Value::Bool(left < Into::<Decimal>::into(right)))
-        }
+
         _ => Err(Error::InvalidType),
     }
 }
 
 fn lte(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left <= right)),
-        (Value::Float(left), Value::Int(right)) => Ok(Value::Bool(left <= right as f64)),
-        (Value::Int(left), Value::Float(right)) => Ok(Value::Bool(left as f64 <= right)),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left <= right)),
-        (Value::Int(left), Value::Decimal(right)) => {
-            Ok(Value::Bool(Into::<Decimal>::into(left) <= right))
-        }
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left <= right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left <= right)),
-        (Value::Decimal(left), Value::Int(right)) => {
-            Ok(Value::Bool(left <= Into::<Decimal>::into(right)))
-        }
+
         _ => Err(Error::InvalidType),
     }
 }

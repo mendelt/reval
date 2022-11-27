@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add neg function to invert sign of numeric values
 - Add cast functions for numeric values
 
+### Changed
+
+- Remove implicit casts in numeric operations
+
 
 ## [0.1.3] - 2022-11-26
 
