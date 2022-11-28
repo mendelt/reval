@@ -103,10 +103,10 @@ pub mod value;
 pub use error::{Error, Result};
 
 pub mod prelude {
-    pub use crate::function::{FunctionResult, UserFunction};
-    pub use crate::ruleset::{builder::ruleset, rule::Rule, RuleSet};
-    pub use crate::value::Value;
-
-    #[cfg(feature = "nom_parser")]
-    pub use crate::parse::parse;
+    pub use crate::{
+        expr::Expr,
+        function::{FunctionResult, UserFunction},
+        ruleset::{builder::ruleset, rule::Rule, RuleSet},
+        value::Value,
+    };
 }
