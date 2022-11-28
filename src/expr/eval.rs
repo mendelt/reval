@@ -61,14 +61,8 @@ impl Expr {
                 left.evaluate(context, facts).await?,
                 right.evaluate(context, facts).await?,
             ),
-            Expr::And(left, right) => and(
-                left.evaluate(context, facts).await?,
-                right.evaluate(context, facts).await?,
-            ),
-            Expr::Or(left, right) => or(
-                left.evaluate(context, facts).await?,
-                right.evaluate(context, facts).await?,
-            ),
+            Expr::And(left, right) => and(context, facts, left, right).await,
+            Expr::Or(left, right) => or(context, facts, left, right).await,
         }
     }
 }
@@ -241,16 +235,45 @@ fn lte(left: Value, right: Value) -> Result<Value> {
     }
 }
 
-fn and(left: Value, right: Value) -> Result<Value> {
-    match (left, right) {
-        (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left & right)),
-        _ => Err(Error::InvalidType),
+/// Lazilly evaluate an and expression
+async fn and<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    left: &Expr,
+    right: &Expr,
+) -> Result<Value> {
+    Ok(if !eval_to_bool(context, facts, left).await? {
+        // If left evaluates to false bypass right and return false immediately
+        false
+    } else {
+        // If left evaluates to true return the result of evaluating right
+        eval_to_bool(context, facts, right).await?
     }
+    .into())
 }
 
-fn or(left: Value, right: Value) -> Result<Value> {
-    match (left, right) {
-        (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left & right)),
-        _ => Err(Error::InvalidType),
+/// Lazilly evaluate an or expression
+async fn or<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    left: &Expr,
+    right: &Expr,
+) -> Result<Value> {
+    Ok(if eval_to_bool(context, facts, left).await? {
+        // If left evaluates to true bypass right and return true immediately
+        true
+    } else {
+        // If left evaluates to false return the result of evaluating right
+        eval_to_bool(context, facts, right).await?
     }
+    .into())
+}
+
+/// Helper function that evaluates an expression and checks if its a boolean
+async fn eval_to_bool<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    expr: &Expr,
+) -> Result<bool> {
+    TryInto::<bool>::try_into(expr.evaluate(context, facts).await?).map_err(|_| Error::InvalidType)
 }
