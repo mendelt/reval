@@ -12,6 +12,13 @@ impl Rule {
     }
 }
 
+impl Expr {
+    /// Parse an expression written in the Reval json format
+    pub fn parse_json(input: &str) -> Result<Expr, Error> {
+        serde_json::from_str::<ParseExpr>(input).map(Into::<Expr>::into)
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 struct ParseRule {
     name: String,
