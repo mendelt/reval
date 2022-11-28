@@ -69,7 +69,7 @@ impl<'a> From<&'a UserFunctions> for FunctionContext<'a> {
 }
 
 /// Function state during rule invocations
-pub(crate) struct FunctionContext<'a> {
+pub struct FunctionContext<'a> {
     functions: &'a UserFunctions,
 }
 

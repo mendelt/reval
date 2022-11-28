@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Allow parsing individual `Expr` instances from json
+- Make `Expr::evaluate` public
 
 ### Changed
 

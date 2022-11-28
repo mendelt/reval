@@ -6,11 +6,7 @@ use rust_decimal::prelude::*;
 
 impl Expr {
     #[async_recursion]
-    pub(crate) async fn evaluate<'a>(
-        &self,
-        context: &mut FunctionContext<'a>,
-        facts: &Value,
-    ) -> Result<Value> {
+    pub async fn evaluate(&self, context: &mut FunctionContext, facts: &Value) -> Result<Value> {
         match self {
             Expr::Value(value) => Ok(value.clone()),
             Expr::Reference(name) => reference(facts, name),
