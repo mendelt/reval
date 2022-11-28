@@ -1,6 +1,6 @@
 //! Parse rules writting in the Reval json format
 
-use crate::{expr::Expr, ruleset::Rule};
+use crate::{expr::Expr, ruleset::rule::Rule};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::Error;

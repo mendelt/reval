@@ -104,7 +104,7 @@ pub use error::{Error, Result};
 
 pub mod prelude {
     pub use crate::function::{FunctionResult, UserFunction};
-    pub use crate::ruleset::{ruleset, Rule, RuleSet};
+    pub use crate::ruleset::{builder::ruleset, rule::Rule, RuleSet};
     pub use crate::value::Value;
 
     #[cfg(feature = "nom_parser")]

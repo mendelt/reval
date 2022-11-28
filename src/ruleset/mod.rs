@@ -1,12 +1,16 @@
 //! Manage and evaluate a set of rules or expressions using RuleSets
 
+pub mod builder;
+pub mod rule;
+
 use crate::{
     error::Result,
-    expr::Expr,
     function::{UserFunction, UserFunctions},
     value::{ser::ValueSerializer, Value},
 };
 use serde::Serialize;
+
+use self::rule::Rule;
 
 /// The RuleSet type can
 pub struct RuleSet {
@@ -42,56 +46,5 @@ impl RuleSet {
         }
 
         Ok(results)
-    }
-}
-
-pub fn ruleset() -> Builder {
-    Builder {
-        rules: Vec::new(),
-        functions: UserFunctions::default(),
-    }
-}
-
-pub struct Builder {
-    rules: Vec<Rule>,
-    functions: UserFunctions,
-}
-
-impl Builder {
-    pub fn with_rule(mut self, rule: Rule) -> Builder {
-        self.rules.push(rule);
-        self
-    }
-
-    pub fn with_function(
-        mut self,
-        name: &str,
-        function: impl UserFunction + Send + Sync + 'static,
-    ) -> Builder {
-        self.functions.add(name, function);
-        self
-    }
-
-    pub fn build(self) -> RuleSet {
-        RuleSet {
-            rules: self.rules,
-            functions: self.functions,
-        }
-    }
-}
-
-/// A rule is an expression with a name
-#[derive(Debug, Clone, PartialEq)]
-pub struct Rule {
-    name: String,
-    expr: Expr,
-}
-
-impl Rule {
-    pub fn new(name: impl Into<String>, expr: Expr) -> Self {
-        Self {
-            name: name.into(),
-            expr,
-        }
     }
 }
