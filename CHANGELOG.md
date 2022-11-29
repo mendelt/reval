@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Allow parsing individual `Expr` instances from json
 - Make `Expr::evaluate` public
+- Add `cacheable` method to `UserFunction` trait
 
 ### Changed
 

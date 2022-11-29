@@ -16,7 +16,15 @@ pub trait UserFunction {
 
     /// The name of the user-function
     fn name(&self) -> &'static str;
+
+    /// Indicates if results of this function can be cached,
+    /// true by default
+    fn cacheable(&self) -> bool {
+        true
+    }
 }
+
+pub(crate) type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
 
 /// Error type returned from UserFunction
 #[derive(Debug, DisplayDoc, thiserror::Error)]
@@ -45,19 +53,15 @@ pub type FunctionResult = result::Result<Value, FunctionError>;
 /// Stores user-functions so they can be easilly called
 #[derive(Default)]
 pub struct UserFunctions {
-    functions: HashMap<&'static str, Box<dyn UserFunction + Send + Sync>>,
+    functions: HashMap<&'static str, BoxedFunction>,
 }
 
 impl UserFunctions {
-    /// Call a user-function by name.
-    pub async fn call(&self, name: &str, params: Value) -> Result<Value> {
-        match self.functions.get(name) {
-            Some(fun) => fun
-                .call(params)
-                .await
-                .map_err(|err| Error::UserFunctionError(name.to_owned(), err)),
-            None => Err(Error::UnknownUserFunction(name.to_owned())),
-        }
+    /// Get a userfunction by name
+    pub fn get(&self, name: &str) -> Result<&BoxedFunction> {
+        self.functions
+            .get(name)
+            .ok_or_else(|| Error::UnknownUserFunction(name.to_owned()))
     }
 
     /// Add a user-function to the collection
@@ -100,11 +104,30 @@ pub struct FunctionContext<'a> {
     results: HashMap<String, Value>,
 }
 
+async fn call_function(function: &BoxedFunction, params: Value, name: &str) -> Result<Value> {
+    function
+        .call(params)
+        .await
+        .map_err(|err| Error::UserFunctionError(name.to_owned(), err))
+}
+
 impl<'a> FunctionContext<'a> {
-    pub(crate) async fn call(&mut self, function: &str, params: Value) -> Result<Value> {
-        match self.results.get(&format!("{function}-{params:?}")) {
-            Some(value) => Ok(value.clone()),
-            None => self.functions.call(function, params).await,
+    pub(crate) async fn call(&mut self, name: &str, params: Value) -> Result<Value> {
+        let function = self.functions.get(name)?;
+
+        if function.cacheable() {
+            let cache_key = format!("{name}-{params:?}");
+
+            match self.results.get(&cache_key) {
+                Some(value) => Ok(value.clone()),
+                None => {
+                    let result = call_function(function, params, name).await?;
+                    self.results.insert(cache_key, result.clone());
+                    Ok(result)
+                }
+            }
+        } else {
+            call_function(function, params, name).await
         }
     }
 }
