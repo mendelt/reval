@@ -19,21 +19,38 @@ pub struct Builder {
 
 impl Builder {
     /// Add a rule to the ruleset being built
-    pub fn with_rule(mut self, rule: Rule) -> Builder {
+    pub fn with_rule(mut self, rule: Rule) -> Self {
         self.rules.push(rule);
         self
     }
 
-    /// Add a user-function to the ruleset being built
-    pub fn with_function(
-        mut self,
-        name: &str,
-        function: impl UserFunction + Send + Sync + 'static,
-    ) -> Builder {
-        self.functions.add(name, function);
+    /// Add multiple rules to the RuleSet being built
+    pub fn with_rules(mut self, rules: impl IntoIterator<Item = Rule>) -> Self {
+        for rule in rules {
+            self.rules.push(rule)
+        }
         self
     }
 
+    /// Add a user-function to the ruleset being built
+    pub fn with_function<F: UserFunction + Send + Sync + 'static>(
+        mut self,
+        function: F,
+    ) -> Builder {
+        self.functions.add_function(function);
+        self
+    }
+
+    /// Add multiple user-functions to the ruleset being built
+    pub fn with_functions<F: UserFunction + Send + Sync + 'static, I: IntoIterator<Item = F>>(
+        mut self,
+        functions: I,
+    ) -> Self {
+        self.functions.add_functions(functions);
+        self
+    }
+
+    /// Finalize the builder and create the RuleSet
     pub fn build(self) -> RuleSet {
         RuleSet {
             rules: self.rules,

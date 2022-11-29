@@ -22,6 +22,10 @@ async fn main() {
             let age: i128 = param.try_into()?;
             Ok((age * 2).into())
         }
+
+        fn name(&self) -> &'static str {
+            "fake_id"
+        }
     }
 
     // Set up an "age check" rule that checks if the "age" input field is
@@ -42,7 +46,7 @@ async fn main() {
     // build the `RuleSet`
     let ruleset = ruleset()
         .with_rule(Rule::parse_json(rule).unwrap())
-        .with_function("fake_id", FakeId {})
+        .with_function(FakeId {})
         .build();
 
     // Set up input data

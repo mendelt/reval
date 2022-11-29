@@ -62,6 +62,10 @@
 //!        let age: i128 = param.try_into()?;
 //!        Ok((age * 2).into())
 //!     }
+//!
+//!     fn name(&self) -> &'static str {
+//!         "fake_id"
+//!     }
 //! }
 //! // Set up an "age check" rule that checks if the "age" input field is
 //! // greater than or equal to 21. But it first calls the `fake_id` user-
@@ -80,7 +84,7 @@
 //! // build the `RuleSet`
 //! let ruleset = ruleset()
 //!     .with_rule(Rule::parse_json(rule).unwrap())
-//!     .with_function("fake_id", FakeId {})
+//!     .with_function(FakeId {})
 //!     .build();
 //! // Set up input data
 //! let facts = Data { age: 16 };

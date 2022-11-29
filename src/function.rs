@@ -13,6 +13,9 @@ use std::{collections::HashMap, result};
 pub trait UserFunction {
     /// Call the userfunction, parameters are passed in as a Value
     async fn call(&self, params: Value) -> FunctionResult;
+
+    /// The name of the user-function
+    fn name(&self) -> &'static str;
 }
 
 /// Error type returned from UserFunction
@@ -39,10 +42,10 @@ impl From<Error> for FunctionError {
 /// Result type returned from UserFunction
 pub type FunctionResult = result::Result<Value, FunctionError>;
 
-/// Stores user-functions by name
+/// Stores user-functions so they can be easilly called
 #[derive(Default)]
 pub struct UserFunctions {
-    functions: HashMap<String, Box<dyn UserFunction + Send + Sync>>,
+    functions: HashMap<&'static str, Box<dyn UserFunction + Send + Sync>>,
 }
 
 impl UserFunctions {
@@ -57,8 +60,25 @@ impl UserFunctions {
         }
     }
 
-    pub fn add<F: UserFunction + Send + Sync + 'static>(&mut self, name: &str, function: F) {
-        self.functions.insert(name.to_owned(), Box::new(function));
+    /// Add a user-function to the collection
+    pub fn add_function<F: UserFunction + Send + Sync + 'static>(&mut self, function: F) {
+        // TODO: Check if function name is valid
+        self.functions.insert(function.name(), Box::new(function));
+    }
+
+    pub fn add_functions<I: IntoIterator<Item = F>, F: UserFunction + Send + Sync + 'static>(
+        &mut self,
+        functions: I,
+    ) {
+        for function in functions {
+            self.add_function(function);
+        }
+    }
+
+    /// Merge two sets of user-functions
+    pub fn merge(&mut self, functions: UserFunctions) -> &mut Self {
+        self.functions.extend(functions.functions.into_iter());
+        self
     }
 }
 

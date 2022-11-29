@@ -19,18 +19,32 @@ pub struct RuleSet {
 }
 
 impl RuleSet {
+    /// Add a rule to the Ruleset
     pub fn add_rule(&mut self, rule: Rule) {
         self.rules.push(rule)
     }
 
-    pub fn add_function(
-        &mut self,
-        name: &str,
-        function: impl UserFunction + Send + Sync + 'static,
-    ) {
-        self.functions.add(name, function)
+    /// Add multiple rules to the RuleSet
+    pub fn add_rules(&mut self, rules: impl IntoIterator<Item = Rule>) {
+        for rule in rules {
+            self.rules.push(rule)
+        }
     }
 
+    /// Add a user-function to the RuleSet
+    pub fn add_function(&mut self, function: impl UserFunction + Send + Sync + 'static) {
+        self.functions.add_function(function)
+    }
+
+    /// Add multiple user-functions to the RuleSet
+    pub fn add_functions<I: IntoIterator<Item = F>, F: UserFunction + Send + Sync + 'static>(
+        &mut self,
+        functions: I,
+    ) {
+        self.functions.add_functions(functions);
+    }
+
+    /// Evaluate the rules in the RuleSet against a piece of data
     pub async fn evaluate(&self, facts: &impl Serialize) -> Result<Vec<Value>> {
         self.evaluate_value(&facts.serialize(ValueSerializer)?)
             .await
