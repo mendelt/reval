@@ -84,17 +84,27 @@ impl UserFunctions {
 
 impl<'a> From<&'a UserFunctions> for FunctionContext<'a> {
     fn from(functions: &'a UserFunctions) -> Self {
-        Self { functions }
+        Self {
+            functions,
+            results: HashMap::new(),
+        }
     }
 }
 
 /// Function state during rule invocations
 pub struct FunctionContext<'a> {
     functions: &'a UserFunctions,
+
+    /// Store results of previously evaluated user-functions here by
+    /// function-name and parameter-value
+    results: HashMap<String, Value>,
 }
 
 impl<'a> FunctionContext<'a> {
     pub(crate) async fn call(&mut self, function: &str, params: Value) -> Result<Value> {
-        self.functions.call(function, params).await
+        match self.results.get(&format!("{function}-{params:?}")) {
+            Some(value) => Ok(value.clone()),
+            None => self.functions.call(function, params).await,
+        }
     }
 }

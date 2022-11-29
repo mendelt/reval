@@ -9,7 +9,7 @@ mod string_ser;
 use rust_decimal::Decimal;
 
 use crate::Error;
-use std::collections::hash_map::HashMap;
+use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
