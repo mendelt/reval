@@ -5,7 +5,7 @@ pub mod rule;
 
 use crate::{
     error::Result,
-    function::{UserFunction, UserFunctions},
+    function::{BoxedFunction, UserFunctions},
     value::{ser::ValueSerializer, Value},
 };
 use serde::Serialize;
@@ -32,15 +32,12 @@ impl RuleSet {
     }
 
     /// Add a user-function to the RuleSet
-    pub fn add_function(&mut self, function: impl UserFunction + Send + Sync + 'static) {
+    pub fn add_function(&mut self, function: BoxedFunction) {
         self.functions.add_function(function)
     }
 
     /// Add multiple user-functions to the RuleSet
-    pub fn add_functions<I: IntoIterator<Item = F>, F: UserFunction + Send + Sync + 'static>(
-        &mut self,
-        functions: I,
-    ) {
+    pub fn add_functions<I: IntoIterator<Item = BoxedFunction>>(&mut self, functions: I) {
         self.functions.add_functions(functions);
     }
 

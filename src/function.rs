@@ -25,7 +25,7 @@ pub trait UserFunction {
     }
 }
 
-pub(crate) type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
+pub type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
 
 /// Error type returned from UserFunction
 #[derive(Debug, DisplayDoc, thiserror::Error)]
@@ -66,15 +66,12 @@ impl UserFunctions {
     }
 
     /// Add a user-function to the collection
-    pub fn add_function<F: UserFunction + Send + Sync + 'static>(&mut self, function: F) {
+    pub fn add_function(&mut self, function: BoxedFunction) {
         // TODO: Check if function name is valid
-        self.functions.insert(function.name(), Box::new(function));
+        self.functions.insert(function.name(), function);
     }
 
-    pub fn add_functions<I: IntoIterator<Item = F>, F: UserFunction + Send + Sync + 'static>(
-        &mut self,
-        functions: I,
-    ) {
+    pub fn add_functions<I: IntoIterator<Item = BoxedFunction>>(&mut self, functions: I) {
         for function in functions {
             self.add_function(function);
         }

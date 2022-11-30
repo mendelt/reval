@@ -86,7 +86,7 @@
 //! // build the `RuleSet`
 //! let ruleset = ruleset()
 //!     .with_rule(Rule::parse_json(rule).unwrap())
-//!     .with_function(FakeId {})
+//!     .with_function(Box::new(FakeId {}))
 //!     .build();
 //! // Set up input data
 //! let facts = Data { age: 16 };
