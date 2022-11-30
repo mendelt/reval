@@ -6,6 +6,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use displaydoc::Display as DisplayDoc;
+use std::error;
 use std::{collections::HashMap, result};
 
 /// User functions should implement this trait
@@ -33,7 +34,7 @@ pub enum FunctionError {
     InvalidParameter(Value, String),
 
     /// Unspecified er
-    Unspecified(#[from] anyhow::Error),
+    Unspecified(#[from] Box<dyn error::Error + Send + Sync>),
 }
 
 impl From<Error> for FunctionError {

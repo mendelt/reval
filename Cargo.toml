@@ -14,7 +14,6 @@ readme = "README.md"
 [dependencies]
 async-recursion = "1"
 async-trait = "0.1"
-anyhow = "1"
 displaydoc = "0.2"
 nom = { version = "7", optional = true }
 rust_decimal = "1"
