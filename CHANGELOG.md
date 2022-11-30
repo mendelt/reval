@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Methods for adding multiple rules and user-functions to a ruleset at once
+- Add conversions to/from Value::Map and Value::Vec as convenience
 
 ### Changed
 

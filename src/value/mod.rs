@@ -134,3 +134,37 @@ impl From<Option<Value>> for Value {
         }
     }
 }
+
+impl TryFrom<Value> for HashMap<String, Value> {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Map(map) => Ok(map),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Bool".to_owned())),
+        }
+    }
+}
+
+impl From<HashMap<String, Value>> for Value {
+    fn from(map: HashMap<String, Value>) -> Self {
+        Value::Map(map)
+    }
+}
+
+impl TryFrom<Value> for Vec<Value> {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Vec(vec) => Ok(vec),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Bool".to_owned())),
+        }
+    }
+}
+
+impl From<Vec<Value>> for Value {
+    fn from(vec: Vec<Value>) -> Self {
+        Value::Vec(vec)
+    }
+}
