@@ -54,5 +54,7 @@ async fn main() {
 
     // Evaluate the ruleset on the input data and check if the rule returns
     // `true`
-    assert_eq!(ruleset.evaluate(&facts).await.unwrap(), vec![true.into()]);
+    for outcome in ruleset.evaluate(&facts).await.unwrap() {
+        assert_eq!(outcome.value.unwrap(), true.into());
+    }
 }

@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Add name method to `UserFunction` trait instead of passing the name into the builder
+- Rule and RuleSet now return `Outcome` instances after evaluation that contain some metadata about the evaluation
+- `RuleSet::evaluate` does not halt rule evaluation when one rule returns `Err`
 
 ## [0.3.0] - 2022-11-29
 

@@ -10,7 +10,7 @@ use crate::{
 };
 use serde::Serialize;
 
-use self::rule::Rule;
+use self::rule::{Outcome, Rule};
 
 /// The RuleSet type can
 pub struct RuleSet {
@@ -45,18 +45,18 @@ impl RuleSet {
     }
 
     /// Evaluate the rules in the RuleSet against a piece of data
-    pub async fn evaluate(&self, facts: &impl Serialize) -> Result<Vec<Value>> {
+    pub async fn evaluate(&self, facts: &impl Serialize) -> Result<Vec<Outcome>> {
         self.evaluate_value(&facts.serialize(ValueSerializer)?)
             .await
     }
 
-    pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Value>> {
+    pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Outcome>> {
         let mut context = (&self.functions).into();
 
         let mut results = Vec::new();
 
         for rule in self.rules.iter() {
-            results.push(rule.expr.evaluate(&mut context, facts).await?);
+            results.push(rule.evaluate(&mut context, facts).await);
         }
 
         Ok(results)

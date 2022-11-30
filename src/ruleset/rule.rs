@@ -1,10 +1,10 @@
-use crate::expr::Expr;
+use crate::{expr::Expr, function::FunctionContext, value::Value, Result};
 
 /// A rule is an expression with a name
 #[derive(Debug, Clone, PartialEq)]
 pub struct Rule {
     name: String,
-    pub(super) expr: Expr,
+    expr: Expr,
 }
 
 impl Rule {
@@ -14,4 +14,19 @@ impl Rule {
             expr,
         }
     }
+
+    pub async fn evaluate<'a>(&self, context: &mut FunctionContext<'a>, facts: &Value) -> Outcome {
+        Outcome {
+            value: self.expr.evaluate(context, facts).await,
+            rule: &self.name,
+        }
+    }
+}
+
+/// The outcome from evaluating a rule.
+/// Contains the resulting value from evaluating the rule expression plus
+/// metadata. For now the metadata is limited to the name of the rule
+pub struct Outcome<'a> {
+    pub value: Result<Value>,
+    pub rule: &'a str,
 }
