@@ -1,5 +1,5 @@
 //! The `Value` type encodes data that can be passed in or out from expressions
-
+pub mod convert;
 #[cfg(feature = "value_serializer")]
 pub mod ser;
 
@@ -7,8 +7,6 @@ pub mod ser;
 mod string_ser;
 
 use rust_decimal::Decimal;
-
-use crate::Error;
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -24,147 +22,7 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn new<T: Into<Value>>(value: T) -> Self {
+    pub fn new<T: Into<Self>>(value: T) -> Self {
         value.into()
-    }
-}
-
-impl From<String> for Value {
-    fn from(value: String) -> Self {
-        Value::String(value)
-    }
-}
-
-impl TryFrom<Value> for String {
-    type Error = Error;
-
-    fn try_from(value: Value) -> Result<Self, Self::Error> {
-        match value {
-            Value::String(value) => Ok(value),
-            _ => Err(Error::UnexpectedValueType(
-                value,
-                "Value::String".to_owned(),
-            )),
-        }
-    }
-}
-
-impl From<&str> for Value {
-    fn from(value: &str) -> Self {
-        Value::String(value.to_string())
-    }
-}
-
-impl From<i128> for Value {
-    fn from(value: i128) -> Self {
-        Value::Int(value)
-    }
-}
-
-impl TryFrom<Value> for i128 {
-    type Error = Error;
-
-    fn try_from(value: Value) -> Result<Self, Self::Error> {
-        match value {
-            Value::Int(value) => Ok(value),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Int".to_owned())),
-        }
-    }
-}
-
-impl From<f64> for Value {
-    fn from(value: f64) -> Self {
-        Value::Float(value)
-    }
-}
-
-impl TryFrom<Value> for f64 {
-    type Error = Error;
-
-    fn try_from(value: Value) -> Result<Self, Self::Error> {
-        match value {
-            Value::Float(value) => Ok(value),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Float".to_owned())),
-        }
-    }
-}
-
-impl From<Decimal> for Value {
-    fn from(value: Decimal) -> Self {
-        Value::Decimal(value)
-    }
-}
-
-impl TryFrom<Value> for Decimal {
-    type Error = Error;
-
-    fn try_from(value: Value) -> Result<Self, Self::Error> {
-        match value {
-            Value::Decimal(value) => Ok(value),
-            _ => Err(Error::UnexpectedValueType(
-                value,
-                "Value::Decimal".to_owned(),
-            )),
-        }
-    }
-}
-
-impl From<bool> for Value {
-    fn from(value: bool) -> Self {
-        Value::Bool(value)
-    }
-}
-
-impl TryFrom<Value> for bool {
-    type Error = Error;
-
-    fn try_from(value: Value) -> Result<Self, Self::Error> {
-        match value {
-            Value::Bool(value) => Ok(value),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Bool".to_owned())),
-        }
-    }
-}
-
-impl From<Option<Value>> for Value {
-    fn from(option: Option<Value>) -> Self {
-        match option {
-            Some(value) => value,
-            None => Value::None,
-        }
-    }
-}
-
-impl TryFrom<Value> for HashMap<String, Value> {
-    type Error = Error;
-
-    fn try_from(value: Value) -> Result<Self, Self::Error> {
-        match value {
-            Value::Map(map) => Ok(map),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Bool".to_owned())),
-        }
-    }
-}
-
-impl From<HashMap<String, Value>> for Value {
-    fn from(map: HashMap<String, Value>) -> Self {
-        Value::Map(map)
-    }
-}
-
-impl TryFrom<Value> for Vec<Value> {
-    type Error = Error;
-
-    fn try_from(value: Value) -> Result<Self, Self::Error> {
-        match value {
-            Value::Vec(vec) => Ok(vec),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Bool".to_owned())),
-        }
-    }
-}
-
-impl From<Vec<Value>> for Value {
-    fn from(vec: Vec<Value>) -> Self {
-        Value::Vec(vec)
     }
 }

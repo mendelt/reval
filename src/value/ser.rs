@@ -373,7 +373,7 @@ mod when_serializing_to_value {
 
     #[test]
     fn should_serialize_int() {
-        assert_serialized(8u8, 8.into());
+        assert_serialized(8u8, 8u8.into());
     }
 
     #[test]
@@ -388,7 +388,7 @@ mod when_serializing_to_value {
 
     #[test]
     fn should_serialize_byte_arrays_to_vec() {
-        assert_serialized(&[3u8, 5], Value::Vec(vec![3.into(), 5.into()]))
+        assert_serialized(&[3u8, 5], Value::Vec(vec![3u8.into(), 5u8.into()]))
     }
 
     #[test]

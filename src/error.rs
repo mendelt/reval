@@ -2,7 +2,7 @@
 
 use crate::{function, value::Value};
 use displaydoc::Display as DisplayDoc;
-use std::result;
+use std::{num::TryFromIntError, result};
 
 /// Result type for anything Reval
 pub type Result<T> = result::Result<T, Error>;
@@ -16,8 +16,11 @@ pub enum Error {
     /// Tried to perform an operation on a value with an invalid type
     InvalidType,
 
-    /// Cannot cast {0:?} to {1}
+    /// Cannot cast value type {0:?} to {1}
     InvalidCast(Value, String),
+
+    /// Numeric overflow casting int types
+    NumericOverflow(#[from] TryFromIntError),
 
     /// Unexpected value {0:?}, expected {1}
     UnexpectedValueType(Value, String),
