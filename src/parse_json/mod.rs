@@ -40,7 +40,7 @@ enum ParseExpr {
     Float(f64),
     Decimal(Decimal),
     Bool(bool),
-    Map(HashMap<String, Box<ParseExpr>>),
+    Map(HashMap<String, ParseExpr>),
     Vec(Vec<ParseExpr>),
     Ref(String),
     Func(String, Box<ParseExpr>),
@@ -99,10 +99,10 @@ impl From<ParseExpr> for Expr {
 }
 
 /// Helper function that recursively creates a map value from a hashmap of ParseExpr
-fn map_expr(map: HashMap<String, Box<ParseExpr>>) -> Expr {
-    let hashmap: HashMap<String, Box<Expr>> = map
+fn map_expr(map: HashMap<String, ParseExpr>) -> Expr {
+    let hashmap: HashMap<String, Expr> = map
         .into_iter()
-        .map(|(key, expr)| (key, Box::new(Expr::from(*expr))))
+        .map(|(key, expr)| (key, Expr::from(expr)))
         .collect();
 
     Expr::Map(hashmap)

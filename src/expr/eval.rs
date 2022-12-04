@@ -108,14 +108,14 @@ fn neg(value: Value) -> Result<Value> {
 }
 
 async fn eval_map(
-    map: &HashMap<String, Box<Expr>>,
+    map: &HashMap<String, Expr>,
     context: &mut FunctionContext<'_>,
     facts: &Value,
 ) -> Result<Value> {
     let mut result = HashMap::<String, Value>::new();
 
     for (key, expr) in map {
-        result.insert(key.clone(), (*expr).evaluate(context, facts).await?);
+        result.insert(key.clone(), expr.evaluate(context, facts).await?);
     }
 
     Ok(result.into())

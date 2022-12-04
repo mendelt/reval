@@ -19,7 +19,7 @@ pub enum Expr {
     Index(Box<Expr>, Box<Expr>),
 
     /// Construct a map from expression results
-    Map(HashMap<String, Box<Expr>>),
+    Map(HashMap<String, Expr>),
 
     /// Construct a vector from expression results
     Vec(Vec<Expr>),
