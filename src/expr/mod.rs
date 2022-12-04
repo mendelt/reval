@@ -1,6 +1,7 @@
 mod eval;
 
 use crate::value::Value;
+use std::collections::HashMap;
 
 /// The Reval expression abstract syntax tree
 #[derive(Clone, Debug, PartialEq)]
@@ -16,6 +17,12 @@ pub enum Expr {
 
     /// Index a dictionary or an array value
     Index(Box<Expr>, Box<Expr>),
+
+    /// Construct a map from expression results
+    Map(HashMap<String, Box<Expr>>),
+
+    /// Construct a vector from expression results
+    Vec(Vec<Expr>),
 
     /// Invert a boolean subexpression !true evaluates to false
     Not(Box<Expr>),

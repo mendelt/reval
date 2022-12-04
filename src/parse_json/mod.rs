@@ -4,6 +4,7 @@ use crate::{expr::Expr, ruleset::rule::Rule};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::Error;
+use std::collections::HashMap;
 
 impl Rule {
     /// Parse a rule written in the Reval json format
@@ -39,6 +40,8 @@ enum ParseExpr {
     Float(f64),
     Decimal(Decimal),
     Bool(bool),
+    Map(HashMap<String, Box<ParseExpr>>),
+    Vec(Vec<ParseExpr>),
     Ref(String),
     Func(String, Box<ParseExpr>),
     Idx(Box<ParseExpr>, Box<ParseExpr>),
@@ -77,6 +80,8 @@ impl From<ParseExpr> for Expr {
             ParseExpr::CInt(value) => Expr::int((*value).into()),
             ParseExpr::CFloat(value) => Expr::float((*value).into()),
             ParseExpr::CDecimal(value) => Expr::dec((*value).into()),
+            ParseExpr::Map(map) => map_expr(map),
+            ParseExpr::Vec(vec) => vec_expr(vec),
             ParseExpr::Mult(left, right) => Expr::mult((*left).into(), (*right).into()),
             ParseExpr::Div(left, right) => Expr::div((*left).into(), (*right).into()),
             ParseExpr::Add(left, right) => Expr::add((*left).into(), (*right).into()),
@@ -91,6 +96,20 @@ impl From<ParseExpr> for Expr {
             ParseExpr::Or(left, right) => Expr::or((*left).into(), (*right).into()),
         }
     }
+}
+
+/// Helper function that recursively creates a map value from a hashmap of ParseExpr
+fn map_expr(map: HashMap<String, Box<ParseExpr>>) -> Expr {
+    let hashmap: HashMap<String, Box<Expr>> = map
+        .into_iter()
+        .map(|(key, expr)| (key, Box::new(Expr::from(*expr))))
+        .collect();
+
+    Expr::Map(hashmap)
+}
+
+fn vec_expr(vec: Vec<ParseExpr>) -> Expr {
+    Expr::Vec(vec.into_iter().map(|expr| expr.into()).collect())
 }
 
 #[cfg(test)]

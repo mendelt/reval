@@ -3,6 +3,7 @@
 use crate::{error::Result, expr::Expr, function::FunctionContext, value::Value, Error};
 use async_recursion::async_recursion;
 use rust_decimal::prelude::*;
+use std::collections::HashMap;
 
 impl Expr {
     #[async_recursion]
@@ -20,6 +21,8 @@ impl Expr {
             }
             Expr::Not(value) => not(value.evaluate(context, facts).await?),
             Expr::Neg(value) => neg(value.evaluate(context, facts).await?),
+            Expr::Map(map) => eval_map(map, context, facts).await,
+            Expr::Vec(vec) => eval_vec(vec, context, facts).await,
             Expr::Int(value) => int(value.evaluate(context, facts).await?),
             Expr::Float(value) => float(value.evaluate(context, facts).await?),
             Expr::Dec(value) => dec(value.evaluate(context, facts).await?),
@@ -102,6 +105,32 @@ fn neg(value: Value) -> Result<Value> {
 
         _ => Err(Error::InvalidType),
     }
+}
+
+async fn eval_map(
+    map: &HashMap<String, Box<Expr>>,
+    context: &mut FunctionContext<'_>,
+    facts: &Value,
+) -> Result<Value> {
+    let mut result = HashMap::<String, Value>::new();
+
+    for (key, expr) in map {
+        result.insert(key.clone(), (*expr).evaluate(context, facts).await?);
+    }
+
+    Ok(result.into())
+}
+
+async fn eval_vec(
+    vec: &Vec<Expr>,
+    context: &mut FunctionContext<'_>,
+    facts: &Value,
+) -> Result<Value> {
+    let mut result = Vec::<Value>::new();
+    for expr in vec {
+        result.push(expr.evaluate(context, facts).await?)
+    }
+    Ok(result.into())
 }
 
 fn int(value: Value) -> Result<Value> {
