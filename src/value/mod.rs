@@ -20,9 +20,3 @@ pub enum Value {
     Vec(Vec<Value>),
     None,
 }
-
-impl Value {
-    pub fn new<T: Into<Self>>(value: T) -> Self {
-        value.into()
-    }
-}
