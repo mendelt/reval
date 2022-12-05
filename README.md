@@ -40,7 +40,9 @@ let ruleset = ruleset().with_rule(Rule::parse_json(rule).unwrap()).build();
 let facts = Data { age: 16 };
 // Evaluate the ruleset on the input data and check if the rule returns
 // `false`
-assert_eq!(ruleset.evaluate(&facts).await.unwrap(), vec![false.into()]);
+for outcome in ruleset.evaluate(&facts).await.unwrap() {
+    assert_eq!(outcome.value.unwrap(), false.into());
+}
  ```
 
 Reval can be extended with user-functions by implementing the `UserFunction` trait on a type and passing an instance of that type to the RuleSet. The following example shows how this would work;
@@ -59,14 +61,13 @@ struct Data {
 struct FakeId;
 #[async_trait::async_trait]
 impl UserFunction for FakeId {
-    async fn call(&self, param: Value) -> anyhow::Result<Value> {
-        match param {
-            Value::Int(age) => Ok((age + 5).into()),
-            _ => Err(anyhow::anyhow!(
-                "Invalid value {:?}, expected Value::Int",
-                param
-            )),
-        }
+    async fn call(&self, param: Value) -> FunctionResult {
+       let age: i128 = param.try_into()?;
+       Ok((age * 2).into())
+    }
+
+    fn name(&self) -> &'static str {
+        "fake_id"
     }
 }
 // Set up an "age check" rule that checks if the "age" input field is
@@ -86,13 +87,15 @@ let rule = r#"
 // build the `RuleSet`
 let ruleset = ruleset()
     .with_rule(Rule::parse_json(rule).unwrap())
-    .with_function("fake_id", FakeId {})
+    .with_function(Box::new(FakeId {}))
     .build();
 // Set up input data
 let facts = Data { age: 16 };
 // Evaluate the ruleset on the input data and check if the rule returns
 // `true`
-assert_eq!(ruleset.evaluate(&facts).await.unwrap(), vec![true.into()]);
+for outcome in ruleset.evaluate(&facts).await.unwrap() {
+    assert_eq!(outcome.value.unwrap(), true.into());
+}
  ```
 
 <!-- cargo-rdme end -->
