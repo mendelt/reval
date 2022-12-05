@@ -8,6 +8,7 @@ pub struct Rule {
 }
 
 impl Rule {
+    /// Construct a new rule from a name and an expression
     pub fn new(name: impl Into<String>, expr: Expr) -> Self {
         Self {
             name: name.into(),
@@ -15,11 +16,18 @@ impl Rule {
         }
     }
 
+    /// Evaluate a rule on some data using the user-functions provided by the
+    /// context
     pub async fn evaluate<'a>(&self, context: &mut FunctionContext<'a>, facts: &Value) -> Outcome {
         Outcome {
             value: self.expr.evaluate(context, facts).await,
             rule: &self.name,
         }
+    }
+
+    /// Return the name of the rule
+    pub fn name(&self) -> &str {
+        &self.name
     }
 }
 
