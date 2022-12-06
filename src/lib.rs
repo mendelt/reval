@@ -113,7 +113,7 @@ pub use error::{Error, Result};
 pub mod prelude {
     pub use crate::{
         expr::Expr,
-        function::{FunctionResult, UserFunction},
+        function::{BoxedFunction, FunctionResult, UserFunction},
         ruleset::{builder::ruleset, rule::Rule, RuleSet},
         value::Value,
     };
