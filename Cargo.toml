@@ -10,6 +10,7 @@ repository = "https://github.com/mendelt/reval"
 documentation = "https://docs.rs/reval/latest/reval/"
 keywords = ["expression", "evaluator"]
 readme = "README.md"
+autotests = false
 
 [dependencies]
 async-recursion = "1"
@@ -30,3 +31,7 @@ default = ["json_parser", "value_serializer"]
 nom_parser = ["dep:nom"]
 json_parser = ["dep:serde", "dep:serde_json"]
 value_serializer = ["dep:serde"]
+
+[[test]]
+name = "integration"
+path = "tests/mod.rs"
