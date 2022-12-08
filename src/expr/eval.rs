@@ -42,8 +42,10 @@ impl Expr {
                 left.evaluate(context, facts).await?,
                 right.evaluate(context, facts).await?,
             ),
-            Expr::Equals(left, right) => Ok(Value::Bool(left == right)),
-            Expr::NotEquals(left, right) => Ok(Value::Bool(left != right)),
+            Expr::Equals(left, right) => eq(context, facts, left, right).await.map(Value::Bool),
+            Expr::NotEquals(left, right) => eq(context, facts, left, right)
+                .await
+                .map(|val| Value::Bool(!val)),
             Expr::GreaterThan(left, right) => gt(
                 left.evaluate(context, facts).await?,
                 right.evaluate(context, facts).await?,
@@ -218,6 +220,24 @@ fn sub(left: Value, right: Value) -> Result<Value> {
 
         _ => Err(Error::InvalidType),
     }
+}
+
+async fn eq<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    left: &Expr,
+    right: &Expr,
+) -> Result<bool> {
+    let left = left.evaluate(context, facts).await?;
+
+    if left == Value::None {
+        // Nothing equals Value::None, not even Value::None, so early return
+        return Ok(false);
+    }
+
+    let right = right.evaluate(context, facts).await?;
+
+    Ok(left == right)
 }
 
 fn gt(left: Value, right: Value) -> Result<Value> {
