@@ -13,6 +13,7 @@ readme = "README.md"
 autotests = false
 
 [dependencies]
+anyhow = "1"
 async-recursion = "1"
 async-trait = "0.1"
 displaydoc = "0.2"

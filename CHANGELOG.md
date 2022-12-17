@@ -6,53 +6,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+### Changed
+- `FunctionError` type is replaced with `anyhow::Error`
+
+
 ## [0.4.4] - 2022-12-08
 
 ### Added
-
 - Add `BoxedFunction` to the prelude
 - `Rule::name` method
 
 ### Fixed
-
 - Equality comparison was not working
 
 ### Removed
-
 - `Value::new` constructor
-
 
 
 ## [0.4.3] - 2022-12-05
 
 ### Added
-
 - Constuctor expressions for Map and Vec
 
 
 ## [0.4.2] - 2022-12-01
 
 ### Added
-
 - Add conversions for a bunch of numerical types to an from `Value`
 
 
 ## [0.4.1] - 2022-11-30
 
 ### Fixed
-
 - Fix adding multiple user-functions
 
 
 ## [0.4.0] - 2022-11-30
 
 ### Added
-
 - Methods for adding multiple rules and user-functions to a ruleset at once
 - Add conversions to/from Value::Map and Value::Vec as convenience
 
 ### Changed
-
 - Add name method to `UserFunction` trait instead of passing the name into the builder
 - Rule and RuleSet now return `Outcome` instances after evaluation that contain some metadata about the evaluation
 - `RuleSet::evaluate` does not halt rule evaluation when one rule returns `Err`
@@ -62,13 +59,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0] - 2022-11-29
 
 ### Added
-
 - Allow parsing individual `Expr` instances from json
 - Make `Expr::evaluate` public
 - Add `cacheable` method to `UserFunction` trait
 
 ### Changed
-
 - Make `parse::parse` a method on `Expr`
 - Make `and` and `or` evaluation lazy
 
@@ -76,19 +71,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2022-11-27
 
 ### Added
-
 - Add neg function to invert sign of numeric values
 - Add cast functions for numeric values
 
 ### Changed
-
 - Remove implicit casts in numeric operations
 
 
 ## [0.1.3] - 2022-11-26
 
 ### Added
-
 - User-function error type
 - TryFrom<> implementations to convert Value into primitive types
 - User Function example and doctest
@@ -99,7 +91,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.2] - 2022-11-22
 
 ### Changed
-
 - Added Ruleset and UserFunction to prelude
 - Removed Error types from prelude
 - Moved `parse_json` into the `Rule` type
@@ -108,20 +99,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.1] - 2022-11-22
 
 ### Added 
-
 - This changelog
 - Ruleset builder
 - Prelude for easy import of `reval` types
 
 ### Changed
-
 - Make `evaluate` method take any parameter that implements `serde::Serialize`
 
 
 ## [0.1.0] - 2022-11-21
 
 ### Added
-
 - Initial release
 - Parse rules from json
 - Experimental support for parsing rules with nom

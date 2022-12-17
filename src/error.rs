@@ -1,6 +1,6 @@
 //! Reval error types
 
-use crate::{function, value::Value};
+use crate::value::Value;
 use displaydoc::Display as DisplayDoc;
 use std::{num::TryFromIntError, result};
 
@@ -28,8 +28,11 @@ pub enum Error {
     /// Unknown value {0}
     UnknownValue(String),
 
-    /// Error executing user function {0}; {1}
-    UserFunctionError(String, function::FunctionError),
+    /// Error executing user function {function}; {error}
+    UserFunctionError {
+        function: String,
+        error: anyhow::Error,
+    },
 
     /// No user function with name {0}
     UnknownUserFunction(String),

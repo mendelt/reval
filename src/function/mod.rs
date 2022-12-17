@@ -2,13 +2,10 @@
 mod context;
 mod user_functions;
 
-use crate::{error::Error, value::Value};
+use crate::value::Value;
 use async_trait::async_trait;
-use displaydoc::Display as DisplayDoc;
-use std::error;
-use std::result;
-
 pub use context::FunctionContext;
+use std::result;
 pub use user_functions::UserFunctions;
 
 /// User functions should implement this trait
@@ -30,26 +27,5 @@ pub trait UserFunction {
 /// Convenience type for passing around boxed user-function implementations
 pub type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
 
-/// Error type returned from UserFunction
-#[derive(Debug, DisplayDoc, thiserror::Error)]
-pub enum FunctionError {
-    /// Invalid parameter {0:?}: Expected {1},
-    InvalidParameter(Value, String),
-
-    /// Unspecified er
-    Unspecified(#[from] Box<dyn error::Error + Send + Sync>),
-}
-
-impl From<Error> for FunctionError {
-    fn from(error: Error) -> Self {
-        match error {
-            Error::UnexpectedValueType(value, expected) => {
-                FunctionError::InvalidParameter(value, expected)
-            }
-            err => FunctionError::Unspecified(err.into()),
-        }
-    }
-}
-
 /// Result type returned from UserFunction
-pub type FunctionResult = result::Result<Value, FunctionError>;
+pub type FunctionResult = result::Result<Value, anyhow::Error>;

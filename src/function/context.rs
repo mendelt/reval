@@ -15,7 +15,10 @@ async fn call_function(function: &BoxedFunction, params: Value, name: &str) -> R
     function
         .call(params)
         .await
-        .map_err(|err| Error::UserFunctionError(name.to_owned(), err))
+        .map_err(|err| Error::UserFunctionError {
+            function: name.to_owned(),
+            error: err,
+        })
 }
 
 impl<'a> FunctionContext<'a> {
