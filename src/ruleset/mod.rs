@@ -5,7 +5,7 @@ pub mod rule;
 
 use crate::{
     error::Result,
-    function::{BoxedFunction, UserFunctions},
+    function::UserFunctions,
     value::{ser::ValueSerializer, Value},
 };
 use serde::Serialize;
@@ -19,28 +19,6 @@ pub struct RuleSet {
 }
 
 impl RuleSet {
-    /// Add a rule to the Ruleset
-    pub fn add_rule(&mut self, rule: Rule) {
-        self.rules.push(rule)
-    }
-
-    /// Add multiple rules to the RuleSet
-    pub fn add_rules(&mut self, rules: impl IntoIterator<Item = Rule>) {
-        for rule in rules {
-            self.rules.push(rule)
-        }
-    }
-
-    /// Add a user-function to the RuleSet
-    pub fn add_function(&mut self, function: BoxedFunction) {
-        self.functions.add_function(function)
-    }
-
-    /// Add multiple user-functions to the RuleSet
-    pub fn add_functions<I: IntoIterator<Item = BoxedFunction>>(&mut self, functions: I) {
-        self.functions.add_functions(functions);
-    }
-
     /// Evaluate the rules in the RuleSet against a piece of data
     pub async fn evaluate(&self, facts: &impl Serialize) -> Result<Vec<Outcome>> {
         self.evaluate_value(&facts.serialize(ValueSerializer)?)
