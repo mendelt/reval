@@ -19,6 +19,7 @@ impl Expr {
                 let param = value.evaluate(context, facts).await?;
                 context.call(name, param).await
             }
+            Expr::If(switch, left, right) => iif(context, facts, switch, left, right).await,
             Expr::Not(value) => not(value.evaluate(context, facts).await?),
             Expr::Neg(value) => neg(value.evaluate(context, facts).await?),
             Expr::Map(map) => eval_map(map, context, facts).await,
@@ -90,6 +91,20 @@ fn index(value: Value, idx: Value) -> Result<Value> {
         (_, _) => Err(Error::InvalidType),
     }
     .map(Clone::clone)
+}
+
+async fn iif(
+    context: &mut FunctionContext<'_>,
+    facts: &Value,
+    switch: &Expr,
+    left: &Expr,
+    right: &Expr,
+) -> Result<Value> {
+    match switch.evaluate(context, facts).await? {
+        Value::Bool(true) => left.evaluate(context, facts).await,
+        Value::Bool(false) => right.evaluate(context, facts).await,
+        _ => Err(Error::InvalidType),
+    }
 }
 
 fn not(value: Value) -> Result<Value> {

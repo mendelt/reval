@@ -18,6 +18,9 @@ pub enum Expr {
     /// Index a dictionary or an array value
     Index(Box<Expr>, Box<Expr>),
 
+    /// Evaluates to one of two expressions based on the boolean value of the first expression
+    If(Box<Expr>, Box<Expr>, Box<Expr>),
+
     /// Construct a map from expression results
     Map(HashMap<String, Expr>),
 
@@ -90,6 +93,11 @@ impl Expr {
     /// Index expression constructor
     pub fn index(left: Expr, right: Expr) -> Self {
         Expr::Index(Box::new(left), Box::new(right))
+    }
+
+    /// If expression constructor
+    pub fn iif(swith: impl Into<Expr>, yes: Expr, no: Expr) -> Self {
+        Expr::If(Box::new(swith.into()), Box::new(yes), Box::new(no))
     }
 
     /// Not expression constructor

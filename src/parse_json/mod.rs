@@ -45,6 +45,7 @@ enum ParseExpr {
     Ref(String),
     Func(String, Box<ParseExpr>),
     Idx(Box<ParseExpr>, Box<ParseExpr>),
+    If(Box<ParseExpr>, Box<ParseExpr>, Box<ParseExpr>),
     Not(Box<ParseExpr>),
     Neg(Box<ParseExpr>),
     CInt(Box<ParseExpr>),
@@ -75,6 +76,9 @@ impl From<ParseExpr> for Expr {
             ParseExpr::Ref(name) => Expr::Reference(name),
             ParseExpr::Func(name, param) => Expr::func(name, (*param).into()),
             ParseExpr::Idx(left, right) => Expr::index((*left).into(), (*right).into()),
+            ParseExpr::If(switch, left, right) => {
+                Expr::iif(*switch, (*left).into(), (*right).into())
+            }
             ParseExpr::Not(value) => Expr::not((*value).into()),
             ParseExpr::Neg(value) => Expr::neg((*value).into()),
             ParseExpr::CInt(value) => Expr::int((*value).into()),
