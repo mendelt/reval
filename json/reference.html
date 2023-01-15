@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Writing rules - Writing Reval rules</title>
+        <title>Reference - Writing Reval rules</title>
 
 
         <!-- Custom HTML head -->
@@ -12,21 +12,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-        <link rel="icon" href="favicon.svg">
-        <link rel="shortcut icon" href="favicon.png">
-        <link rel="stylesheet" href="css/variables.css">
-        <link rel="stylesheet" href="css/general.css">
-        <link rel="stylesheet" href="css/chrome.css">
-        <link rel="stylesheet" href="css/print.css" media="print">
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="fonts/fonts.css">
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" href="highlight.css">
-        <link rel="stylesheet" href="tomorrow-night.css">
-        <link rel="stylesheet" href="ayu-highlight.css">
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
@@ -34,7 +34,7 @@
     <body>
         <!-- Provide site root to javascript -->
         <script>
-            var path_to_root = "";
+            var path_to_root = "../";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
@@ -80,7 +80,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html" class="active"><strong aria-hidden="true">1.</strong> Writing rules</a></li><li class="chapter-item expanded "><a href="json/index.html"><strong aria-hidden="true">2.</strong> Json rules</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="json/reference.html"><strong aria-hidden="true">2.1.</strong> Reference</a></li></ol></li><li class="chapter-item expanded "><a href="reval/index.html"><strong aria-hidden="true">3.</strong> Reval DSL rules</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../intro.html"><strong aria-hidden="true">1.</strong> Writing rules</a></li><li class="chapter-item expanded "><a href="../json/index.html"><strong aria-hidden="true">2.</strong> Json rules</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../json/reference.html" class="active"><strong aria-hidden="true">2.1.</strong> Reference</a></li></ol></li><li class="chapter-item expanded "><a href="../reval/index.html"><strong aria-hidden="true">3.</strong> Reval DSL rules</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -112,7 +112,7 @@
                     <h1 class="menu-title">Writing Reval rules</h1>
 
                     <div class="right-buttons">
-                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
 
@@ -141,40 +141,43 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="writing-reval-rules"><a class="header" href="#writing-reval-rules">Writing Reval rules</a></h1>
-<h2 id="intro"><a class="header" href="#intro">Intro</a></h2>
-<p>Reval is a library (or crate as libraries are called in Rust, the language that Reval is written in) for managing, interpreting and executing rules.
-This document is targeted at people writing rules for Reval. It describes the syntax and structure of the rules. This document does not describe details of a specific Reval implementation. Any information on the structure of input data, output data or extra functions provided by any system that uses Reval should be described in the documentation of that system.</p>
-<h2 id="concepts"><a class="header" href="#concepts">Concepts</a></h2>
-<h3 id="rules"><a class="header" href="#rules">Rules</a></h3>
-<p>Rules are pieces of text describing how to process input data to generate the required output. How the input and output data is structured depends depends on your particular Reval implementation.
-Each rule has a name, this name is used to identify the rule in error messages and other output and should be unique in a ruleset. Each rule also contains an expression, this is the actual rule that will be evaluated to generate the output.</p>
-<p>Rules can be writting in one of two languages. First is a language based on the Json text format. This is a very precise but verbose way of expressing rules. A rule written in the Json language will look like this;</p>
-<pre><code class="language-json">{
-    &quot;name&quot;: &quot;Example rule&quot;,
-    &quot;expr&quot;: {&quot;gte&quot;: [{&quot;ref&quot;: &quot;input_field&quot;}, {&quot;int&quot;: &quot;5&quot;}]}
-}
-</code></pre>
-<p>This rule has the name <code>&quot;Example rule&quot;</code> and compares the value in <code>input_field</code> with the integer <code>5</code>. It will return <code>true</code> if it is greater than or equal to 5 and <code>false</code> otherwise. This rule will return an error if <code>input_field</code> does not contain a value with an integer type.</p>
-<p>Reval will also support a more concise Reval language. Right now this language is still experimental and only supports a small subset of the Reval features. In the future it might replace the json language. The rule that we just looked at might look like this in the Reval language</p>
-<pre><code>### Example rule
-[input_field] &gt;= 5
-</code></pre>
-<h3 id="rulesets"><a class="header" href="#rulesets">Rulesets</a></h3>
-<p>Rules are bundled into rulesets. A ruleset will typically contain rules that work on the same type of input data and produce the same type of output data. Normally all the rules in a ruleset are run on each piece of input data. The output from running each of the rules is then combined.
-A ruleset that is used to trigger some action might contain rules that will each return a boolean, like the example rule in the previous paragraph. The values output by each of the rules will then be combined so that the action is triggered when one of the rules was triggered. Or outputs of rules might also be averaged or added together.</p>
-<p>Data passed into the rules is usually one or more named values. These can be accessed inside the rule. These values can have primitive types like <code>string</code>, <code>integer</code>, <code>decimal</code>, <code>float</code> or <code>boolean</code>, or they can themselves be structured values, they can be a <code>map</code> or a <code>vector</code> containing either named values or numbered values.</p>
-<h3 id="functions"><a class="header" href="#functions">Functions</a></h3>
-<p>A ruleset can also have custom functions that allow rules to access functionality provided by the software that embeds the Reval rules-engine. Functions have a name, take a value as their input and return a value as output. Depending on how the function is implemented the output can be cached. So calling it multiple times might not incur a performance impact. </p>
-<h3 id="tests"><a class="header" href="#tests">Tests</a></h3>
-<p>T.B.D.</p>
-
+                        <h1 id="reference"><a class="header" href="#reference">Reference</a></h1>
+<p>A reference guide to quickly find Reval expressions</p>
+<h2 id="expressions"><a class="header" href="#expressions">Expressions</a></h2>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Expr</th><th style="text-align: left">Description</th></tr></thead><tbody>
+<tr><td style="text-align: left">string</td><td style="text-align: left">Construct a simple string value</td></tr>
+<tr><td style="text-align: left">int</td><td style="text-align: left">Construct a simple int value</td></tr>
+<tr><td style="text-align: left">float</td><td style="text-align: left">Construct a simple float value</td></tr>
+<tr><td style="text-align: left">decimal</td><td style="text-align: left">Construct a simple decimal value</td></tr>
+<tr><td style="text-align: left">bool</td><td style="text-align: left">Construct a simple boolean value</td></tr>
+<tr><td style="text-align: left">map</td><td style="text-align: left">Construct a map value</td></tr>
+<tr><td style="text-align: left">vec</td><td style="text-align: left">Construct a vec value</td></tr>
+<tr><td style="text-align: left">not</td><td style="text-align: left">Logical inversion, converts <code>true</code> to <code>false</code> and <code>false</code> to <code>true</code></td></tr>
+<tr><td style="text-align: left">and</td><td style="text-align: left">Logical and, is <code>true</code> only when all parameters evaluate to <code>true</code></td></tr>
+<tr><td style="text-align: left">or</td><td style="text-align: left">Logical or, is <code>false</code> only when all parameters evaluate to <code>false</code></td></tr>
+<tr><td style="text-align: left">neg</td><td style="text-align: left">Numeric inversion, makes positive values negative and negative values positive</td></tr>
+<tr><td style="text-align: left">add</td><td style="text-align: left">Addition, adds up numeric values</td></tr>
+<tr><td style="text-align: left">sub</td><td style="text-align: left">Subtraction, subtracts numeric values</td></tr>
+<tr><td style="text-align: left">mul</td><td style="text-align: left">Multiplication, multiplies numeric values</td></tr>
+<tr><td style="text-align: left">div</td><td style="text-align: left">Division, divides numeric values</td></tr>
+<tr><td style="text-align: left">if</td><td style="text-align: left">Control flow expression, <code>if</code> takes three expressions as parameters.  If the first expression evaluates to <code>true</code> the if expression will take the value of the second or <code>then</code> expression.  If the first expression evaluates to <code>false</code> the if expression will take the value of the third or <code>else</code> expression.</td></tr>
+<tr><td style="text-align: left">ref</td><td style="text-align: left">Ref references a field from the input</td></tr>
+<tr><td style="text-align: left">idx</td><td style="text-align: left">Access fields in map or vec types. <code>idx</code> indexes fields of maps with strings and vec fields can be indexed using integer values</td></tr>
+<tr><td style="text-align: left">func</td><td style="text-align: left">Call a custom fuction by name</td></tr>
+<tr><td style="text-align: left">cint</td><td style="text-align: left">Convert a value to an integer</td></tr>
+<tr><td style="text-align: left">cfloat</td><td style="text-align: left">Convert a value to float</td></tr>
+<tr><td style="text-align: left">cdecimal</td><td style="text-align: left">Convert a value to decimal</td></tr>
+</tbody></table>
+</div>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../json/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next" href="json/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../reval/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -184,8 +187,11 @@ A ruleset that is used to trigger some action might contain rules that will each
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../json/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next" href="json/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../reval/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -200,13 +206,13 @@ A ruleset that is used to trigger some action might contain rules that will each
         </script>
 
 
-        <script src="elasticlunr.min.js"></script>
-        <script src="mark.min.js"></script>
-        <script src="searcher.js"></script>
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
 
-        <script src="clipboard.min.js"></script>
-        <script src="highlight.js"></script>
-        <script src="book.js"></script>
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
 

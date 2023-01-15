@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Intro</a></li><li class="chapter-item expanded "><a href="json/index.html"><strong aria-hidden="true">2.</strong> Json rules</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">3.</strong> </div></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Writing rules</a></li><li class="chapter-item expanded "><a href="json/index.html"><strong aria-hidden="true">2.</strong> Json rules</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="json/reference.html"><strong aria-hidden="true">2.1.</strong> Reference</a></li></ol></li><li class="chapter-item expanded "><a href="reval/index.html"><strong aria-hidden="true">3.</strong> Reval DSL rules</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -178,8 +178,11 @@ The expression is a nested tree-structure. At the root is the first expression t
     &quot;expr&quot;: {&quot;string&quot;: &quot;&quot;}
 }
 </code></pre>
-<h2 id="values"><a class="header" href="#values">Values</a></h2>
-<p>The simpelest expressions are value expressions. Reval values can have different types and there is one value expression for each type. The primitive types that Reval uses are <code>String</code>, <code>Int</code>, <code>Decimal</code>, <code>Float</code> and <code>Bool</code> and there are expressions for each of these.</p>
+<h1 id="expressions"><a class="header" href="#expressions">Expressions</a></h1>
+<p>Expressions are written as a key-value pair in json, the key is the name of the expression and the value is either one parameter if the expression only takes one parameter. In most cases expressions take more than one parameter so the value will be a list.</p>
+<p>Expression names are in lower-case.</p>
+<h2 id="value-expressions"><a class="header" href="#value-expressions">Value Expressions</a></h2>
+<p>The simpelest expressions are value expressions. Reval values can have different types and there is one value expression for each type. The primitive types that Reval uses are <code>String</code>, <code>Int</code>, <code>Decimal</code>, <code>Float</code> and <code>Bool</code> and there are expressions for each of these;</p>
 <pre><code class="language-json">{ &quot;string&quot;: &quot;This is a string value&quot; }
 </code></pre>
 <pre><code class="language-json">{ &quot;int&quot;: -5 }
@@ -190,23 +193,35 @@ The expression is a nested tree-structure. At the root is the first expression t
 </code></pre>
 <pre><code class="language-json">{ &quot;bool&quot;: true }
 </code></pre>
-<h2 id="conversions"><a class="header" href="#conversions">Conversions</a></h2>
-<p>Reval has three expressions that allow conversions between numeric types, each of these takes one expression as a parameter.</p>
-<ul>
-<li>CFloat</li>
-<li>CInt</li>
-<li>CDecimal</li>
-</ul>
-<h2 id="comparison"><a class="header" href="#comparison">Comparison</a></h2>
+<h2 id="comparison-expressions"><a class="header" href="#comparison-expressions">Comparison Expressions</a></h2>
 <p>Reval supports a number of comparison expressions that can be used to compare values. Al these expressions result in a boolean value.</p>
+<h3 id="eq-and-neq"><a class="header" href="#eq-and-neq">Eq and neq</a></h3>
+<p>Eq is short for &quot;equals&quot; and compares equality. It returns true when the two parameters are exactly the same</p>
+<pre><code class="language-json">{ &quot;eq&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
+</code></pre>
+<p>Neq is short for &quot;not equal&quot; and is the inverse of the <code>eq</code> expression. Compares equality of two parameters and returns <code>false</code> if they are the same.</p>
+<pre><code class="language-json">{ &quot;neq&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
+</code></pre>
+<h2 id="special-expressions"><a class="header" href="#special-expressions">Special expressions</a></h2>
+<p>There are a couple of special expressions that allow </p>
+<h3 id="access-to-input-data"><a class="header" href="#access-to-input-data">Access to input data</a></h3>
 <ul>
-<li>Eq</li>
-<li>Neq</li>
-<li>Gt</li>
-<li>Gte</li>
-<li>Lt</li>
-<li>Lte</li>
+<li>Ref</li>
 </ul>
+<h3 id="field-access-for-map-and-vec-types"><a class="header" href="#field-access-for-map-and-vec-types">Field access for Map and Vec types</a></h3>
+<ul>
+<li>Idx</li>
+</ul>
+<h3 id="gt-gte-lt-and-lte"><a class="header" href="#gt-gte-lt-and-lte">Gt, gte, lt and lte</a></h3>
+<p>Gt is short for &quot;greater than&quot; it compares two numeric values of the same type, lt is &quot;less than&quot; and is the inverse. Gte and lte are the inclusive versions of these operations. They are short for &quot;Greater than or equal&quot; and &quot;Less than or equal&quot;</p>
+<pre><code class="language-json">{ &quot;gt&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
+</code></pre>
+<pre><code class="language-json">{ &quot;gte&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
+</code></pre>
+<pre><code class="language-json">{ &quot;lt&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
+</code></pre>
+<pre><code class="language-json">{ &quot;lte&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
+</code></pre>
 <h2 id="logic"><a class="header" href="#logic">Logic</a></h2>
 <p>Logic expressions perform logic operations on boolean values. These can be used to combine results from comparison expressions for example. Logic expressions take one or more boolean expressions as parameters and return a boolean value when evaluated.</p>
 <ul>
@@ -222,16 +237,41 @@ The expression is a nested tree-structure. At the root is the first expression t
 <li>Mul</li>
 <li>Div</li>
 </ul>
-<h2 id="special-expressions"><a class="header" href="#special-expressions">Special expressions</a></h2>
-<p>There are a couple of special expressions that allow </p>
-<h3 id="access-to-input-data"><a class="header" href="#access-to-input-data">Access to input data</a></h3>
+<h2 id="conversions"><a class="header" href="#conversions">Conversions</a></h2>
+<p>Reval has three expressions that allow conversions between numeric types, each of these takes one expression as a parameter.</p>
 <ul>
-<li>Ref</li>
+<li>CFloat</li>
+<li>CInt</li>
+<li>CDecimal</li>
 </ul>
-<h3 id="field-access-for-map-and-vec-types"><a class="header" href="#field-access-for-map-and-vec-types">Field access for Map and Vec types</a></h3>
-<ul>
-<li>Idx</li>
-</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="reference"><a class="header" href="#reference">Reference</a></h1>
+<p>A reference guide to quickly find Reval expressions</p>
+<h2 id="expressions-1"><a class="header" href="#expressions-1">Expressions</a></h2>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Expr</th><th style="text-align: left">Description</th></tr></thead><tbody>
+<tr><td style="text-align: left">string</td><td style="text-align: left">Construct a simple string value</td></tr>
+<tr><td style="text-align: left">int</td><td style="text-align: left">Construct a simple int value</td></tr>
+<tr><td style="text-align: left">float</td><td style="text-align: left">Construct a simple float value</td></tr>
+<tr><td style="text-align: left">decimal</td><td style="text-align: left">Construct a simple decimal value</td></tr>
+<tr><td style="text-align: left">bool</td><td style="text-align: left">Construct a simple boolean value</td></tr>
+<tr><td style="text-align: left">map</td><td style="text-align: left">Construct a map value</td></tr>
+<tr><td style="text-align: left">vec</td><td style="text-align: left">Construct a vec value</td></tr>
+<tr><td style="text-align: left">not</td><td style="text-align: left">Logical inversion, converts <code>true</code> to <code>false</code> and <code>false</code> to <code>true</code></td></tr>
+<tr><td style="text-align: left">and</td><td style="text-align: left">Logical and, is <code>true</code> only when all parameters evaluate to <code>true</code></td></tr>
+<tr><td style="text-align: left">or</td><td style="text-align: left">Logical or, is <code>false</code> only when all parameters evaluate to <code>false</code></td></tr>
+<tr><td style="text-align: left">neg</td><td style="text-align: left">Numeric inversion, makes positive values negative and negative values positive</td></tr>
+<tr><td style="text-align: left">add</td><td style="text-align: left">Addition, adds up numeric values</td></tr>
+<tr><td style="text-align: left">sub</td><td style="text-align: left">Subtraction, subtracts numeric values</td></tr>
+<tr><td style="text-align: left">mul</td><td style="text-align: left">Multiplication, multiplies numeric values</td></tr>
+<tr><td style="text-align: left">div</td><td style="text-align: left">Division, divides numeric values</td></tr>
+<tr><td style="text-align: left">if</td><td style="text-align: left">Control flow expression, <code>if</code> takes three expressions as parameters.  If the first expression evaluates to <code>true</code> the if expression will take the value of the second or <code>then</code> expression.  If the first expression evaluates to <code>false</code> the if expression will take the value of the third or <code>else</code> expression.</td></tr>
+<tr><td style="text-align: left">ref</td><td style="text-align: left">Ref references a field from the input</td></tr>
+<tr><td style="text-align: left">idx</td><td style="text-align: left">Access fields in map or vec types. <code>idx</code> indexes fields of maps with strings and vec fields can be indexed using integer values</td></tr>
+<tr><td style="text-align: left">func</td><td style="text-align: left">Call a custom fuction by name</td></tr>
+<tr><td style="text-align: left">cint</td><td style="text-align: left">Convert a value to an integer</td></tr>
+<tr><td style="text-align: left">cfloat</td><td style="text-align: left">Convert a value to float</td></tr>
+<tr><td style="text-align: left">cdecimal</td><td style="text-align: left">Convert a value to decimal</td></tr>
+</tbody></table>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="reval-dsl-rules"><a class="header" href="#reval-dsl-rules">Reval DSL rules</a></h1>
 
                     </main>
 
