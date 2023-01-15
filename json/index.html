@@ -80,7 +80,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../intro.html"><strong aria-hidden="true">1.</strong> Writing rules</a></li><li class="chapter-item expanded "><a href="../json/index.html" class="active"><strong aria-hidden="true">2.</strong> Json rules</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../json/reference.html"><strong aria-hidden="true">2.1.</strong> Reference</a></li></ol></li><li class="chapter-item expanded "><a href="../reval/index.html"><strong aria-hidden="true">3.</strong> Reval DSL rules</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../intro.html"><strong aria-hidden="true">1.</strong> Writing rules</a></li><li class="chapter-item expanded "><a href="../json/index.html" class="active"><strong aria-hidden="true">2.</strong> Json rules</a></li><li class="chapter-item expanded "><a href="../json/reference.html"><strong aria-hidden="true">3.</strong> Json rules Reference</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -175,15 +175,20 @@ The expression is a nested tree-structure. At the root is the first expression t
 <pre><code class="language-json">{ &quot;neq&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
 </code></pre>
 <h2 id="special-expressions"><a class="header" href="#special-expressions">Special expressions</a></h2>
-<p>There are a couple of special expressions that allow </p>
-<h3 id="access-to-input-data"><a class="header" href="#access-to-input-data">Access to input data</a></h3>
-<ul>
-<li>Ref</li>
-</ul>
-<h3 id="field-access-for-map-and-vec-types"><a class="header" href="#field-access-for-map-and-vec-types">Field access for Map and Vec types</a></h3>
-<ul>
-<li>Idx</li>
-</ul>
+<p>There are a couple of special expressions that allow express</p>
+<h3 id="ref"><a class="header" href="#ref">Ref</a></h3>
+<p>The <code>ref</code> expression allow rules to access fields from input data by name</p>
+<pre><code class="language-json">{&quot;ref&quot;: &quot;input_field_name&quot;}
+</code></pre>
+<h3 id="idx"><a class="header" href="#idx">Idx</a></h3>
+<p>The <code>idx</code> expression indexes fields from map or vec values.</p>
+<p>Fields from a vec can be indexed by number.</p>
+<pre><code class="language-json">{&quot;idx&quot;: [{ &quot;ref&quot;: &quot;some_vec_value&quot; }, { &quot;int&quot;: 5 } ]}
+</code></pre>
+<p>Fields from maps are indexed by string.</p>
+<pre><code class="language-json">{&quot;idx&quot;: [{ &quot;ref&quot;: &quot;some_map_value&quot; }, { &quot;string&quot;: &quot;sub-field&quot; } ]}
+</code></pre>
+<h3 id=""><a class="header" href="#"></a></h3>
 <h3 id="gt-gte-lt-and-lte"><a class="header" href="#gt-gte-lt-and-lte">Gt, gte, lt and lte</a></h3>
 <p>Gt is short for &quot;greater than&quot; it compares two numeric values of the same type, lt is &quot;less than&quot; and is the inverse. Gte and lte are the inclusive versions of these operations. They are short for &quot;Greater than or equal&quot; and &quot;Less than or equal&quot;</p>
 <pre><code class="language-json">{ &quot;gt&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
@@ -194,14 +199,30 @@ The expression is a nested tree-structure. At the root is the first expression t
 </code></pre>
 <pre><code class="language-json">{ &quot;lte&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
 </code></pre>
-<h2 id="logic"><a class="header" href="#logic">Logic</a></h2>
+<h2 id="logic-expressions"><a class="header" href="#logic-expressions">Logic expressions</a></h2>
 <p>Logic expressions perform logic operations on boolean values. These can be used to combine results from comparison expressions for example. Logic expressions take one or more boolean expressions as parameters and return a boolean value when evaluated.</p>
-<ul>
-<li>Not</li>
-<li>And</li>
-<li>Or</li>
-</ul>
-<p>If is not a logic expression but it works well with logic expressions. It can be used to evaluate an expression and return one value if the expression is true and another value when that expression is false. The returned values themselves are retrieved by evaluating expressions so <code>if</code> can be used to implement simple control flow in expressions</p>
+<h3 id="not"><a class="header" href="#not">Not</a></h3>
+<p>The not expression inverts a boolean value. So <code>true</code> becomes <code>false</code> and <code>false</code> becomes <code>true</code>.</p>
+<pre><code class="language-json">{ &quot;not&quot;: { &quot;bool&quot;: false } }
+</code></pre>
+<h3 id="and"><a class="header" href="#and">And</a></h3>
+<p>The logical <code>and</code> expression takes two sub-expressions as parameters and only evaluates to <code>true</code> if both parameters evaluate to <code>true</code>.</p>
+<pre><code class="language-json">{
+    &quot;and&quot;: [ 
+        { &quot;gte&quot;: [{ &quot;ref&quot;: &quot;input_1&quot; }, { &quot;int&quot;: 5 }]},
+        { &quot;gte&quot;: [{ &quot;ref&quot;: &quot;input_2&quot; }, { &quot;float&quot;: 15.9 }]}
+    ]
+}
+</code></pre>
+<h3 id="or"><a class="header" href="#or">Or</a></h3>
+<p>The logical <code>or</code> expression takes two sub-expressions as parameters and only evaluates to <code>false</code> if both parameters evaluate to <code>false</code>.</p>
+<pre><code class="language-json">{
+    &quot;or&quot;: [ 
+        { &quot;gte&quot;: [{ &quot;ref&quot;: &quot;input_1&quot; }, { &quot;int&quot;: 5 }]},
+        { &quot;gte&quot;: [{ &quot;ref&quot;: &quot;input_2&quot; }, { &quot;float&quot;: 15.9 }]}
+    ]
+}
+</code></pre>
 <h2 id="calculation"><a class="header" href="#calculation">Calculation</a></h2>
 <ul>
 <li>Add</li>
