@@ -55,11 +55,28 @@ Neq is short for "not equal" and is the inverse of the `eq` expression. Compares
 ```
 
 ## Special expressions
-There are a couple of special expressions that allow 
-### Access to input data
-* Ref
-### Field access for Map and Vec types
-* Idx
+There are a couple of special expressions that allow express
+### Ref
+The `ref` expression allow rules to access fields from input data by name
+
+```json
+{"ref": "input_field_name"}
+```
+
+### Idx
+The `idx` expression indexes fields from map or vec values.
+
+Fields from a vec can be indexed by number.
+```json
+{"idx": [{ "ref": "some_vec_value" }, { "int": 5 } ]}
+```
+
+Fields from maps are indexed by string.
+```json
+{"idx": [{ "ref": "some_map_value" }, { "string": "sub-field" } ]}
+```
+
+### 
 
 ### Gt, gte, lt and lte
 Gt is short for "greater than" it compares two numeric values of the same type, lt is "less than" and is the inverse. Gte and lte are the inclusive versions of these operations. They are short for "Greater than or equal" and "Less than or equal"
@@ -80,14 +97,39 @@ Gt is short for "greater than" it compares two numeric values of the same type, 
 { "lte": [{"int": 5}, {"ref": "input"}] }
 ```
 
-## Logic
+## Logic expressions
 Logic expressions perform logic operations on boolean values. These can be used to combine results from comparison expressions for example. Logic expressions take one or more boolean expressions as parameters and return a boolean value when evaluated.
 
-* Not
-* And
-* Or
+### Not
+The not expression inverts a boolean value. So `true` becomes `false` and `false` becomes `true`.
 
-If is not a logic expression but it works well with logic expressions. It can be used to evaluate an expression and return one value if the expression is true and another value when that expression is false. The returned values themselves are retrieved by evaluating expressions so `if` can be used to implement simple control flow in expressions
+```json
+{ "not": { "bool": false } }
+```
+
+### And
+The logical `and` expression takes two sub-expressions as parameters and only evaluates to `true` if both parameters evaluate to `true`.
+
+```json
+{
+    "and": [ 
+        { "gte": [{ "ref": "input_1" }, { "int": 5 }]},
+        { "gte": [{ "ref": "input_2" }, { "float": 15.9 }]}
+    ]
+}
+```
+
+### Or
+The logical `or` expression takes two sub-expressions as parameters and only evaluates to `false` if both parameters evaluate to `false`.
+
+```json
+{
+    "or": [ 
+        { "gte": [{ "ref": "input_1" }, { "int": 5 }]},
+        { "gte": [{ "ref": "input_2" }, { "float": 15.9 }]}
+    ]
+}
+```
 
 ## Calculation
 * Add
