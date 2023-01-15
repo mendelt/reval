@@ -3,45 +3,43 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Chapter 1 - Reval book</title>
-                
+        <title>Intro - Writing Reval rules</title>
+
 
         <!-- Custom HTML head -->
         
-
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-                <link rel="icon" href="favicon.svg">
-                        <link rel="shortcut icon" href="favicon.png">
-                <link rel="stylesheet" href="css/variables.css">
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
-                <link rel="stylesheet" href="css/print.css" media="print">
-        
+        <link rel="stylesheet" href="css/print.css" media="print">
+
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-                <link rel="stylesheet" href="fonts/fonts.css">
-        
+        <link rel="stylesheet" href="fonts/fonts.css">
+
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
-        
-            </head>
+
+    </head>
     <body>
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -57,7 +55,7 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
@@ -69,7 +67,7 @@
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
+        <script>
             var html = document.querySelector('html');
             var sidebar = 'hidden';
             if (document.body.clientWidth >= 1080) {
@@ -82,15 +80,15 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html" class="active"><strong aria-hidden="true">1.</strong> Chapter 1</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html" class="active"><strong aria-hidden="true">1.</strong> Intro</a></li><li class="chapter-item expanded "><a href="json/index.html"><strong aria-hidden="true">2.</strong> Json rules</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">3.</strong> </div></li></ol>
+            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
-                
-                <div id="menu-bar-hover-placeholder"></div>
+                                <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky bordered">
                     <div class="left-buttons">
                         <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
@@ -100,28 +98,28 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                                                <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
-                                            </div>
+                    </div>
 
-                    <h1 class="menu-title">Reval book</h1>
+                    <h1 class="menu-title">Writing Reval rules</h1>
 
                     <div class="right-buttons">
-                                                <a href="print.html" title="Print this book" aria-label="Print this book">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                                                                        
+
                     </div>
                 </div>
 
-                                <div id="search-wrapper" class="hidden">
+                <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
                         <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
@@ -131,9 +129,9 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -143,105 +141,75 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="json-rules"><a class="header" href="#json-rules">Json rules</a></h1>
-<p>A rule is written as a json structure with a name and an associated expression. The name is what identifies the rule and should be unique in the rule-set.
-The expression is what will be evaluated.
-The expression is a nested tree-structure. At the root is the first expression that will be evaluated. Expressions can have parameters and depending on the expression these parameters can themselves be expressions.</p>
+                        <h1 id="writing-reval-rules"><a class="header" href="#writing-reval-rules">Writing Reval rules</a></h1>
+<h2 id="intro"><a class="header" href="#intro">Intro</a></h2>
+<p>Reval is a library (or crate as libraries are called in Rust, the language that Reval is written in) for managing, interpreting and executing rules.
+This document is targeted at people writing rules for Reval. It describes the syntax and structure of the rules. This document does not describe details of a specific Reval implementation. Any information on the structure of input data, output data or extra functions provided by any system that uses Reval should be described in the documentation of that system.</p>
+<h2 id="concepts"><a class="header" href="#concepts">Concepts</a></h2>
+<h3 id="rules"><a class="header" href="#rules">Rules</a></h3>
+<p>Rules are pieces of text describing how to process input data to generate the required output. How the input and output data is structured depends depends on your particular Reval implementation.
+Each rule has a name, this name is used to identify the rule in error messages and other output and should be unique in a ruleset. Each rule also contains an expression, this is the actual rule that will be evaluated to generate the output.</p>
+<p>Rules can be writting in one of two languages. First is a language based on the Json text format. This is a very precise but verbose way of expressing rules. A rule written in the Json language will look like this;</p>
 <pre><code class="language-json">{
     &quot;name&quot;: &quot;Example rule&quot;,
-    &quot;expr&quot;: {&quot;string&quot;: &quot;&quot;}
+    &quot;expr&quot;: {&quot;gte&quot;: [{&quot;ref&quot;: &quot;input_field&quot;}, {&quot;int&quot;: &quot;5&quot;}]}
 }
 </code></pre>
-<h2 id="values"><a class="header" href="#values">Values</a></h2>
-<p>The simpelest expressions are value expressions. Reval values can have different types and there is one value expression for each type. The primitive types that Reval uses are <code>String</code>, <code>Int</code>, <code>Decimal</code>, <code>Float</code> and <code>Bool</code> and there are expressions for each of these.</p>
-<pre><code class="language-json">{ &quot;string&quot;: &quot;This is a string value&quot; }
+<p>This rule has the name <code>&quot;Example rule&quot;</code> and compares the value in <code>input_field</code> with the integer <code>5</code>. It will return <code>true</code> if it is greater than or equal to 5 and <code>false</code> otherwise. This rule will return an error if <code>input_field</code> does not contain a value with an integer type.</p>
+<p>Reval will also support a more concise Reval language. Right now this language is still experimental and only supports a small subset of the Reval features. In the future it might replace the json language. The rule that we just looked at might look like this in the Reval language</p>
+<pre><code>### Example rule
+[input_field] &gt;= 5
 </code></pre>
-<pre><code class="language-json">{ &quot;int&quot;: -5 }
-</code></pre>
-<pre><code class="language-json">{ &quot;decimal&quot;: 5.132 }
-</code></pre>
-<pre><code class="language-json">{ &quot;float&quot;: 5.15e28 }
-</code></pre>
-<pre><code class="language-json">{ &quot;bool&quot;: true }
-</code></pre>
-<h2 id="conversions"><a class="header" href="#conversions">Conversions</a></h2>
-<p>Reval has three expressions that allow conversions between numeric types, each of these takes one expression as a parameter.</p>
-<ul>
-<li>CFloat</li>
-<li>CInt</li>
-<li>CDecimal</li>
-</ul>
-<h2 id="comparison"><a class="header" href="#comparison">Comparison</a></h2>
-<p>Reval supports a number of comparison expressions that can be used to compare values. Al these expressions result in a boolean value.</p>
-<ul>
-<li>Eq</li>
-<li>Neq</li>
-<li>Gt</li>
-<li>Gte</li>
-<li>Lt</li>
-<li>Lte</li>
-</ul>
-<h2 id="logic"><a class="header" href="#logic">Logic</a></h2>
-<p>Logic expressions perform logic operations on boolean values. These can be used to combine results from comparison expressions for example. Logic expressions take one or more boolean expressions as parameters and return a boolean value when evaluated.</p>
-<ul>
-<li>Not</li>
-<li>And</li>
-<li>Or</li>
-</ul>
-<p>If is not a logic expression but it works well with logic expressions. It can be used to evaluate an expression and return one value if the expression is true and another value when that expression is false. The returned values themselves are retrieved by evaluating expressions so <code>if</code> can be used to implement simple control flow in expressions</p>
-<h2 id="calculation"><a class="header" href="#calculation">Calculation</a></h2>
-<ul>
-<li>Add</li>
-<li>Sub</li>
-<li>Mul</li>
-<li>Div</li>
-</ul>
-<h2 id="special-expressions"><a class="header" href="#special-expressions">Special expressions</a></h2>
-<p>There are a couple of special expressions that allow </p>
-<h3 id="access-to-input-data"><a class="header" href="#access-to-input-data">Access to input data</a></h3>
-<ul>
-<li>Ref</li>
-</ul>
-<h3 id="field-access-for-map-and-vec-types"><a class="header" href="#field-access-for-map-and-vec-types">Field access for Map and Vec types</a></h3>
-<ul>
-<li>Idx</li>
-</ul>
+<h3 id="rulesets"><a class="header" href="#rulesets">Rulesets</a></h3>
+<p>Rules are bundled into rulesets. A ruleset will typically contain rules that work on the same type of input data and produce the same type of output data. Normally all the rules in a ruleset are run on each piece of input data. The output from running each of the rules is then combined.
+A ruleset that is used to trigger some action might contain rules that will each return a boolean, like the example rule in the previous paragraph. The values output by each of the rules will then be combined so that the action is triggered when one of the rules was triggered. Or outputs of rules might also be averaged or added together.</p>
+<p>Data passed into the rules is usually one or more named values. These can be accessed inside the rule. These values can have primitive types like <code>string</code>, <code>integer</code>, <code>decimal</code>, <code>float</code> or <code>boolean</code>, or they can themselves be structured values, they can be a <code>map</code> or a <code>vector</code> containing either named values or numbered values.</p>
+<h3 id="functions"><a class="header" href="#functions">Functions</a></h3>
+<p>A ruleset can also have custom functions that allow rules to access functionality provided by the software that embeds the Reval rules-engine. Functions have a name, take a value as their input and return a value as output. Depending on how the function is implemented the output can be cached. So calling it multiple times might not incur a performance impact. </p>
+<h3 id="tests"><a class="header" href="#tests">Tests</a></h3>
+<p>T.B.D.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                        
-                        
+
+                            <a rel="next" href="json/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
                         <div style="clear: both"></div>
                     </nav>
                 </div>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                
-                            </nav>
+
+                    <a rel="next" href="json/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
 
         </div>
 
-        
-        
-        
-                <script type="text/javascript">
+
+
+
+        <script>
             window.playground_copyable = true;
         </script>
-        
-        
-                <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
-        
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
-        
-        
+
+
     </body>
 </html>
