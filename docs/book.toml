@@ -3,4 +3,4 @@ authors = ["Mendelt Siebenga"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Reval book"
+title = "Writing Reval rules"
