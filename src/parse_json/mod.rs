@@ -1,6 +1,6 @@
 //! Parse rules writting in the Reval json format
 
-use crate::{expr::Expr, ruleset::rule::Rule};
+use crate::{expr::Expr, prelude::Value, ruleset::rule::Rule};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::Error;
@@ -51,22 +51,22 @@ enum ParseExpr {
     CInt(Box<ParseExpr>),
     CFloat(Box<ParseExpr>),
     CDecimal(Box<ParseExpr>),
-    Mult(Box<ParseExpr>, Box<ParseExpr>),
-    Div(Box<ParseExpr>, Box<ParseExpr>),
-    Add(Box<ParseExpr>, Box<ParseExpr>),
-    Sub(Box<ParseExpr>, Box<ParseExpr>),
+    Mult(Vec<ParseExpr>),
+    Div(Vec<ParseExpr>),
+    Add(Vec<ParseExpr>),
+    Sub(Vec<ParseExpr>),
     Eq(Box<ParseExpr>, Box<ParseExpr>),
     Neq(Box<ParseExpr>, Box<ParseExpr>),
     Gt(Box<ParseExpr>, Box<ParseExpr>),
     Gte(Box<ParseExpr>, Box<ParseExpr>),
     Lt(Box<ParseExpr>, Box<ParseExpr>),
     Lte(Box<ParseExpr>, Box<ParseExpr>),
-    And(Box<ParseExpr>, Box<ParseExpr>),
-    Or(Box<ParseExpr>, Box<ParseExpr>),
+    And(Vec<ParseExpr>),
+    Or(Vec<ParseExpr>),
 }
 
 impl From<ParseExpr> for Expr {
-    fn from(value: ParseExpr) -> Expr {
+    fn from(value: ParseExpr) -> Self {
         match value {
             ParseExpr::String(value) => Expr::Value(value.into()),
             ParseExpr::Int(value) => Expr::Value(value.into()),
@@ -86,18 +86,18 @@ impl From<ParseExpr> for Expr {
             ParseExpr::CDecimal(value) => Expr::dec((*value).into()),
             ParseExpr::Map(map) => map_expr(map),
             ParseExpr::Vec(vec) => vec_expr(vec),
-            ParseExpr::Mult(left, right) => Expr::mult((*left).into(), (*right).into()),
-            ParseExpr::Div(left, right) => Expr::div((*left).into(), (*right).into()),
-            ParseExpr::Add(left, right) => Expr::add((*left).into(), (*right).into()),
-            ParseExpr::Sub(left, right) => Expr::sub((*left).into(), (*right).into()),
+            ParseExpr::Mult(params) => operands(params, Expr::mult),
+            ParseExpr::Div(params) => operands(params, Expr::div),
+            ParseExpr::Add(params) => operands(params, Expr::add),
+            ParseExpr::Sub(params) => operands(params, Expr::sub),
             ParseExpr::Eq(left, right) => Expr::eq((*left).into(), (*right).into()),
             ParseExpr::Neq(left, right) => Expr::neq((*left).into(), (*right).into()),
             ParseExpr::Gt(left, right) => Expr::gt((*left).into(), (*right).into()),
             ParseExpr::Gte(left, right) => Expr::gte((*left).into(), (*right).into()),
             ParseExpr::Lt(left, right) => Expr::lt((*left).into(), (*right).into()),
             ParseExpr::Lte(left, right) => Expr::lte((*left).into(), (*right).into()),
-            ParseExpr::And(left, right) => Expr::and((*left).into(), (*right).into()),
-            ParseExpr::Or(left, right) => Expr::or((*left).into(), (*right).into()),
+            ParseExpr::And(params) => operands(params, Expr::and),
+            ParseExpr::Or(params) => operands(params, Expr::or),
         }
     }
 }
@@ -114,6 +114,32 @@ fn map_expr(map: HashMap<String, ParseExpr>) -> Expr {
 
 fn vec_expr(vec: Vec<ParseExpr>) -> Expr {
     Expr::Vec(vec.into_iter().map(|expr| expr.into()).collect())
+}
+
+/// Recursively destructure a list of sub-expressions into a left associative nested Expr
+fn operands(
+    expressions: impl IntoIterator<Item = ParseExpr>,
+    operator: impl Fn(Expr, Expr) -> Expr,
+) -> Expr {
+    // TODO: Make this left associative, its right-associative right now
+
+    fn recurse(
+        head: Expr,
+        mut tail: impl Iterator<Item = ParseExpr>,
+        operator: &impl Fn(Expr, Expr) -> Expr,
+    ) -> Expr {
+        match tail.next() {
+            None => head,
+            Some(expr) => recurse(operator(head, expr.into()), tail, operator), // Some(expr) => operator(head, recurse(expr.into(), tail, operator)),
+        }
+    }
+
+    let mut tail = expressions.into_iter();
+
+    match tail.next() {
+        None => Value::None.into(),
+        Some(head) => recurse(head.into(), tail, &operator),
+    }
 }
 
 #[cfg(test)]
@@ -135,6 +161,50 @@ mod when_parsing_json_expr {
             Rule::parse_json(r#"{"name": "testrule", "expr": {"add": [{"int": 4}, {"int": 3}]}}"#)
                 .unwrap(),
             Rule::new("testrule", Expr::add(Expr::value(4), Expr::value(3)))
+        );
+    }
+
+    #[test]
+    fn should_left_associatively_parse_sub_expr() {
+        assert_eq!(
+            Rule::parse_json(
+                r#"{"name": "testrule", "expr": {"sub": [{"int": 4}, {"int": 3}, {"int": 2}]}}"#
+            )
+            .unwrap(),
+            Rule::new(
+                "testrule",
+                Expr::sub(Expr::sub(Expr::value(4), Expr::value(3)), Expr::value(2))
+            )
+        );
+    }
+
+    #[test]
+    fn should_parse_empty_sub_expr_to_unit_val() {
+        assert_eq!(
+            Rule::parse_json(r#"{"name": "testrule", "expr": {"sub": []}}"#).unwrap(),
+            Rule::new("testrule", Expr::value(None))
+        );
+    }
+
+    #[test]
+    fn should_parse_empty_sub_expr_with_one_operand_to_operand() {
+        assert_eq!(
+            Rule::parse_json(r#"{"name": "testrule", "expr": {"sub": [{"int": 4}]}}"#).unwrap(),
+            Rule::new("testrule", Expr::value(4))
+        );
+    }
+
+    #[test]
+    fn should_left_associatively_parse_div_expr() {
+        assert_eq!(
+            Rule::parse_json(
+                r#"{"name": "testrule", "expr": {"div": [{"int": 5}, {"int": 4}, {"int": 3}, {"int": 2}]}}"#
+            )
+            .unwrap(),
+            Rule::new(
+                "testrule",
+                Expr::div(Expr::div(Expr::div(Expr::value(5), Expr::value(4)), Expr::value(3)), Expr::value(2))
+            )
         );
     }
 }

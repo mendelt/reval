@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation for rules writers
 - Into implementation from `Value` to `Expr`
 
+### Changed
+- Make add, sub, mul, div, and and or in the json rules language take more than 2 operands  Left associatively combine them into their respective expressions
 
 ## [0.5.0] - 2022-01-04
 
