@@ -90,6 +90,11 @@ impl Expr {
         Expr::Function(name, Box::new(param))
     }
 
+    /// Reference an input value
+    pub fn reff(name: impl ToString) -> Self {
+        Expr::Reference(name.to_string())
+    }
+
     /// Index expression constructor
     pub fn index(left: Expr, right: Expr) -> Self {
         Expr::Index(Box::new(left), Box::new(right))
