@@ -3,9 +3,11 @@
 //! Expressions or rules can be written in a simple DSL or in a json format that is directly parsed into Reval expression AST objects. For now the Reval DSL parser is experimental but eventually this should replace json rules.
 //!
 //! Expressions can be evaluated against input data to produce output data. The input and output data is passed in and out of the rules as a `reval::Value` object which can contain simple data or more complex structures like maps or vectors.
-//! Data can even be nested so complex data can be passed into Reval expressions.
+//! Data can be nested so complex data can be passed into Reval expressions.
 //!
 //! To make it easy to construct input data from your own datatypes the Reval crate implements a serde serializer for Value types. So any type that implements `serde::Serialize` can be serialized into a `reval::Value` without writing any code.
+//!
+//! More information on writing rules can be found here: [Writing Rules](https://mendelt.github.io/reval/)
 //!
 //! This example shows how to set up a RuleSet using the builder. A simple Rule is added and a data-type is set up that is used as input for the rules;
 //! ```rust
