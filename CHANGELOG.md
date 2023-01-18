@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Utility function for creating `Expr::Reference`
+- `From<usize>` implementation for `Value`
 
 ## [0.5.1] - 2022-01-18
 

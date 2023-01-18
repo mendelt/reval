@@ -90,6 +90,12 @@ impl From<u8> for Value {
     }
 }
 
+impl From<usize> for Value {
+    fn from(value: usize) -> Self {
+        (value as i128).into()
+    }
+}
+
 impl TryFrom<Value> for i128 {
     type Error = Error;
 
