@@ -96,8 +96,8 @@ impl Expr {
     }
 
     /// Index expression constructor
-    pub fn index(left: Expr, right: Expr) -> Self {
-        Expr::Index(Box::new(left), Box::new(right))
+    pub fn index(value: Expr, index: Expr) -> Self {
+        Expr::Index(Box::new(value), Box::new(index))
     }
 
     /// If expression constructor

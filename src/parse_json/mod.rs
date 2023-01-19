@@ -1,6 +1,6 @@
 //! Parse rules writting in the Reval json format
 
-use crate::{expr::Expr, prelude::Value, ruleset::rule::Rule};
+use crate::{expr::Expr, ruleset::rule::Rule, value::Value};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::Error;
@@ -44,7 +44,7 @@ enum ParseExpr {
     Vec(Vec<ParseExpr>),
     Ref(String),
     Func(String, Box<ParseExpr>),
-    Idx(Box<ParseExpr>, Box<ParseExpr>),
+    Idx(Box<ParseExpr>, ParseIndex),
     If(Box<ParseExpr>, Box<ParseExpr>, Box<ParseExpr>),
     Not(Box<ParseExpr>),
     Neg(Box<ParseExpr>),
@@ -65,6 +65,31 @@ enum ParseExpr {
     Or(Vec<ParseExpr>),
 }
 
+/// Index type for parsing an index into a map or vec, can be a String, a usize
+/// or an Expr that will be evaluated into an index value
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[serde(untagged)]
+enum ParseIndex {
+    /// String index to index map fields
+    Map(String),
+
+    /// Usize index to index vec elements
+    Vec(usize),
+
+    /// An expression that can be evaluated into an index
+    Expr(Box<ParseExpr>),
+}
+
+impl From<ParseIndex> for Expr {
+    fn from(value: ParseIndex) -> Self {
+        match value {
+            ParseIndex::Map(index) => Expr::value(index),
+            ParseIndex::Vec(index) => Expr::value(index),
+            ParseIndex::Expr(expr) => (*expr).into(),
+        }
+    }
+}
+
 impl From<ParseExpr> for Expr {
     fn from(value: ParseExpr) -> Self {
         match value {
@@ -75,7 +100,7 @@ impl From<ParseExpr> for Expr {
             ParseExpr::Bool(value) => Expr::Value(value.into()),
             ParseExpr::Ref(name) => Expr::Reference(name),
             ParseExpr::Func(name, param) => Expr::func(name, (*param).into()),
-            ParseExpr::Idx(left, right) => Expr::index((*left).into(), (*right).into()),
+            ParseExpr::Idx(expr, index) => Expr::index((*expr).into(), index.into()),
             ParseExpr::If(switch, left, right) => {
                 Expr::iif(*switch, (*left).into(), (*right).into())
             }
@@ -204,6 +229,48 @@ mod when_parsing_json_expr {
             Rule::new(
                 "testrule",
                 Expr::div(Expr::div(Expr::div(Expr::value(5), Expr::value(4)), Expr::value(3)), Expr::value(2))
+            )
+        );
+    }
+
+    #[test]
+    fn should_index_by_string() {
+        assert_eq!(
+            Rule::parse_json(
+                r#"{"name": "testrule", "expr": {"idx": [{"ref": "some_map_value"}, "field"]}}"#
+            )
+            .unwrap(),
+            Rule::new(
+                "testrule",
+                Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
+            )
+        );
+    }
+
+    #[test]
+    fn should_index_by_usize() {
+        assert_eq!(
+            Rule::parse_json(
+                r#"{"name": "testrule", "expr": {"idx": [{"ref": "some_vec_value"}, 5]}}"#
+            )
+            .unwrap(),
+            Rule::new(
+                "testrule",
+                Expr::index(Expr::reff("some_vec_value"), Expr::value(5usize))
+            )
+        );
+    }
+
+    #[test]
+    fn should_index_by_expression() {
+        assert_eq!(
+            Rule::parse_json(
+                r#"{"name": "testrule", "expr": {"idx": [{"ref": "some_map_value"}, {"string": "field"}]}}"#
+            )
+            .unwrap(),
+            Rule::new(
+                "testrule",
+                Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
             )
         );
     }

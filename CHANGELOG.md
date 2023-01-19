@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Utility function for creating `Expr::Reference`
 - `From<usize>` implementation for `Value`
+- Allow simple `String` or `usize` index parameter for `idx` besides expressions
 
 ## [0.5.1] - 2022-01-18
 
