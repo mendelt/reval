@@ -45,3 +45,57 @@ impl UserFunctions {
         self
     }
 }
+
+#[cfg(test)]
+mod when_managing_user_functions {
+    use super::*;
+    use crate::prelude::*;
+    use async_trait::async_trait;
+
+    struct TestFunc {
+        name: &'static str,
+    }
+
+    #[async_trait]
+    impl UserFunction for TestFunc {
+        async fn call(&self, _params: Value) -> FunctionResult {
+            Ok(Value::None)
+        }
+
+        fn name(&self) -> &'static str {
+            self.name
+        }
+    }
+
+    #[test]
+    fn should_add_function() {
+        let mut functions = UserFunctions::default();
+
+        assert!(functions
+            .add_function(Box::new(TestFunc {
+                name: "test function",
+            }))
+            .is_ok());
+        assert!(functions.get("test function").is_ok());
+    }
+
+    #[test]
+    fn should_not_add_duplicate_function_name() {
+        let mut functions = UserFunctions::default();
+
+        // Add a function
+        assert!(functions
+            .add_function(Box::new(TestFunc {
+                name: "test function",
+            }))
+            .is_ok());
+
+        // Add a function with the same name
+        assert!(matches!(
+            functions.add_function(Box::new(TestFunc {
+                name: "test function"
+            })),
+            Err(Error::DuplicateFunctionName(name)) if name == "test function".to_string()
+        ));
+    }
+}
