@@ -17,15 +17,26 @@ impl UserFunctions {
     }
 
     /// Add a user-function to the collection
-    pub fn add_function(&mut self, function: BoxedFunction) {
+    pub fn add_function(&mut self, function: BoxedFunction) -> Result<()> {
+        if self.functions.contains_key(function.name()) {
+            return Err(Error::DuplicateFunctionName(function.name().to_string()));
+        }
+
         // TODO: Check if function name is valid
         self.functions.insert(function.name(), function);
+
+        Ok(())
     }
 
-    pub fn add_functions<I: IntoIterator<Item = BoxedFunction>>(&mut self, functions: I) {
+    pub fn add_functions<I: IntoIterator<Item = BoxedFunction>>(
+        &mut self,
+        functions: I,
+    ) -> Result<()> {
         for function in functions {
-            self.add_function(function);
+            self.add_function(function)?;
         }
+
+        Ok(())
     }
 
     /// Merge two sets of user-functions

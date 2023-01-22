@@ -3,7 +3,7 @@ use crate::{expr::Expr, function::FunctionContext, value::Value, Result};
 /// A rule is an expression with a name
 #[derive(Debug, Clone, PartialEq)]
 pub struct Rule {
-    name: String,
+    pub(super) name: String,
     expr: Expr,
 }
 

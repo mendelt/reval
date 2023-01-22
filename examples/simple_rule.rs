@@ -27,7 +27,10 @@ async fn main() {
     }"#;
 
     // Set up the ruleset builder, add the rule and build the `RuleSet`
-    let ruleset = ruleset().with_rule(Rule::parse_json(rule).unwrap()).build();
+    let ruleset = ruleset()
+        .with_rule(Rule::parse_json(rule).unwrap())
+        .unwrap()
+        .build();
 
     // Set up input data
     let facts = Data { age: 16 };

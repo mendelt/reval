@@ -10,6 +10,12 @@ pub type Result<T> = result::Result<T, Error>;
 /// Anything that can go wrong in Reval should be represented here
 #[derive(Debug, DisplayDoc, thiserror::Error)]
 pub enum Error {
+    /// Duplicate user-function or rule name; {0}
+    DuplicateFunctionName(String),
+
+    /// Duplicate rule name; {0}
+    DuplicateRuleName(String),
+
     /// An error occured serializing to a value; {0}
     ValueSerializationError(String),
 

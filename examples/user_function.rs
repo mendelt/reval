@@ -46,7 +46,9 @@ async fn main() {
     // build the `RuleSet`
     let ruleset = ruleset()
         .with_rule(Rule::parse_json(rule).unwrap())
+        .unwrap()
         .with_function(Box::new(FakeId {}))
+        .unwrap()
         .build();
 
     // Set up input data

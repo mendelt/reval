@@ -37,7 +37,7 @@ let rule = r#"
     }
 }"#;
 // Set up the ruleset builder, add the rule and build the `RuleSet`
-let ruleset = ruleset().with_rule(Rule::parse_json(rule).unwrap()).build();
+let ruleset = ruleset().with_rule(Rule::parse_json(rule).unwrap()).unwrap().build();
 // Set up input data
 let facts = Data { age: 16 };
 // Evaluate the ruleset on the input data and check if the rule returns
@@ -88,8 +88,8 @@ let rule = r#"
 // Set up the ruleset builder, add the rule, add the user-function and
 // build the `RuleSet`
 let ruleset = ruleset()
-    .with_rule(Rule::parse_json(rule).unwrap())
-    .with_function(Box::new(FakeId {}))
+    .with_rule(Rule::parse_json(rule).unwrap()).unwrap()
+    .with_function(Box::new(FakeId {})).unwrap()
     .build();
 // Set up input data
 let facts = Data { age: 16 };
