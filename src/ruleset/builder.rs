@@ -54,3 +54,37 @@ impl Builder {
         }
     }
 }
+
+#[cfg(test)]
+pub mod when_building_ruleset {
+    use super::*;
+    use crate::prelude::*;
+
+    /// Test helper that creates an empty rule
+    fn rule(name: &str) -> Rule {
+        Rule::new(name, Value::None.into())
+    }
+
+    #[test]
+    fn should_add_rule() {
+        ruleset().with_rule(rule("test rule 1")).unwrap();
+    }
+
+    #[test]
+    fn should_add_multiple_rules() {
+        let builder = ruleset().with_rule(rule("test rule 1")).unwrap();
+
+        builder.with_rule(rule("test rule 2")).unwrap();
+    }
+
+    #[test]
+    fn should_not_add_duplicate_rule_name() {
+        // Start a ruleset builder and add one rule
+        let builder = ruleset().with_rule(rule("test rule 1")).unwrap();
+
+        assert!(matches!(
+            builder.with_rule(rule("test rule 1")),
+            Err(Error::DuplicateRuleName(name)) if name == "test rule 1".to_string()
+        ));
+    }
+}

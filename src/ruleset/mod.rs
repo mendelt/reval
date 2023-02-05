@@ -12,7 +12,6 @@ use serde::Serialize;
 
 use self::rule::{Outcome, Rule};
 
-/// The RuleSet type can
 pub struct RuleSet {
     rules: Vec<Rule>,
     functions: UserFunctions,
