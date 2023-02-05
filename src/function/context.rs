@@ -1,4 +1,4 @@
-use super::{BoxedFunction, UserFunctions};
+use super::{user_functions::BoxedFunction, UserFunctions};
 use crate::{value::Value, Error, Result};
 use std::collections::HashMap;
 

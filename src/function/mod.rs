@@ -24,8 +24,5 @@ pub trait UserFunction {
     }
 }
 
-/// Convenience type for passing around boxed user-function implementations
-pub type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
-
 /// Result type returned from UserFunction
 pub type FunctionResult = result::Result<Value, anyhow::Error>;

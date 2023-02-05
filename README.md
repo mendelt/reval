@@ -89,7 +89,7 @@ let rule = r#"
 // build the `RuleSet`
 let ruleset = ruleset()
     .with_rule(Rule::parse_json(rule).unwrap()).unwrap()
-    .with_function(Box::new(FakeId {})).unwrap()
+    .with_function(FakeId {}).unwrap()
     .build();
 // Set up input data
 let facts = Data { age: 16 };

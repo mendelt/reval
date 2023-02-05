@@ -47,7 +47,7 @@ async fn main() {
     let ruleset = ruleset()
         .with_rule(Rule::parse_json(rule).unwrap())
         .unwrap()
-        .with_function(Box::new(FakeId {}))
+        .with_function(FakeId {})
         .unwrap()
         .build();
 

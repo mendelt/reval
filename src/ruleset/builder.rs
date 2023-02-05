@@ -1,6 +1,6 @@
 use crate::{
     error::{Error, Result},
-    function::{BoxedFunction, UserFunctions},
+    function::{UserFunction, UserFunctions},
     ruleset::{rule::Rule, RuleSet},
 };
 
@@ -38,17 +38,11 @@ impl Builder {
     }
 
     /// Add a user-function to the ruleset being built
-    pub fn with_function(mut self, function: BoxedFunction) -> Result<Self> {
-        self.functions.add_function(function)?;
-        Ok(self)
-    }
-
-    /// Add multiple user-functions to the ruleset being built
-    pub fn with_functions<I: IntoIterator<Item = BoxedFunction>>(
+    pub fn with_function(
         mut self,
-        functions: I,
+        function: impl UserFunction + Send + Sync + 'static,
     ) -> Result<Self> {
-        self.functions.add_functions(functions)?;
+        self.functions.add_function(function)?;
         Ok(self)
     }
 

@@ -88,7 +88,7 @@
 //! // build the `RuleSet`
 //! let ruleset = ruleset()
 //!     .with_rule(Rule::parse_json(rule).unwrap()).unwrap()
-//!     .with_function(Box::new(FakeId {})).unwrap()
+//!     .with_function(FakeId {}).unwrap()
 //!     .build();
 //! // Set up input data
 //! let facts = Data { age: 16 };
@@ -115,7 +115,7 @@ pub use error::{Error, Result};
 pub mod prelude {
     pub use crate::{
         expr::Expr,
-        function::{BoxedFunction, FunctionResult, UserFunction},
+        function::{FunctionResult, UserFunction},
         ruleset::{builder::ruleset, rule::Rule, RuleSet},
         value::Value,
     };

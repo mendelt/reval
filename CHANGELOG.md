@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Changed
 - Make ruleset `Builder` fail on rules or functions with duplicate names
+- `add_function` on `UserFunctions` and ruleset `Builder` now takes non-boxed `UserFunction`s
+
+## Removed
+- Removed `add_functions` method from `Userfunctions` and ruleset `Builder` because it does not make much sense
+- Removed `get` method from `UserFunctions` public api
+- Removed `BoxedFunction` type from prelude and public api
 
 ## [0.5.2] - 2022-01-20
 

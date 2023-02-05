@@ -1,6 +1,7 @@
-use super::BoxedFunction;
 use crate::{Error, Result};
 use std::collections::HashMap;
+
+use super::UserFunction;
 
 /// Stores user-functions so they can be easilly called
 #[derive(Default)]
@@ -10,31 +11,23 @@ pub struct UserFunctions {
 
 impl UserFunctions {
     /// Get a userfunction by name
-    pub fn get(&self, name: &str) -> Result<&BoxedFunction> {
+    pub(crate) fn get(&self, name: &str) -> Result<&BoxedFunction> {
         self.functions
             .get(name)
             .ok_or_else(|| Error::UnknownUserFunction(name.to_owned()))
     }
 
     /// Add a user-function to the collection
-    pub fn add_function(&mut self, function: BoxedFunction) -> Result<()> {
+    pub fn add_function(
+        &mut self,
+        function: impl UserFunction + Send + Sync + 'static,
+    ) -> Result<()> {
         if self.functions.contains_key(function.name()) {
             return Err(Error::DuplicateFunctionName(function.name().to_string()));
         }
 
         // TODO: Check if function name is valid
-        self.functions.insert(function.name(), function);
-
-        Ok(())
-    }
-
-    pub fn add_functions<I: IntoIterator<Item = BoxedFunction>>(
-        &mut self,
-        functions: I,
-    ) -> Result<()> {
-        for function in functions {
-            self.add_function(function)?;
-        }
+        self.functions.insert(function.name(), Box::new(function));
 
         Ok(())
     }
@@ -45,6 +38,9 @@ impl UserFunctions {
         self
     }
 }
+
+/// Convenience type for passing around boxed user-function implementations
+pub(crate) type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
 
 #[cfg(test)]
 mod when_managing_user_functions {
@@ -72,9 +68,9 @@ mod when_managing_user_functions {
         let mut functions = UserFunctions::default();
 
         assert!(functions
-            .add_function(Box::new(TestFunc {
+            .add_function(TestFunc {
                 name: "test function",
-            }))
+            })
             .is_ok());
         assert!(functions.get("test function").is_ok());
     }
@@ -85,16 +81,16 @@ mod when_managing_user_functions {
 
         // Add a function
         assert!(functions
-            .add_function(Box::new(TestFunc {
+            .add_function(TestFunc {
                 name: "test function",
-            }))
+            })
             .is_ok());
 
         // Add a function with the same name
         assert!(matches!(
-            functions.add_function(Box::new(TestFunc {
+            functions.add_function(TestFunc {
                 name: "test function"
-            })),
+            }),
             Err(Error::DuplicateFunctionName(name)) if name == "test function".to_string()
         ));
     }
