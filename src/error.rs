@@ -10,6 +10,9 @@ pub type Result<T> = result::Result<T, Error>;
 /// Anything that can go wrong in Reval should be represented here
 #[derive(Debug, DisplayDoc, thiserror::Error)]
 pub enum Error {
+    /// User-function name {0} is not valid
+    InvalidFunctionName(String),
+
     /// Duplicate user-function or rule name; {0}
     DuplicateFunctionName(String),
 

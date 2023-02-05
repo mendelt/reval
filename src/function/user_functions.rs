@@ -1,13 +1,18 @@
-use crate::{Error, Result};
-use std::collections::HashMap;
-
 use super::UserFunction;
+use crate::{
+    expr::keywords::{is_reserved_keyword, is_valid_identifier},
+    Error, Result,
+};
+use std::collections::HashMap;
 
 /// Stores user-functions so they can be easilly called
 #[derive(Default)]
 pub struct UserFunctions {
     functions: HashMap<&'static str, BoxedFunction>,
 }
+
+/// Convenience type for passing around boxed user-function implementations
+pub(crate) type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
 
 impl UserFunctions {
     /// Get a userfunction by name
@@ -22,11 +27,18 @@ impl UserFunctions {
         &mut self,
         function: impl UserFunction + Send + Sync + 'static,
     ) -> Result<()> {
+        if is_reserved_keyword(function.name()) {
+            return Err(Error::InvalidFunctionName(function.name().to_string()));
+        }
+
+        if !is_valid_identifier(function.name()) {
+            return Err(Error::InvalidFunctionName(function.name().to_string()));
+        }
+
         if self.functions.contains_key(function.name()) {
             return Err(Error::DuplicateFunctionName(function.name().to_string()));
         }
 
-        // TODO: Check if function name is valid
         self.functions.insert(function.name(), Box::new(function));
 
         Ok(())
@@ -39,14 +51,48 @@ impl UserFunctions {
     }
 }
 
-/// Convenience type for passing around boxed user-function implementations
-pub(crate) type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
-
 #[cfg(test)]
 mod when_managing_user_functions {
     use super::*;
     use crate::prelude::*;
     use async_trait::async_trait;
+
+    #[test]
+    fn should_add_function() {
+        let mut functions = UserFunctions::default();
+
+        functions.add_function(func("test_function")).unwrap();
+        functions.get("test_function").unwrap();
+    }
+
+    #[test]
+    fn should_not_add_duplicate_function_name() {
+        let mut functions = UserFunctions::default();
+
+        // Add a function
+        functions.add_function(func("test_function")).unwrap();
+
+        // Add a function with the same name
+        assert!(matches!(
+            functions.add_function(func("test_function")),
+            Err(Error::DuplicateFunctionName(name)) if name == "test_function".to_string()
+        ));
+    }
+
+    #[test]
+    fn should_not_add_reserved_keyword_as_function_name() {
+        let mut functions = UserFunctions::default();
+
+        // Add a function with the same name
+        assert!(matches!(
+            functions.add_function(func("if")),
+            Err(Error::InvalidFunctionName(name)) if name == "if".to_string()
+        ));
+    }
+
+    fn func(name: &'static str) -> TestFunc {
+        TestFunc { name }
+    }
 
     struct TestFunc {
         name: &'static str,
@@ -61,37 +107,5 @@ mod when_managing_user_functions {
         fn name(&self) -> &'static str {
             self.name
         }
-    }
-
-    #[test]
-    fn should_add_function() {
-        let mut functions = UserFunctions::default();
-
-        assert!(functions
-            .add_function(TestFunc {
-                name: "test function",
-            })
-            .is_ok());
-        assert!(functions.get("test function").is_ok());
-    }
-
-    #[test]
-    fn should_not_add_duplicate_function_name() {
-        let mut functions = UserFunctions::default();
-
-        // Add a function
-        assert!(functions
-            .add_function(TestFunc {
-                name: "test function",
-            })
-            .is_ok());
-
-        // Add a function with the same name
-        assert!(matches!(
-            functions.add_function(TestFunc {
-                name: "test function"
-            }),
-            Err(Error::DuplicateFunctionName(name)) if name == "test function".to_string()
-        ));
     }
 }

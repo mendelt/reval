@@ -1,4 +1,5 @@
 mod eval;
+pub(crate) mod keywords;
 
 use crate::value::Value;
 use std::collections::HashMap;
