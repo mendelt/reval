@@ -7,7 +7,7 @@ const FLOAT: &str = "float";
 const INT: &str = "int";
 const DEC: &str = "dec";
 
-const KEYWORDS: [&'static str; 6] = [IF, REF, NEG, FLOAT, INT, DEC];
+const KEYWORDS: [&str; 6] = [IF, REF, NEG, FLOAT, INT, DEC];
 
 pub(crate) fn is_reserved_keyword(name: &str) -> bool {
     KEYWORDS.contains(&name)
