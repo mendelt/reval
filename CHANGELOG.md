@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## Changed
-- Make ruleset `Builder` fail on rules or functions with duplicate names
+- Do not allow rules or functions with duplicate names
+- Do not allow rules or functions with invalid names
 - `add_function` on `UserFunctions` and ruleset `Builder` now takes non-boxed `UserFunction`s
 
 ## Removed

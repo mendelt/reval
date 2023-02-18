@@ -27,19 +27,21 @@ impl UserFunctions {
         &mut self,
         function: impl UserFunction + Send + Sync + 'static,
     ) -> Result<()> {
-        if is_reserved_keyword(function.name()) {
-            return Err(Error::InvalidFunctionName(function.name().to_string()));
+        let name = function.name();
+
+        if is_reserved_keyword(name) {
+            return Err(Error::InvalidFunctionName(name.to_string()));
         }
 
-        if !is_valid_identifier(function.name()) {
-            return Err(Error::InvalidFunctionName(function.name().to_string()));
+        if !is_valid_identifier(name) {
+            return Err(Error::InvalidFunctionName(name.to_string()));
         }
 
-        if self.functions.contains_key(function.name()) {
-            return Err(Error::DuplicateFunctionName(function.name().to_string()));
+        if self.functions.contains_key(name) {
+            return Err(Error::DuplicateFunctionName(name.to_string()));
         }
 
-        self.functions.insert(function.name(), Box::new(function));
+        self.functions.insert(name, Box::new(function));
 
         Ok(())
     }
