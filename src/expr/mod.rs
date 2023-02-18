@@ -34,6 +34,12 @@ pub enum Expr {
     /// Invert the sign of a numerical value
     Neg(Box<Expr>),
 
+    /// True if the expression is not None
+    IsSome(Box<Expr>),
+
+    /// True if the expression is none
+    IsNone(Box<Expr>),
+
     /// Cast numerical values to int
     Int(Box<Expr>),
 
@@ -121,6 +127,16 @@ impl Expr {
     #[allow(clippy::should_implement_trait)]
     pub fn neg(expr: Expr) -> Self {
         Expr::Neg(Box::new(expr))
+    }
+
+    /// IsSome epression constructor
+    pub fn is_some(expr: Expr) -> Self {
+        Expr::IsSome(Box::new(expr))
+    }
+
+    /// IsNone epression constructor
+    pub fn is_none(expr: Expr) -> Self {
+        Expr::IsNone(Box::new(expr))
     }
 
     /// Int-cast expression constructor

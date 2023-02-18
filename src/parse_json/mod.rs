@@ -50,6 +50,10 @@ enum ParseExpr {
     If(Box<ParseExpr>, Box<ParseExpr>, Box<ParseExpr>),
     Not(Box<ParseExpr>),
     Neg(Box<ParseExpr>),
+    #[serde(rename = "is_some")]
+    IsSome(Box<ParseExpr>),
+    #[serde(rename = "is_none")]
+    IsNone(Box<ParseExpr>),
     CInt(Box<ParseExpr>),
     CFloat(Box<ParseExpr>),
     CDecimal(Box<ParseExpr>),
@@ -109,6 +113,8 @@ impl From<ParseExpr> for Expr {
             }
             ParseExpr::Not(value) => Expr::not((*value).into()),
             ParseExpr::Neg(value) => Expr::neg((*value).into()),
+            ParseExpr::IsSome(value) => Expr::is_some((*value).into()),
+            ParseExpr::IsNone(value) => Expr::is_none((*value).into()),
             ParseExpr::CInt(value) => Expr::int((*value).into()),
             ParseExpr::CFloat(value) => Expr::float((*value).into()),
             ParseExpr::CDecimal(value) => Expr::dec((*value).into()),
@@ -209,6 +215,48 @@ mod when_parsing_json_expr {
             Rule::parse_json(r#"{"name": "testrule", "expr": "none"}"#).unwrap(),
             Rule::new("testrule", None, Expr::none())
         );
+    }
+
+    #[test]
+    fn should_parse_cint() {
+        assert_eq!(
+            Rule::parse_json(r#"{"name": "testrule", "expr": {"cint": {"float": 3.15}}}"#).unwrap(),
+            Rule::new("testrule", None, Expr::int(Expr::value(3.15)))
+        );
+    }
+
+    #[test]
+    fn should_parse_cfloat() {
+        assert_eq!(
+            Rule::parse_json(r#"{"name": "testrule", "expr": {"cfloat": {"int": 3}}}"#).unwrap(),
+            Rule::new("testrule", None, Expr::float(Expr::value(3)))
+        );
+    }
+
+    #[test]
+    fn should_parse_cdecimal() {
+        assert_eq!(
+            Rule::parse_json(r#"{"name": "testrule", "expr": {"cdecimal": {"int": 3}}}"#).unwrap(),
+            Rule::new("testrule", None, Expr::dec(Expr::value(3)))
+        );
+    }
+
+    #[test]
+    fn should_parse_is_none() {
+        assert_eq!(
+            Rule::parse_json(r#"{"name": "testrule", "expr" : {"is_none": {"string": "value"}}}"#)
+                .unwrap(),
+            Rule::new("testrule", None, Expr::is_none(Expr::value("value")))
+        )
+    }
+
+    #[test]
+    fn should_parse_is_some() {
+        assert_eq!(
+            Rule::parse_json(r#"{"name": "testrule", "expr" : {"is_some": {"string": "value"}}}"#)
+                .unwrap(),
+            Rule::new("testrule", None, Expr::is_some(Expr::value("value")))
+        )
     }
 
     #[test]

@@ -40,6 +40,14 @@ The simpelest expressions are value expressions. Reval values can have different
 { "bool": true }
 ```
 
+### None value
+`none` is a special value used to indicate that a value is not available. It can be used when passing values into a rule to indicate a missing value for example.
+```json
+{"none"}
+```
+
+The expressions `is_some` and `is_none` can be used to test for `none` values. These are documented with the Special Expressions.
+
 ## Comparison Expressions
 Reval supports a number of comparison expressions that can be used to compare values. Al these expressions result in a boolean value.
 
@@ -76,7 +84,20 @@ Fields from maps are indexed by string.
 {"idx": [{ "ref": "some_map_value" }, { "string": "sub-field" } ]}
 ```
 
-### 
+### None checks
+The `is_some` and `is_none` expressions test for none values.
+
+`is_some` checks for `none` values and returns `true` if the expression returns a value that is not equal to `none`.
+```json
+{"is_some": {"string": "some value"}}
+```
+This returns `true` because `{"string": "some value"}` is not `none`
+
+`is_none` checks for `none` values and returns `true` if the expression returns a value that is equal to `none`.
+```json
+{"is_none": "none"}
+```
+This returns `true`
 
 ### Gt, gte, lt and lte
 Gt is short for "greater than" it compares two numeric values of the same type, lt is "less than" and is the inverse. Gte and lte are the inclusive versions of these operations. They are short for "Greater than or equal" and "Less than or equal"

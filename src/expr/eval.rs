@@ -22,6 +22,8 @@ impl Expr {
             Expr::If(switch, left, right) => iif(context, facts, switch, left, right).await,
             Expr::Not(value) => not(value.evaluate(context, facts).await?),
             Expr::Neg(value) => neg(value.evaluate(context, facts).await?),
+            Expr::IsSome(value) => is_some(value.evaluate(context, facts).await?),
+            Expr::IsNone(value) => is_none(value.evaluate(context, facts).await?),
             Expr::Map(map) => eval_map(map, context, facts).await,
             Expr::Vec(vec) => eval_vec(vec, context, facts).await,
             Expr::Int(value) => int(value.evaluate(context, facts).await?),
@@ -121,6 +123,20 @@ fn neg(value: Value) -> Result<Value> {
         Value::Decimal(value) => Ok(Value::Decimal(-value)),
 
         _ => Err(Error::InvalidType),
+    }
+}
+
+fn is_some(value: Value) -> Result<Value> {
+    match value {
+        Value::None => Ok(Value::Bool(false)),
+        _ => Ok(Value::Bool(true)),
+    }
+}
+
+fn is_none(value: Value) -> Result<Value> {
+    match value {
+        Value::None => Ok(Value::Bool(true)),
+        _ => Ok(Value::Bool(false)),
     }
 }
 
