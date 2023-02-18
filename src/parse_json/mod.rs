@@ -23,12 +23,13 @@ impl Expr {
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 struct ParseRule {
     name: String,
+    description: Option<String>,
     expr: ParseExpr,
 }
 
 impl From<ParseRule> for Rule {
     fn from(value: ParseRule) -> Rule {
-        Rule::new(value.name, value.expr.into())
+        Rule::new(&value.name, value.description, value.expr.into())
     }
 }
 
@@ -173,10 +174,30 @@ mod when_parsing_json_expr {
     use crate::expr::Expr;
 
     #[test]
+    fn should_parse_rule_name() {
+        let rule = Rule::parse_json(
+            r#"{"name": "testrule", "description": "Test Rule", "expr": {"string": "test"}}"#,
+        )
+        .unwrap();
+
+        assert_eq!(rule.name(), "testrule");
+    }
+
+    #[test]
+    fn should_parse_rule_description() {
+        let rule = Rule::parse_json(
+            r#"{"name": "testrule", "description": "Test Rule", "expr": {"string": "test"}}"#,
+        )
+        .unwrap();
+
+        assert_eq!(rule.description(), Some("Test Rule"));
+    }
+
+    #[test]
     fn should_parse_string_value() {
         assert_eq!(
             Rule::parse_json(r#"{"name": "testrule", "expr": {"string": "test"}}"#).unwrap(),
-            Rule::new("testrule", Expr::value("test"))
+            Rule::new("testrule", None, Expr::value("test"))
         );
     }
 
@@ -185,7 +206,7 @@ mod when_parsing_json_expr {
         assert_eq!(
             Rule::parse_json(r#"{"name": "testrule", "expr": {"add": [{"int": 4}, {"int": 3}]}}"#)
                 .unwrap(),
-            Rule::new("testrule", Expr::add(Expr::value(4), Expr::value(3)))
+            Rule::new("testrule", None, Expr::add(Expr::value(4), Expr::value(3)))
         );
     }
 
@@ -198,6 +219,7 @@ mod when_parsing_json_expr {
             .unwrap(),
             Rule::new(
                 "testrule",
+                None,
                 Expr::sub(Expr::sub(Expr::value(4), Expr::value(3)), Expr::value(2))
             )
         );
@@ -207,7 +229,7 @@ mod when_parsing_json_expr {
     fn should_parse_empty_sub_expr_to_unit_val() {
         assert_eq!(
             Rule::parse_json(r#"{"name": "testrule", "expr": {"sub": []}}"#).unwrap(),
-            Rule::new("testrule", Expr::value(None))
+            Rule::new("testrule", None, Expr::value(None))
         );
     }
 
@@ -215,7 +237,7 @@ mod when_parsing_json_expr {
     fn should_parse_empty_sub_expr_with_one_operand_to_operand() {
         assert_eq!(
             Rule::parse_json(r#"{"name": "testrule", "expr": {"sub": [{"int": 4}]}}"#).unwrap(),
-            Rule::new("testrule", Expr::value(4))
+            Rule::new("testrule", None, Expr::value(4))
         );
     }
 
@@ -227,7 +249,7 @@ mod when_parsing_json_expr {
             )
             .unwrap(),
             Rule::new(
-                "testrule",
+                "testrule", None,
                 Expr::div(Expr::div(Expr::div(Expr::value(5), Expr::value(4)), Expr::value(3)), Expr::value(2))
             )
         );
@@ -242,6 +264,7 @@ mod when_parsing_json_expr {
             .unwrap(),
             Rule::new(
                 "testrule",
+                None,
                 Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
             )
         );
@@ -256,6 +279,7 @@ mod when_parsing_json_expr {
             .unwrap(),
             Rule::new(
                 "testrule",
+                None,
                 Expr::index(Expr::reff("some_vec_value"), Expr::value(5usize))
             )
         );
@@ -270,6 +294,7 @@ mod when_parsing_json_expr {
             .unwrap(),
             Rule::new(
                 "testrule",
+                None,
                 Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
             )
         );

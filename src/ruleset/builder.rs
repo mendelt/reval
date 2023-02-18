@@ -73,7 +73,7 @@ pub mod when_building_ruleset {
 
     /// Test helper that creates an empty rule
     fn rule(name: &str) -> Rule {
-        Rule::new(name, Value::None.into())
+        Rule::new(name, None, Value::None.into())
     }
 
     #[test]

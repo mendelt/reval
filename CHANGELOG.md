@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- A `description` field for `Rule`s
+
 ## Changed
 - Do not allow rules or functions with duplicate names
 - Do not allow rules or functions with invalid names
