@@ -86,6 +86,11 @@ impl Expr {
         Expr::Value(value.into())
     }
 
+    /// None value expression constructor
+    pub fn none() -> Self {
+        Expr::Value(Value::None)
+    }
+
     /// Function expression constructor
     pub fn func(name: String, param: Expr) -> Self {
         Expr::Function(name, Box::new(param))

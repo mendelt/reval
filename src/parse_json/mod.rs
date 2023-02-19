@@ -41,6 +41,7 @@ enum ParseExpr {
     Float(f64),
     Decimal(Decimal),
     Bool(bool),
+    None,
     Map(HashMap<String, ParseExpr>),
     Vec(Vec<ParseExpr>),
     Ref(String),
@@ -99,6 +100,7 @@ impl From<ParseExpr> for Expr {
             ParseExpr::Float(value) => Expr::Value(value.into()),
             ParseExpr::Decimal(value) => Expr::Value(value.into()),
             ParseExpr::Bool(value) => Expr::Value(value.into()),
+            ParseExpr::None => Expr::none(),
             ParseExpr::Ref(name) => Expr::Reference(name),
             ParseExpr::Func(name, param) => Expr::func(name, (*param).into()),
             ParseExpr::Idx(expr, index) => Expr::index((*expr).into(), index.into()),
@@ -198,6 +200,14 @@ mod when_parsing_json_expr {
         assert_eq!(
             Rule::parse_json(r#"{"name": "testrule", "expr": {"string": "test"}}"#).unwrap(),
             Rule::new("testrule", None, Expr::value("test"))
+        );
+    }
+
+    #[test]
+    fn should_parse_none_value() {
+        assert_eq!(
+            Rule::parse_json(r#"{"name": "testrule", "expr": "none"}"#).unwrap(),
+            Rule::new("testrule", None, Expr::none())
         );
     }
 
