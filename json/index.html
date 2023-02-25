@@ -165,6 +165,11 @@ The expression is a nested tree-structure. At the root is the first expression t
 </code></pre>
 <pre><code class="language-json">{ &quot;bool&quot;: true }
 </code></pre>
+<h3 id="none-value"><a class="header" href="#none-value">None value</a></h3>
+<p><code>none</code> is a special value used to indicate that a value is not available. It can be used when passing values into a rule to indicate a missing value for example.</p>
+<pre><code class="language-json">{&quot;none&quot;}
+</code></pre>
+<p>The expressions <code>is_some</code> and <code>is_none</code> can be used to test for <code>none</code> values. These are documented with the Special Expressions.</p>
 <h2 id="comparison-expressions"><a class="header" href="#comparison-expressions">Comparison Expressions</a></h2>
 <p>Reval supports a number of comparison expressions that can be used to compare values. Al these expressions result in a boolean value.</p>
 <h3 id="eq-and-neq"><a class="header" href="#eq-and-neq">Eq and neq</a></h3>
@@ -188,7 +193,16 @@ The expression is a nested tree-structure. At the root is the first expression t
 <p>Fields from maps are indexed by string.</p>
 <pre><code class="language-json">{&quot;idx&quot;: [{ &quot;ref&quot;: &quot;some_map_value&quot; }, { &quot;string&quot;: &quot;sub-field&quot; } ]}
 </code></pre>
-<h3 id=""><a class="header" href="#"></a></h3>
+<h3 id="none-checks"><a class="header" href="#none-checks">None checks</a></h3>
+<p>The <code>is_some</code> and <code>is_none</code> expressions test for none values.</p>
+<p><code>is_some</code> checks for <code>none</code> values and returns <code>true</code> if the expression returns a value that is not equal to <code>none</code>.</p>
+<pre><code class="language-json">{&quot;is_some&quot;: {&quot;string&quot;: &quot;some value&quot;}}
+</code></pre>
+<p>This returns <code>true</code> because <code>{&quot;string&quot;: &quot;some value&quot;}</code> is not <code>none</code></p>
+<p><code>is_none</code> checks for <code>none</code> values and returns <code>true</code> if the expression returns a value that is equal to <code>none</code>.</p>
+<pre><code class="language-json">{&quot;is_none&quot;: &quot;none&quot;}
+</code></pre>
+<p>This returns <code>true</code></p>
 <h3 id="gt-gte-lt-and-lte"><a class="header" href="#gt-gte-lt-and-lte">Gt, gte, lt and lte</a></h3>
 <p>Gt is short for &quot;greater than&quot; it compares two numeric values of the same type, lt is &quot;less than&quot; and is the inverse. Gte and lte are the inclusive versions of these operations. They are short for &quot;Greater than or equal&quot; and &quot;Less than or equal&quot;</p>
 <pre><code class="language-json">{ &quot;gt&quot;: [{&quot;int&quot;: 5}, {&quot;ref&quot;: &quot;input&quot;}] }
