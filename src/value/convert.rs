@@ -270,7 +270,7 @@ impl TryFrom<Value> for HashMap<String, Value> {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Map(map) => Ok(map),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Bool".to_owned())),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Map".to_owned())),
         }
     }
 }
@@ -289,7 +289,7 @@ impl TryFrom<Value> for Vec<Value> {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Vec(vec) => Ok(vec),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Bool".to_owned())),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Vec".to_owned())),
         }
     }
 }

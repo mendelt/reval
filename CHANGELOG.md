@@ -5,13 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.1] - 2022-02-25
+## [Unreleased] - 20
+
+### Fixed
+- Fixed the error message when trying to `try_from` a Value into a `HashMap`
+- Fixed the error message when trying to `try_from` a Value into a `Vec`
+
+## [0.6.1] - 2023-02-25
 
 ### Added
 - Add the `none` value to the json DSL
 - Add `is_some` and `is_none` functions to test for none values
 
-## [0.6.0] - 2022-02-18
+## [0.6.0] - 2023-02-18
 
 ### Added
 - A `description` field for `Rule`s
@@ -26,14 +32,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed `get` method from `UserFunctions` public api
 - Removed `BoxedFunction` type from prelude and public api
 
-## [0.5.2] - 2022-01-20
+## [0.5.2] - 2023-01-20
 
 ### Added
 - Utility function for creating `Expr::Reference`
 - `From<usize>` implementation for `Value`
 - Allow simple `String` or `usize` index parameter for `idx` besides expressions
 
-## [0.5.1] - 2022-01-18
+## [0.5.1] - 2023-01-18
 
 ### Added
 - Documentation for rules writers
@@ -42,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Make add, sub, mul, div, and and or in the json rules language take more than 2 operands  Left associatively combine them into their respective expressions
 
-## [0.5.0] - 2022-01-04
+## [0.5.0] - 2023-01-04
 
 ### Added
 - if expression.
@@ -54,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Methods for adding rules and functions to a `RuleSet` directly.
 
 
-## [0.5.0] - 2022-01-04
+## [0.5.0] - 2023-01-04
 
 Was yanked and replaced by [0.5.0]
 
