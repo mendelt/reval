@@ -278,6 +278,17 @@ impl<K: Into<String>, V: Into<Value>> From<BTreeMap<K, V>> for Value {
     }
 }
 
+impl TryFrom<Value> for HashMap<String, Value> {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Map(map) => Ok(map),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Map".to_owned())),
+        }
+    }
+}
+
 impl<V: TryFrom<Value, Error = Error>> TryFrom<Value> for HashMap<String, V> {
     type Error = Error;
 
@@ -330,6 +341,23 @@ mod test {
     use super::*;
 
     #[test]
+    fn should_convert_map_directly_to_string_value_hashmap() {
+        let value: Value = HashMap::from([("Key 1", 25), ("Key 2", 24), ("Key 3", 12)]).into();
+
+        // Convert the value back into a different type of map
+        let new_map: HashMap<String, Value> = value.try_into().unwrap();
+
+        assert_eq!(
+            new_map,
+            HashMap::from([
+                ("Key 1".to_string(), 25.into()),
+                ("Key 2".to_string(), 24.into()),
+                ("Key 3".to_string(), 12.into())
+            ])
+        );
+    }
+
+    #[test]
     fn should_convert_map_to_hashmap() {
         let map = BTreeMap::from([("Key 1", 25), ("Key 2", 24), ("Key 3", 12)]);
 
@@ -337,7 +365,6 @@ mod test {
         let value: Value = map.into();
 
         // Convert the value back into a different type of map
-
         let new_map: HashMap<String, u32> = value.try_into().unwrap();
 
         assert_eq!(
@@ -358,7 +385,6 @@ mod test {
         let value: Value = map.into();
 
         // Convert the value back into a different type of map
-
         let new_map: BTreeMap<String, u32> = value.try_into().unwrap();
 
         assert_eq!(
