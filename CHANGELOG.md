@@ -5,11 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 20
+## [Unreleased]
 
 ### Fixed
 - Fixed the error message when trying to `try_from` a Value into a `HashMap`
 - Fixed the error message when trying to `try_from` a Value into a `Vec`
+
+### Changed
+- Made converting from and into Value::Vec and Value::Map more flexible, we now also map the contents of the vec and map
 
 ## [0.6.1] - 2023-02-25
 

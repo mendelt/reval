@@ -4,7 +4,7 @@
 use super::Value;
 use crate::Error;
 use rust_decimal::Decimal;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 // Convert to and from Value::String
 
@@ -258,18 +258,49 @@ impl From<Option<Value>> for Value {
 
 // Convert to and from Value::Map
 
-impl From<HashMap<String, Value>> for Value {
-    fn from(map: HashMap<String, Value>) -> Self {
-        Value::Map(map)
+impl<K: Into<String>, V: Into<Value>> From<HashMap<K, V>> for Value {
+    fn from(map: HashMap<K, V>) -> Self {
+        Value::Map(
+            map.into_iter()
+                .map(|(key, value)| (key.into(), value.into()))
+                .collect(),
+        )
     }
 }
 
-impl TryFrom<Value> for HashMap<String, Value> {
+impl<K: Into<String>, V: Into<Value>> From<BTreeMap<K, V>> for Value {
+    fn from(map: BTreeMap<K, V>) -> Self {
+        Value::Map(
+            map.into_iter()
+                .map(|(key, value)| (key.into(), value.into()))
+                .collect(),
+        )
+    }
+}
+
+impl<V: TryFrom<Value, Error = Error>> TryFrom<Value> for HashMap<String, V> {
     type Error = Error;
 
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
-            Value::Map(map) => Ok(map),
+            Value::Map(map) => map
+                .into_iter()
+                .map(|(key, val)| val.try_into().map(|val| (key, val)))
+                .collect(),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Map".to_owned())),
+        }
+    }
+}
+
+impl<V: TryFrom<Value, Error = Error>> TryFrom<Value> for BTreeMap<String, V> {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Map(map) => map
+                .into_iter()
+                .map(|(key, val)| val.try_into().map(|val| (key, val)))
+                .collect(),
             _ => Err(Error::UnexpectedValueType(value, "Value::Map".to_owned())),
         }
     }
@@ -277,19 +308,84 @@ impl TryFrom<Value> for HashMap<String, Value> {
 
 // Convert to and from Value::Vec
 
-impl From<Vec<Value>> for Value {
-    fn from(vec: Vec<Value>) -> Self {
-        Value::Vec(vec)
+impl<V: Into<Value>> From<Vec<V>> for Value {
+    fn from(vec: Vec<V>) -> Self {
+        Value::Vec(vec.into_iter().map(|value| value.into()).collect())
     }
 }
 
-impl TryFrom<Value> for Vec<Value> {
+impl<V: TryFrom<Value, Error = Error>> TryFrom<Value> for Vec<V> {
     type Error = Error;
 
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
-            Value::Vec(vec) => Ok(vec),
+            Value::Vec(vec) => vec.into_iter().map(|val| val.try_into()).collect(),
             _ => Err(Error::UnexpectedValueType(value, "Value::Vec".to_owned())),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn should_convert_map_to_hashmap() {
+        let map = BTreeMap::from([("Key 1", 25), ("Key 2", 24), ("Key 3", 12)]);
+
+        // Convert the map into a value
+        let value: Value = map.into();
+
+        // Convert the value back into a different type of map
+
+        let new_map: HashMap<String, u32> = value.try_into().unwrap();
+
+        assert_eq!(
+            new_map,
+            HashMap::from([
+                ("Key 1".to_string(), 25),
+                ("Key 2".to_string(), 24),
+                ("Key 3".to_string(), 12)
+            ])
+        );
+    }
+
+    #[test]
+    fn should_convert_map_to_btreemap() {
+        let map = HashMap::from([("Key 1", 25), ("Key 2", 24), ("Key 3", 12)]);
+
+        // Convert the map into a value
+        let value: Value = map.into();
+
+        // Convert the value back into a different type of map
+
+        let new_map: BTreeMap<String, u32> = value.try_into().unwrap();
+
+        assert_eq!(
+            new_map,
+            BTreeMap::from([
+                ("Key 1".to_string(), 25),
+                ("Key 2".to_string(), 24),
+                ("Key 3".to_string(), 12)
+            ])
+        );
+    }
+
+    #[test]
+    fn should_convert_value_to_vec() {
+        let list = vec!["item 1", "item 2", "item 3"];
+
+        let value: Value = list.into();
+
+        let new_list: Vec<String> = value.try_into().unwrap();
+
+        assert_eq!(
+            new_list,
+            vec![
+                "item 1".to_string(),
+                "item 2".to_string(),
+                "item 3".to_string()
+            ]
+        )
     }
 }
