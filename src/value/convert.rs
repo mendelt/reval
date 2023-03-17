@@ -289,6 +289,17 @@ impl TryFrom<Value> for HashMap<String, Value> {
     }
 }
 
+impl TryFrom<Value> for BTreeMap<String, Value> {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Map(map) => Ok(map.into_iter().collect()),
+            _ => Err(Error::UnexpectedValueType(value, "Value::Map".to_owned())),
+        }
+    }
+}
+
 impl<V: TryFrom<Value, Error = Error>> TryFrom<Value> for HashMap<String, V> {
     type Error = Error;
 

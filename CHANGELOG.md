@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## Added
+- A direct conversion from Value::Map to a BTreeMap<String, Value>
+
 ### Fixed
 - Fixed the direct conversion from Value::Map to a HashMap<String, Value>
 
