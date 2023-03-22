@@ -155,8 +155,6 @@ fn operands(
     expressions: impl IntoIterator<Item = ParseExpr>,
     operator: impl Fn(Expr, Expr) -> Expr,
 ) -> Expr {
-    // TODO: Make this left associative, its right-associative right now
-
     fn recurse(
         head: Expr,
         mut tail: impl Iterator<Item = ParseExpr>,
