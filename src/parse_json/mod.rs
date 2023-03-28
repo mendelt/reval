@@ -175,9 +175,8 @@ fn operands(
 }
 
 #[cfg(test)]
-mod when_parsing_json_expr {
+mod when_parsing_rule_metadata {
     use super::*;
-    use crate::expr::Expr;
 
     #[test]
     fn should_parse_rule_name() {
@@ -200,159 +199,351 @@ mod when_parsing_json_expr {
     }
 
     #[test]
+    fn should_parse_rule_expression() {
+        let rule = Rule::parse_json(
+            r#"{"name": "testrule", "description": "Test Rule", "expr": {"string": "test"}}"#,
+        )
+        .unwrap();
+
+        assert_eq!(rule.expr(), &Expr::value("test"));
+    }
+}
+
+#[cfg(test)]
+mod when_parsing_value_expressions {
+    use super::*;
+    use crate::expr::Expr;
+
+    #[test]
     fn should_parse_string_value() {
         assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr": {"string": "test"}}"#).unwrap(),
-            Rule::new("testrule", None, Expr::value("test"))
+            Expr::parse_json(r#"{"string": "test"}"#).unwrap(),
+            Expr::value("test")
+        );
+    }
+
+    #[test]
+    fn should_parse_int_value() {
+        assert_eq!(Expr::parse_json(r#"{"int": 5}"#).unwrap(), Expr::value(5));
+    }
+
+    #[test]
+    fn should_parse_float_value() {
+        assert_eq!(
+            Expr::parse_json(r#"{"float": 5.5}"#).unwrap(),
+            Expr::value(5.5)
+        );
+    }
+
+    #[test]
+    fn should_parse_decimal_value() {
+        assert_eq!(
+            Expr::parse_json(r#"{"decimal": 2.02}"#).unwrap(),
+            Expr::value(Decimal::new(202, 2))
+        );
+    }
+
+    #[test]
+    fn should_parse_bool_value() {
+        assert_eq!(
+            Expr::parse_json(r#"{"bool": true}"#).unwrap(),
+            Expr::value(true)
         );
     }
 
     #[test]
     fn should_parse_none_value() {
+        assert_eq!(Expr::parse_json(r#""none""#).unwrap(), Expr::none());
+    }
+}
+
+#[cfg(test)]
+mod when_parsing_single_expressions {
+    use std::collections::HashMap;
+
+    use crate::expr::Expr;
+
+    #[test]
+    fn should_parse_reference() {
         assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr": "none"}"#).unwrap(),
-            Rule::new("testrule", None, Expr::none())
+            Expr::parse_json(r#"{"ref": "the value"}"#).unwrap(),
+            Expr::Reference("the value".to_string())
         );
     }
 
     #[test]
-    fn should_parse_cint() {
+    fn should_parse_function_call() {
         assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr": {"cint": {"float": 3.15}}}"#).unwrap(),
-            Rule::new("testrule", None, Expr::int(Expr::value(3.15)))
-        );
-    }
-
-    #[test]
-    fn should_parse_cfloat() {
-        assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr": {"cfloat": {"int": 3}}}"#).unwrap(),
-            Rule::new("testrule", None, Expr::float(Expr::value(3)))
-        );
-    }
-
-    #[test]
-    fn should_parse_cdecimal() {
-        assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr": {"cdecimal": {"int": 3}}}"#).unwrap(),
-            Rule::new("testrule", None, Expr::dec(Expr::value(3)))
-        );
-    }
-
-    #[test]
-    fn should_parse_is_none() {
-        assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr" : {"is_none": {"string": "value"}}}"#)
+            Expr::parse_json(r#"{"func": ["function_name", {"string": "function parameter"}]}"#)
                 .unwrap(),
-            Rule::new("testrule", None, Expr::is_none(Expr::value("value")))
+            Expr::func("function_name", Expr::value("function parameter"))
+        );
+    }
+
+    #[test]
+    fn should_parse_index_by_string() {
+        assert_eq!(
+            Expr::parse_json(r#"{"idx": [{"ref": "some_map_value"}, "field"]}"#).unwrap(),
+            Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
+        );
+    }
+
+    #[test]
+    fn should_parse_index_by_usize() {
+        assert_eq!(
+            Expr::parse_json(r#"{"idx": [{"ref": "some_vec_value"}, 5]}"#).unwrap(),
+            Expr::index(Expr::reff("some_vec_value"), Expr::value(5usize))
+        );
+    }
+
+    #[test]
+    fn should_parse_index_by_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"idx": [{"ref": "some_map_value"}, {"string": "field"}]}"#)
+                .unwrap(),
+            Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
+        );
+    }
+
+    #[test]
+    fn should_parse_if_statement() {
+        assert_eq!(
+            Expr::parse_json(
+                r#"{"if": [{"bool": true}, {"string": "true"}, {"string": "false"}]}"#
+            )
+            .unwrap(),
+            Expr::iif(Expr::value(true), Expr::value("true"), Expr::value("false"))
         )
     }
 
     #[test]
-    fn should_parse_is_some() {
+    fn should_parse_not_expression() {
         assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr" : {"is_some": {"string": "value"}}}"#)
-                .unwrap(),
-            Rule::new("testrule", None, Expr::is_some(Expr::value("value")))
+            Expr::parse_json(r#"{"not": {"bool": true}}"#).unwrap(),
+            Expr::not(Expr::value(true))
+        )
+    }
+
+    #[test]
+    fn should_parse_neg_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"neg": {"int": 5}}"#).unwrap(),
+            Expr::neg(Expr::value(5))
+        )
+    }
+
+    #[test]
+    fn should_parse_is_some_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"is_some": {"string": "value"}}"#).unwrap(),
+            Expr::is_some(Expr::value("value"))
+        )
+    }
+
+    #[test]
+    fn should_parse_is_none_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"is_none": {"string": "value"}}"#).unwrap(),
+            Expr::is_none(Expr::value("value"))
+        )
+    }
+
+    #[test]
+    fn should_parse_cint_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"cint": {"float": 3.15}}"#).unwrap(),
+            Expr::int(Expr::value(3.15))
+        );
+    }
+
+    #[test]
+    fn should_parse_cfloat_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"cfloat": {"int": 3}}"#).unwrap(),
+            Expr::float(Expr::value(3))
+        );
+    }
+
+    #[test]
+    fn should_parse_cdecimal_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"cdecimal": {"int": 3}}"#).unwrap(),
+            Expr::dec(Expr::value(3))
+        );
+    }
+
+    #[test]
+    fn should_parse_vec() {
+        assert_eq!(
+            Expr::parse_json(r#"{"vec": [{"string": "test 1"}, {"string": "test 2"}]}"#).unwrap(),
+            Expr::Vec(vec![Expr::value("test 1"), Expr::value("test 2")])
+        );
+    }
+
+    #[test]
+    fn should_parse_empty_vec() {
+        assert_eq!(
+            Expr::parse_json(r#"{"vec": []}"#).unwrap(),
+            Expr::Vec(Vec::new())
+        );
+    }
+
+    #[test]
+    fn should_parse_map() {
+        assert_eq!(
+            Expr::parse_json(
+                r#"{"map": {"test 1": {"string": "test 1"}, "test 2": {"string": "test 2"}}}"#
+            )
+            .unwrap(),
+            Expr::Map(HashMap::from([
+                ("test 1".to_string(), Expr::value("test 1")),
+                ("test 2".to_string(), Expr::value("test 2"))
+            ]))
+        )
+    }
+
+    #[test]
+    fn should_parse_empty_map() {
+        assert_eq!(
+            Expr::parse_json(r#"{"map": {}}"#).unwrap(),
+            Expr::Map(HashMap::new())
+        )
+    }
+
+    #[test]
+    fn should_parse_mult_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"mult": [{"int": 4}, {"int": 3}]}"#).unwrap(),
+            Expr::mult(Expr::value(4), Expr::value(3))
+        )
+    }
+
+    #[test]
+    fn should_parse_div_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"div": [{"int": 4}, {"int": 3}]}"#).unwrap(),
+            Expr::div(Expr::value(4), Expr::value(3))
         )
     }
 
     #[test]
     fn should_parse_add_expr() {
         assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr": {"add": [{"int": 4}, {"int": 3}]}}"#)
+            Expr::parse_json(r#"{"add": [{"int": 4}, {"int": 3}]}"#).unwrap(),
+            Expr::add(Expr::value(4), Expr::value(3))
+        );
+    }
+
+    #[test]
+    fn should_parse_sub_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"sub": [{"int": 4}, {"int": 3}]}"#).unwrap(),
+            Expr::sub(Expr::value(4), Expr::value(3))
+        )
+    }
+
+    #[test]
+    fn should_parse_eq_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"eq": [{"bool": true}, {"bool": true}]}"#).unwrap(),
+            Expr::eq(Expr::value(true), Expr::value(true))
+        )
+    }
+
+    #[test]
+    fn should_parse_neq_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"neq": [{"bool": true}, {"bool": false}]}"#).unwrap(),
+            Expr::neq(Expr::value(true), Expr::value(false))
+        )
+    }
+
+    #[test]
+    fn should_parse_gt_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"gt": [{"int": 4}, {"int": 15}]}"#).unwrap(),
+            Expr::gt(Expr::value(4), Expr::value(15))
+        )
+    }
+
+    #[test]
+    fn should_parse_gte_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"gte": [{"int": 12}, {"int": 12}]}"#).unwrap(),
+            Expr::gte(Expr::value(12), Expr::value(12))
+        )
+    }
+
+    #[test]
+    fn should_parse_lt_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"lt": [{"int": 14}, {"int": 12}]}"#).unwrap(),
+            Expr::lt(Expr::value(14), Expr::value(12))
+        )
+    }
+
+    #[test]
+    fn should_parse_lte_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"lte": [{"int": 80}, {"int": 3}]}"#).unwrap(),
+            Expr::lte(Expr::value(80), Expr::value(3))
+        )
+    }
+
+    #[test]
+    fn should_parse_and_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"and": [{"bool": true}, {"bool": false}]}"#).unwrap(),
+            Expr::and(Expr::value(true), Expr::value(false))
+        );
+    }
+
+    #[test]
+    fn should_parse_or_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"or": [{"bool": true}, {"bool": false}]}"#).unwrap(),
+            Expr::or(Expr::value(true), Expr::value(false))
+        );
+    }
+}
+
+#[cfg(test)]
+mod when_parsing_json_expr_with_variable_params {
+    use crate::expr::Expr;
+
+    #[test]
+    fn should_left_associatively_parse_sub_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"sub": [{"int": 4}, {"int": 3}, {"int": 2}]}"#).unwrap(),
+            Expr::sub(Expr::sub(Expr::value(4), Expr::value(3)), Expr::value(2))
+        );
+    }
+
+    #[test]
+    fn should_left_associatively_parse_div_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"div": [{"int": 5}, {"int": 4}, {"int": 3}, {"int": 2}]}"#)
                 .unwrap(),
-            Rule::new("testrule", None, Expr::add(Expr::value(4), Expr::value(3)))
-        );
-    }
-
-    #[test]
-    fn should_left_associatively_parse_sub_expr() {
-        assert_eq!(
-            Rule::parse_json(
-                r#"{"name": "testrule", "expr": {"sub": [{"int": 4}, {"int": 3}, {"int": 2}]}}"#
-            )
-            .unwrap(),
-            Rule::new(
-                "testrule",
-                None,
-                Expr::sub(Expr::sub(Expr::value(4), Expr::value(3)), Expr::value(2))
+            Expr::div(
+                Expr::div(Expr::div(Expr::value(5), Expr::value(4)), Expr::value(3)),
+                Expr::value(2)
             )
         );
     }
 
     #[test]
-    fn should_parse_empty_sub_expr_to_unit_val() {
+    fn should_parse_empty_expression_to_unit_val() {
         assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr": {"sub": []}}"#).unwrap(),
-            Rule::new("testrule", None, Expr::value(None))
+            Expr::parse_json(r#"{"add": []}"#).unwrap(),
+            Expr::value(None)
         );
     }
 
     #[test]
-    fn should_parse_empty_sub_expr_with_one_operand_to_operand() {
+    fn should_parse_expr_with_one_operand_to_operand() {
         assert_eq!(
-            Rule::parse_json(r#"{"name": "testrule", "expr": {"sub": [{"int": 4}]}}"#).unwrap(),
-            Rule::new("testrule", None, Expr::value(4))
-        );
-    }
-
-    #[test]
-    fn should_left_associatively_parse_div_expr() {
-        assert_eq!(
-            Rule::parse_json(
-                r#"{"name": "testrule", "expr": {"div": [{"int": 5}, {"int": 4}, {"int": 3}, {"int": 2}]}}"#
-            )
-            .unwrap(),
-            Rule::new(
-                "testrule", None,
-                Expr::div(Expr::div(Expr::div(Expr::value(5), Expr::value(4)), Expr::value(3)), Expr::value(2))
-            )
-        );
-    }
-
-    #[test]
-    fn should_index_by_string() {
-        assert_eq!(
-            Rule::parse_json(
-                r#"{"name": "testrule", "expr": {"idx": [{"ref": "some_map_value"}, "field"]}}"#
-            )
-            .unwrap(),
-            Rule::new(
-                "testrule",
-                None,
-                Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
-            )
-        );
-    }
-
-    #[test]
-    fn should_index_by_usize() {
-        assert_eq!(
-            Rule::parse_json(
-                r#"{"name": "testrule", "expr": {"idx": [{"ref": "some_vec_value"}, 5]}}"#
-            )
-            .unwrap(),
-            Rule::new(
-                "testrule",
-                None,
-                Expr::index(Expr::reff("some_vec_value"), Expr::value(5usize))
-            )
-        );
-    }
-
-    #[test]
-    fn should_index_by_expression() {
-        assert_eq!(
-            Rule::parse_json(
-                r#"{"name": "testrule", "expr": {"idx": [{"ref": "some_map_value"}, {"string": "field"}]}}"#
-            )
-            .unwrap(),
-            Rule::new(
-                "testrule",
-                None,
-                Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
-            )
+            Expr::parse_json(r#"{"mult": [{"int": 4}]}"#).unwrap(),
+            Expr::value(4)
         );
     }
 }
