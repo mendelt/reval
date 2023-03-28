@@ -41,7 +41,7 @@ impl Rule {
         self.description.as_deref()
     }
 
-    pub fn expr<'a>(&'a self) -> &'a Expr {
+    pub fn expr(&self) -> &Expr {
         &self.expr
     }
 }
