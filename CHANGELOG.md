@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.4] - 2023-03-28
 
 ## Added
 - Added `Rule::expr` getter to read the expression from a rule
@@ -193,7 +193,8 @@ Was yanked and replaced by [0.5.0]
 - async `UserFunction` support
 
 
-[unreleased]: https://github.com/mendelt/reval/compare/v0.6.3...HEAD
+[unreleased]: https://github.com/mendelt/reval/compare/v0.6.4...HEAD
+[0.6.4]: https://github.com/mendelt/reval/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/mendelt/reval/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/mendelt/reval/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/mendelt/reval/compare/v0.6.0...v0.6.1
