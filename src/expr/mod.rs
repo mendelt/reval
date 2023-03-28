@@ -98,8 +98,8 @@ impl Expr {
     }
 
     /// Function expression constructor
-    pub fn func(name: String, param: Expr) -> Self {
-        Expr::Function(name, Box::new(param))
+    pub fn func(name: impl Into<String>, param: Expr) -> Self {
+        Expr::Function(name.into(), Box::new(param))
     }
 
     /// Reference an input value
