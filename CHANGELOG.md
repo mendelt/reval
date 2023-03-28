@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 - Added `Rule::expr` getter to read the expression from a rule
+- Re-introduced `add_functions` to add multiple functions at once on the `RuleSet` `Builder`
 
 ## Changed
 - Made `Expr::func` constructor more flexible by taking Into<String> for the function name

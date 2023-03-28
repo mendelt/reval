@@ -27,6 +27,10 @@ impl UserFunctions {
         &mut self,
         function: impl UserFunction + Send + Sync + 'static,
     ) -> Result<()> {
+        self.add_boxed_function(Box::new(function))
+    }
+
+    pub(crate) fn add_boxed_function(&mut self, function: BoxedFunction) -> Result<()> {
         let name = function.name();
 
         if is_reserved_keyword(name) {
@@ -41,7 +45,7 @@ impl UserFunctions {
             return Err(Error::DuplicateFunctionName(name.to_string()));
         }
 
-        self.functions.insert(name, Box::new(function));
+        self.functions.insert(name, function);
 
         Ok(())
     }

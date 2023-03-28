@@ -20,7 +20,7 @@ pub struct Builder {
 }
 
 impl Builder {
-    /// Add a rule to the ruleset being built
+    /// Add a rule to the ruleset
     pub fn with_rule(mut self, rule: Rule) -> Result<Self> {
         let name = rule.name();
 
@@ -40,7 +40,7 @@ impl Builder {
         Ok(self)
     }
 
-    /// Add multiple rules to the RuleSet being built
+    /// Add multiple rules to the RuleSet
     pub fn with_rules(mut self, rules: impl IntoIterator<Item = Rule>) -> Result<Self> {
         for rule in rules {
             self = self.with_rule(rule)?;
@@ -48,12 +48,23 @@ impl Builder {
         Ok(self)
     }
 
-    /// Add a user-function to the ruleset being built
+    /// Add a user-function to the ruleset
     pub fn with_function(
         mut self,
         function: impl UserFunction + Send + Sync + 'static,
     ) -> Result<Self> {
         self.functions.add_function(function)?;
+        Ok(self)
+    }
+
+    /// Add multiple boxed user-functions to the ruleset
+    pub fn with_functions(
+        mut self,
+        functions: impl IntoIterator<Item = Box<dyn UserFunction + Send + Sync + 'static>>,
+    ) -> Result<Self> {
+        for function in functions {
+            self.functions.add_boxed_function(function)?;
+        }
         Ok(self)
     }
 
