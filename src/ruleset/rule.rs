@@ -40,6 +40,10 @@ impl Rule {
     pub fn description(&self) -> Option<&str> {
         self.description.as_deref()
     }
+
+    pub fn expr<'a>(&'a self) -> &'a Expr {
+        &self.expr
+    }
 }
 
 /// The outcome from evaluating a rule.
