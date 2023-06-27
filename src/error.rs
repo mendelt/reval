@@ -37,8 +37,11 @@ pub enum Error {
     /// Unexpected value {0:?}, expected {1}
     UnexpectedValueType(Value, String),
 
-    /// Unknown value {0}
-    UnknownValue(String),
+    /// Unknown field reference {0}
+    UnknownRef(String),
+
+    /// Unknown index {0}
+    UnknownIndex(String),
 
     /// Error executing user function {function}; {error}
     UserFunctionError {

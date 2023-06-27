@@ -76,7 +76,7 @@ fn reference(facts: &Value, name: &str) -> Result<Value> {
         value if name == "facts" => Ok(value),
         Value::Map(facts) => facts
             .get(name)
-            .ok_or_else(|| Error::UnknownValue(name.to_owned())),
+            .ok_or_else(|| Error::UnknownRef(name.to_owned())),
         _ => Err(Error::InvalidType),
     }
     .map(Clone::clone)
@@ -86,10 +86,10 @@ fn index(value: Value, idx: Value) -> Result<Value> {
     match (&value, idx) {
         (Value::Map(map), Value::String(field)) => map
             .get(&field)
-            .ok_or_else(|| Error::UnknownValue(field.to_owned())),
+            .ok_or_else(|| Error::UnknownIndex(field.to_owned())),
         (Value::Vec(vec), Value::Int(index)) => vec
             .get(index as usize)
-            .ok_or_else(|| Error::UnknownValue(index.to_string())),
+            .ok_or_else(|| Error::UnknownIndex(index.to_string())),
         (_, _) => Err(Error::InvalidType),
     }
     .map(Clone::clone)
