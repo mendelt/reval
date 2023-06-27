@@ -84,6 +84,9 @@ pub enum Expr {
 
     /// Or operation on two subexpressions
     Or(Box<Expr>, Box<Expr>),
+
+    /// Checks if a vec contains an item or if a map contains a key
+    Contains(Box<Expr>, Box<Expr>),
 }
 
 impl Expr {
@@ -215,6 +218,10 @@ impl Expr {
     /// Or expression constructor
     pub fn or(left: Expr, right: Expr) -> Self {
         Expr::Or(Box::new(left), Box::new(right))
+    }
+
+    pub fn contains(list: Expr, key: Expr) -> Self {
+        Expr::Contains(Box::new(list), Box::new(key))
     }
 }
 

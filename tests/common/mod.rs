@@ -1,5 +1,7 @@
 //! Shared functionality, types and data for testing
 
+use std::collections::HashMap;
+
 use serde::Serialize;
 
 pub fn simple_event() -> Event {
@@ -15,6 +17,8 @@ pub fn simple_event() -> Event {
 #[serde(tag = "event")]
 pub enum Event {
     Simple(SimpleEvent),
+    List { list: Vec<String> },
+    Map { map: HashMap<String, String> },
 }
 
 /// A simple event with a name and id

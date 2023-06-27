@@ -69,6 +69,7 @@ enum ParseExpr {
     Lte(Box<ParseExpr>, Box<ParseExpr>),
     And(Vec<ParseExpr>),
     Or(Vec<ParseExpr>),
+    Contains(Box<ParseExpr>, Box<ParseExpr>),
 }
 
 /// Index type for parsing an index into a map or vec, can be a String, a usize
@@ -132,6 +133,7 @@ impl From<ParseExpr> for Expr {
             ParseExpr::Lte(left, right) => Expr::lte((*left).into(), (*right).into()),
             ParseExpr::And(params) => operands(params, Expr::and),
             ParseExpr::Or(params) => operands(params, Expr::or),
+            ParseExpr::Contains(list, key) => Expr::contains((*list).into(), (*key).into()),
         }
     }
 }
@@ -503,6 +505,23 @@ mod when_parsing_single_expressions {
         assert_eq!(
             Expr::parse_json(r#"{"or": [{"bool": true}, {"bool": false}]}"#).unwrap(),
             Expr::or(Expr::value(true), Expr::value(false))
+        );
+    }
+
+    #[test]
+    fn should_parse_contains_expression() {
+        assert_eq!(
+            Expr::parse_json(
+                r#"{"contains": [
+                    {"vec": [{"string": "test 1"}, {"string": "test 2"}]},
+                    {"string": "test 2"}
+                ]}"#
+            )
+            .unwrap(),
+            Expr::contains(
+                Expr::Vec(vec![Expr::value("test 1"), Expr::value("test 2")]),
+                Expr::value("test 2")
+            )
         );
     }
 }

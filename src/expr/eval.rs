@@ -67,6 +67,8 @@ impl Expr {
             ),
             Expr::And(left, right) => and(context, facts, left, right).await,
             Expr::Or(left, right) => or(context, facts, left, right).await,
+
+            Expr::Contains(coll, item) => contains(context, facts, coll, item).await,
         }
     }
 }
@@ -352,4 +354,20 @@ async fn eval_to_bool<'a>(
     expr: &Expr,
 ) -> Result<bool> {
     TryInto::<bool>::try_into(expr.evaluate(context, facts).await?).map_err(|_| Error::InvalidType)
+}
+
+async fn contains<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    coll: &Expr,
+    item: &Expr,
+) -> Result<Value> {
+    let coll = coll.evaluate(context, facts).await?;
+    let item = item.evaluate(context, facts).await?;
+
+    match (coll, item) {
+        (Value::Map(map), Value::String(key)) => Ok(Value::Bool(map.contains_key(&key))),
+        (Value::Vec(vec), item) => Ok(Value::Bool(vec.contains(&item))),
+        _ => Err(Error::InvalidType),
+    }
 }
