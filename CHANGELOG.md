@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.6] - 2023-07-03
+
+## Changed
+- gt, gte, lt and lte now return false if the first parameter is `None`
+
 ## [0.6.5] - 2023-06-27
 
 ## Added
@@ -201,7 +206,8 @@ Was yanked and replaced by [0.5.0]
 - async `UserFunction` support
 
 
-[unreleased]: https://github.com/mendelt/reval/compare/v0.6.5...HEAD
+[unreleased]: https://github.com/mendelt/reval/compare/v0.6.6...HEAD
+[0.6.6]: https://github.com/mendelt/reval/compare/v0.6.5...v0.6.6
 [0.6.5]: https://github.com/mendelt/reval/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/mendelt/reval/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/mendelt/reval/compare/v0.6.2...v0.6.3
