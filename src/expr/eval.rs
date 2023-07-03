@@ -275,6 +275,7 @@ async fn eq<'a>(
 
 fn gt(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
+        (Value::None, _) => Ok(false.into()),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left > right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left > right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left > right)),
@@ -285,6 +286,7 @@ fn gt(left: Value, right: Value) -> Result<Value> {
 
 fn gte(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
+        (Value::None, _) => Ok(false.into()),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left >= right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left >= right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left >= right)),
@@ -295,6 +297,7 @@ fn gte(left: Value, right: Value) -> Result<Value> {
 
 fn lt(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
+        (Value::None, _) => Ok(false.into()),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left < right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left < right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left < right)),
@@ -305,6 +308,7 @@ fn lt(left: Value, right: Value) -> Result<Value> {
 
 fn lte(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
+        (Value::None, _) => Ok(false.into()),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left <= right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left <= right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left <= right)),
