@@ -17,7 +17,6 @@ anyhow = "1"
 async-recursion = "1"
 async-trait = "0.1"
 displaydoc = "0.2"
-nom = { version = "7", optional = true }
 rust_decimal = "1"
 serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
@@ -31,7 +30,6 @@ tokio-test = "0.4"
 
 [features]
 default = ["json_parser", "value_serializer"]
-nom_parser = ["dep:nom"]
 json_parser = ["dep:serde", "dep:serde_json"]
 value_serializer = ["dep:serde"]
 
