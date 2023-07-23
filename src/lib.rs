@@ -103,7 +103,6 @@
 pub mod error;
 pub mod expr;
 pub mod function;
-#[cfg(feature = "nom_parser")]
 pub mod parse;
 #[cfg(feature = "json_parser")]
 pub mod parse_json;
