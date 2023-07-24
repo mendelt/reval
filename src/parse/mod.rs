@@ -1,15 +1,12 @@
-//! Parse rules written using the Reval DSL
+//! Parse rules and expressions written using the Reval DSL
 
 mod expr;
-mod value;
+mod rule;
 
-use crate::expr::Expr;
+/// Extension crate for Reval DSL parsing, adds a `parse` method to Expr and Rule
+pub trait Parsers {
+    type Error;
+    type Parseable;
 
-// impl Expr {
-//     /// Parse an expression written in the Reval DSL format
-//     pub fn parse(input: &str) -> Self {
-//         let (remaining, expr) = expr::expr(input).unwrap();
-//         assert!(remaining.is_empty());
-//         expr
-//     }
-// }
+    fn parse(input: &str) -> Result<Self::Parseable, Self::Error>;
+}
