@@ -34,17 +34,49 @@ mod when_parsing_float {
 
     #[test]
     fn should_parse_simple_float() {
-        assert_eq!(Expr::parse("f5.0").unwrap(), Expr::value(5.0));
+        assert_eq!(Expr::parse("f5").unwrap(), Expr::value(5.0));
+    }
+
+    #[test]
+    fn should_parse_factional_float() {
+        assert_eq!(Expr::parse("f5.5").unwrap(), Expr::value(5.5))
     }
 
     #[test]
     fn should_parse_negative_float() {
-        assert_eq!(Expr::parse("f-5.0").unwrap(), Expr::value(-5.0));
+        assert_eq!(Expr::parse("f-5.5").unwrap(), Expr::value(-5.5));
     }
 
     #[test]
     fn should_parse_exponent() {
         assert_eq!(Expr::parse("f38.0e-1").unwrap(), Expr::value(3.8))
+    }
+}
+
+#[cfg(test)]
+mod when_parsing_decimal {
+    use super::*;
+    use rust_decimal::Decimal;
+
+    #[test]
+    fn should_parse_simple_decimal() {
+        assert_eq!(Expr::parse("d5").unwrap(), Expr::value(Decimal::new(5, 0)));
+    }
+
+    #[test]
+    fn should_parse_fractional_decimal() {
+        assert_eq!(
+            Expr::parse("d5.5").unwrap(),
+            Expr::value(Decimal::new(55, 1))
+        );
+    }
+
+    #[test]
+    fn should_parse_negative_decimal() {
+        assert_eq!(
+            Expr::parse("d-5.5").unwrap(),
+            Expr::value(Decimal::new(-55, 1))
+        );
     }
 }
 
@@ -102,7 +134,7 @@ mod when_parsing_string {
 
 #[cfg(test)]
 mod when_parsing_expressions {
-    // use super::*;
+    use super::*;
 
     // #[test]
     // fn should_parse_less_than_equal() {
@@ -180,6 +212,11 @@ mod when_parsing_expressions {
     //         Expr::add(Expr::mult(Expr::value(3), Expr::value(4)), Expr::value(8)),
     //     );
     // }
+
+    #[test]
+    fn should_parse_simple_parentheses() {
+        assert_eq!(Expr::parse("(5)").unwrap(), Expr::value(5));
+    }
 
     // #[test]
     // fn should_override_precedence_with_parentheses() {
