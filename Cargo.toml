@@ -2,7 +2,7 @@
 name = "reval"
 version = "0.6.6"
 edition = "2021"
-rust-version = "1.62.1"
+rust-version = "1.64.0"
 authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
 license = "MIT/Apache-2.0"
 description = "Simple Rust expression evaluator"
@@ -17,6 +17,7 @@ anyhow = "1"
 async-recursion = "1"
 async-trait = "0.1"
 displaydoc = "0.2"
+lalrpop-util = { version = "0.20.0", features = ["lexer", "unicode"] }
 rust_decimal = "1"
 serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
@@ -27,6 +28,9 @@ unicode-xid = "0.2"
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 tokio-test = "0.4"
+
+[build-dependencies] # <-- We added this and everything after!
+lalrpop = "0.20.0"
 
 [features]
 default = ["json_parser", "value_serializer"]

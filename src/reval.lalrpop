@@ -1,0 +1,11 @@
+use std::str::FromStr;
+use crate::{expr::Expr, value::Value};
+
+grammar;
+
+pub Expr: Expr = {
+    IntValue => Expr::Value(<>),
+    "(" <Expr> ")"
+};
+
+IntValue: Value = <s:r"[+-]?[0-9]+"> => Value::Int(i128::from_str(s).unwrap());
