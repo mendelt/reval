@@ -50,23 +50,17 @@ mod when_parsing_float {
 
 #[cfg(test)]
 mod when_parsing_bool {
-    // use super::*;
+    use super::*;
 
-    // #[test]
-    // fn should_parse_true() {
-    //     assert_eq!(bool_value("true").unwrap().1, Value::Bool(true));
-    //     // assert_eq!(bool_value("true").unwrap().1, Value::Bool(true));
-    // }
+    #[test]
+    fn should_parse_true() {
+        assert_eq!(Expr::parse("true").unwrap(), Expr::value(true));
+    }
 
-    // #[test]
-    // fn should_parse_false() {
-    //     assert_eq!(bool_value("false").unwrap().1, Value::Bool(false));
-    // }
-
-    // #[test]
-    // fn should_not_parse_non_bool() {
-    //     assert!(bool_value("stuff").is_err());
-    // }
+    #[test]
+    fn should_parse_false() {
+        assert_eq!(Expr::parse("false").unwrap(), Expr::value(false));
+    }
 }
 
 #[cfg(test)]
