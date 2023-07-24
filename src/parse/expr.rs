@@ -30,22 +30,22 @@ mod when_parsing_integer {
 
 #[cfg(test)]
 mod when_parsing_float {
-    // use super::*;
+    use super::*;
 
-    // #[test]
-    // fn should_parse_simple_float() {
-    //     assert_eq!(value("5.0").unwrap().1, Value::Float(5.0));
-    // }
+    #[test]
+    fn should_parse_simple_float() {
+        assert_eq!(Expr::parse("f5.0").unwrap(), Expr::value(5.0));
+    }
 
-    // #[test]
-    // fn should_parse_negative_float() {
-    //     assert_eq!(value("-5.0").unwrap().1, Value::Float(-5.0));
-    // }
+    #[test]
+    fn should_parse_negative_float() {
+        assert_eq!(Expr::parse("f-5.0").unwrap(), Expr::value(-5.0));
+    }
 
-    // #[test]
-    // fn should_parse_exponent() {
-    //     assert_eq!(value("38.0e-1").unwrap().1, Value::Float(3.8))
-    // }
+    #[test]
+    fn should_parse_exponent() {
+        assert_eq!(Expr::parse("f38.0e-1").unwrap(), Expr::value(3.8))
+    }
 }
 
 #[cfg(test)]
