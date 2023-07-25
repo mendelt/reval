@@ -4,7 +4,17 @@ use crate::{expr::Expr, value::Value};
 
 grammar;
 
-pub Expr: Expr = AddExpr;
+pub Expr: Expr = EqExpr;
+
+EqExpr: Expr = {
+    <l:EqExpr> "==" <r:AddExpr> => Expr::eq(l, r),
+    <l:EqExpr> "!=" <r:AddExpr> => Expr::neq(l, r),
+    <l:EqExpr> ">" <r:AddExpr> => Expr::gt(l, r),
+    <l:EqExpr> "<" <r:AddExpr> => Expr::lt(l, r),
+    <l:EqExpr> ">=" <r:AddExpr> => Expr::gte(l, r),
+    <l:EqExpr> "<=" <r:AddExpr> => Expr::lte(l, r),
+    AddExpr
+}
 
 AddExpr: Expr = {
     <l:AddExpr> "+" <r:MultExpr> => Expr::add(l, r),

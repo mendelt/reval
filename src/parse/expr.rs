@@ -19,12 +19,12 @@ mod when_parsing_integer {
 
     #[test]
     fn should_parse_integer() {
-        assert_eq!(Expr::parse("i15").unwrap(), Expr::value(15));
+        assert_eq!(Expr::parse("i15").unwrap().to_string(), "i15");
     }
 
     #[test]
     fn should_parse_negative_integer() {
-        assert_eq!(Expr::parse("i-6").unwrap(), Expr::value(-6))
+        assert_eq!(Expr::parse("i-6").unwrap().to_string(), "i-6")
     }
 }
 
@@ -34,49 +34,42 @@ mod when_parsing_float {
 
     #[test]
     fn should_parse_simple_float() {
-        assert_eq!(Expr::parse("f5").unwrap(), Expr::value(5.0));
+        assert_eq!(Expr::parse("f5").unwrap().to_string(), "f5");
     }
 
     #[test]
     fn should_parse_factional_float() {
-        assert_eq!(Expr::parse("f5.5").unwrap(), Expr::value(5.5))
+        assert_eq!(Expr::parse("f5.5").unwrap().to_string(), "f5.5")
     }
 
     #[test]
     fn should_parse_negative_float() {
-        assert_eq!(Expr::parse("f-5.5").unwrap(), Expr::value(-5.5));
+        assert_eq!(Expr::parse("f-5.5").unwrap().to_string(), "f-5.5");
     }
 
     #[test]
     fn should_parse_exponent() {
-        assert_eq!(Expr::parse("f38.0e-1").unwrap(), Expr::value(3.8))
+        assert_eq!(Expr::parse("f38.0e-1").unwrap().to_string(), "f3.8");
     }
 }
 
 #[cfg(test)]
 mod when_parsing_decimal {
     use super::*;
-    use rust_decimal::Decimal;
 
     #[test]
     fn should_parse_simple_decimal() {
-        assert_eq!(Expr::parse("d5").unwrap(), Expr::value(Decimal::new(5, 0)));
+        assert_eq!(Expr::parse("d5").unwrap().to_string(), "d5");
     }
 
     #[test]
     fn should_parse_fractional_decimal() {
-        assert_eq!(
-            Expr::parse("d5.5").unwrap(),
-            Expr::value(Decimal::new(55, 1))
-        );
+        assert_eq!(Expr::parse("d5.5").unwrap().to_string(), "d5.5");
     }
 
     #[test]
     fn should_parse_negative_decimal() {
-        assert_eq!(
-            Expr::parse("d-5.5").unwrap(),
-            Expr::value(Decimal::new(-55, 1))
-        );
+        assert_eq!(Expr::parse("d-5.5").unwrap().to_string(), "d-5.5");
     }
 }
 
@@ -86,12 +79,12 @@ mod when_parsing_bool {
 
     #[test]
     fn should_parse_true() {
-        assert_eq!(Expr::parse("true").unwrap(), Expr::value(true));
+        assert_eq!(Expr::parse("true").unwrap().to_string(), "true");
     }
 
     #[test]
     fn should_parse_false() {
-        assert_eq!(Expr::parse("false").unwrap(), Expr::value(false));
+        assert_eq!(Expr::parse("false").unwrap().to_string(), "false");
     }
 }
 
@@ -100,35 +93,15 @@ mod when_parsing_string {
     // use super::*;
 
     // #[test]
-    // fn should_parse_double_quoted_string() {
+    // fn should_parse_quoted_string() {
     //     assert_eq!(
     //         string_value("\"string value\"").unwrap().1,
     //         Value::String("string value".to_string())
     //     );
     // }
 
-    // #[test]
-    // fn should_ignore_single_quotes_inside_double_quoted_string() {
-    //     assert_eq!(
-    //         string_value("\"string 'value'\"").unwrap().1,
-    //         Value::String("string 'value'".to_string())
-    //     );
-    // }
-
-    // #[test]
-    // fn should_parse_single_quoted_string() {
-    //     assert_eq!(
-    //         string_value("'string value'").unwrap().1,
-    //         Value::String("string value".to_string())
-    //     );
-    // }
-
-    // #[test]
-    // fn should_ignore_double_quotes_inside_single_quoted_string() {
-    //     assert_eq!(
-    //         string_value("'string \"value\"'").unwrap().1,
-    //         Value::String("string \"value\"".to_string())
-    //     );
+    // fn should_parse_string_with_escaped_characters() {
+    //     todo!()
     // }
 }
 
@@ -136,35 +109,40 @@ mod when_parsing_string {
 mod when_parsing_expressions {
     use super::*;
 
-    // #[test]
-    // fn should_parse_less_than_equal() {
-    //     should_parse(expr("12<=4"), Expr::lte(Expr::value(12), Expr::value(4)));
-    // }
+    #[test]
+    fn should_parse_equal() {
+        assert_eq!(Expr::parse("i2==i8").unwrap().to_string(), "(i2 == i8)");
+    }
 
-    // #[test]
-    // fn should_parse_less_than() {
-    //     should_parse(expr("1<4"), Expr::lt(Expr::value(1), Expr::value(4)));
-    // }
+    #[test]
+    fn should_parse_not_equal() {
+        assert_eq!(Expr::parse("i14!=i8").unwrap().to_string(), "(i14 != i8)");
+    }
 
-    // #[test]
-    // fn should_parse_greater_than_equal() {
-    //     should_parse(expr("1>=15"), Expr::gte(Expr::value(1), Expr::value(15)));
-    // }
+    #[test]
+    fn should_parse_greater_than() {
+        assert_eq!(Expr::parse("i1>i4").unwrap().to_string(), "(i1 > i4)");
+    }
 
-    // #[test]
-    // fn should_parse_greater_than() {
-    //     should_parse(expr("1>4"), Expr::gt(Expr::value(1), Expr::value(4)));
-    // }
+    #[test]
+    fn should_parse_less_than() {
+        assert_eq!(Expr::parse("i1<i4").unwrap().to_string(), "(i1 < i4)");
+    }
 
-    // #[test]
-    // fn should_parse_not_equal() {
-    //     should_parse(expr("14!=8"), Expr::neq(Expr::value(14), Expr::value(8)));
-    // }
+    #[test]
+    fn should_parse_greater_than_equal() {
+        assert_eq!(Expr::parse("i1>=i15").unwrap().to_string(), "(i1 >= i15)");
+    }
 
-    // #[test]
-    // fn should_parse_equal() {
-    //     should_parse(expr("2==8"), Expr::eq(Expr::value(2), Expr::value(8)));
-    // }
+    #[test]
+    fn should_parse_less_than_equal() {
+        assert_eq!(Expr::parse("i12<=i4").unwrap().to_string(), "(i12 <= i4)");
+    }
+
+    #[test]
+    fn should_parse_equality_operators_left_associatively() {
+        // TODO:
+    }
 
     #[test]
     fn should_parse_add() {
@@ -216,6 +194,7 @@ mod when_parsing_expressions {
 
     #[test]
     fn should_parse_correct_precedence() {
+        // TODO: check logic against equality against sum/sub against mult/div
         assert_eq!(
             Expr::parse("i14*i128+i4/i5*i3-i1").unwrap(),
             Expr::sub(
