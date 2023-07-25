@@ -4,7 +4,19 @@ use crate::{expr::Expr, value::Value};
 
 grammar;
 
-pub Expr: Expr = Term;
+pub Expr: Expr = AddExpr;
+
+AddExpr: Expr = {
+    <l:AddExpr> "+" <r:MultExpr> => Expr::add(l, r),
+    <l:AddExpr> "-" <r:MultExpr> => Expr::sub(l, r),
+    MultExpr
+}
+
+MultExpr: Expr = {
+    <l:MultExpr> "*" <r:Term> => Expr::mult(l, r),
+    <l:MultExpr> "/" <r:Term> => Expr::div(l, r),
+    Term
+}
 
 Term: Expr = {
     IntValue => Expr::Value(<>),
@@ -14,7 +26,7 @@ Term: Expr = {
     "(" <Expr> ")"
 };
 
-IntValue: Value = <s:r"[+-]?[0-9]+"> => Value::Int(i128::from_str(s).unwrap());
+IntValue: Value = <s:r"i[+-]?[0-9]+"> => Value::Int(i128::from_str(&s[1..]).unwrap());
 FloatValue: Value = <s:r"f[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?"> => Value::Float(f64::from_str(&s[1..]).unwrap());
 DecimalValue: Value = <s:r"d[+-]?[0-9]*\.?[0-9]+"> => Value::Decimal(Decimal::from_str(&s[1..]).unwrap());
 BoolValue: Value = {
