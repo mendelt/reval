@@ -22,6 +22,3 @@ pub(crate) fn is_valid_identifier(name: &str) -> bool {
         None => false,
     }
 }
-
-#[cfg(test)]
-mod test {}

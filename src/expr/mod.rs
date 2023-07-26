@@ -2,7 +2,7 @@ mod eval;
 pub(crate) mod keywords;
 
 use crate::value::Value;
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Display};
 
 /// The Reval expression abstract syntax tree
 #[derive(Clone, Debug, PartialEq)]
@@ -228,5 +228,76 @@ impl Expr {
 impl From<Value> for Expr {
     fn from(value: Value) -> Self {
         Expr::Value(value)
+    }
+}
+
+impl Display for Expr {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Expr::Value(value) => write!(formatter, "{value}"),
+            Expr::Reference(_) => todo!(),
+            Expr::Function(_, _) => todo!(),
+            Expr::Index(_, _) => todo!(),
+            Expr::If(_, _, _) => todo!(),
+            Expr::Map(_) => todo!(),
+            Expr::Vec(_) => todo!(),
+            Expr::Not(_) => todo!(),
+            Expr::Neg(_) => todo!(),
+            Expr::IsSome(_) => todo!(),
+            Expr::IsNone(_) => todo!(),
+            Expr::Int(_) => todo!(),
+            Expr::Float(_) => todo!(),
+            Expr::Dec(_) => todo!(),
+            Expr::Mult(left, right) => write!(formatter, "({left}*{right})"),
+            Expr::Div(left, right) => write!(formatter, "({left}/{right})"),
+            Expr::Add(left, right) => write!(formatter, "({left}+{right})"),
+            Expr::Sub(left, right) => write!(formatter, "({left}-{right})"),
+            Expr::Equals(left, right) => write!(formatter, "({left}=={right})"),
+            Expr::NotEquals(left, right) => write!(formatter, "({left}!={right})"),
+            Expr::GreaterThan(left, right) => write!(formatter, "({left}>{right})"),
+            Expr::GreaterThanEquals(left, right) => write!(formatter, "({left}>={right})"),
+            Expr::LessThan(left, right) => write!(formatter, "({left}<{right})"),
+            Expr::LessThanEquals(left, right) => write!(formatter, "({left}<={right})"),
+            Expr::And(left, right) => write!(formatter, "({left} and {right})"),
+            Expr::Or(left, right) => write!(formatter, "({left} or {right})"),
+            Expr::Contains(_, _) => todo!(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod when_displaying_expr {
+    use super::*;
+
+    #[test]
+    fn should_display_value() {
+        assert_eq!(Expr::value(5).to_string(), "i5");
+    }
+
+    #[test]
+    fn should_display_mult_div_add_sub() {
+        assert_eq!(
+            Expr::mult(
+                Expr::add(Expr::value(3), Expr::value(4)),
+                Expr::div(Expr::value(5), Expr::sub(Expr::value(6), Expr::value(7)))
+            )
+            .to_string(),
+            "((i3+i4)*(i5/(i6-i7)))"
+        );
+    }
+
+    #[test]
+    fn should_display_eq_neq_gte_gt_lte_lt() {
+        assert_eq!(
+            Expr::eq(
+                Expr::neq(Expr::value(3), Expr::lte(Expr::value(4), Expr::value(9))),
+                Expr::gte(
+                    Expr::lt(Expr::value(5), Expr::value(8)),
+                    Expr::gt(Expr::value(6), Expr::value(7))
+                )
+            )
+            .to_string(),
+            "((i3!=(i4<=i9))==((i5<i8)>=(i6>i7)))"
+        );
     }
 }
