@@ -14,6 +14,23 @@ impl Parsers for Expr {
 }
 
 #[cfg(test)]
+mod when_parsing_string {
+    // use super::*;
+
+    // #[test]
+    // fn should_parse_quoted_string() {
+    //     assert_eq!(
+    //         string_value("\"string value\"").unwrap().1,
+    //         Value::String("string value".to_string())
+    //     );
+    // }
+
+    // fn should_parse_string_with_escaped_characters() {
+    //     todo!()
+    // }
+}
+
+#[cfg(test)]
 mod when_parsing_integer {
     use super::*;
 
@@ -89,20 +106,13 @@ mod when_parsing_bool {
 }
 
 #[cfg(test)]
-mod when_parsing_string {
-    // use super::*;
+mod when_parsing_none {
+    use super::*;
 
-    // #[test]
-    // fn should_parse_quoted_string() {
-    //     assert_eq!(
-    //         string_value("\"string value\"").unwrap().1,
-    //         Value::String("string value".to_string())
-    //     );
-    // }
-
-    // fn should_parse_string_with_escaped_characters() {
-    //     todo!()
-    // }
+    #[test]
+    fn should_parse_none_value() {
+        assert_eq!(Expr::parse("none").unwrap().to_string(), "none");
+    }
 }
 
 #[cfg(test)]
