@@ -213,49 +213,52 @@ mod when_parsing_rule_metadata {
 
 #[cfg(test)]
 mod when_parsing_value_expressions {
-    use super::*;
     use crate::expr::Expr;
 
     #[test]
     fn should_parse_string_value() {
         assert_eq!(
-            Expr::parse_json(r#"{"string": "test"}"#).unwrap(),
-            Expr::value("test")
+            Expr::parse_json(r#"{"string": "test"}"#)
+                .unwrap()
+                .to_string(),
+            "\"test\""
         );
     }
 
     #[test]
     fn should_parse_int_value() {
-        assert_eq!(Expr::parse_json(r#"{"int": 5}"#).unwrap(), Expr::value(5));
+        assert_eq!(Expr::parse_json(r#"{"int": 5}"#).unwrap().to_string(), "i5");
     }
 
     #[test]
     fn should_parse_float_value() {
         assert_eq!(
-            Expr::parse_json(r#"{"float": 5.5}"#).unwrap(),
-            Expr::value(5.5)
+            Expr::parse_json(r#"{"float": 5.5}"#).unwrap().to_string(),
+            "f5.5"
         );
     }
 
     #[test]
     fn should_parse_decimal_value() {
         assert_eq!(
-            Expr::parse_json(r#"{"decimal": 2.02}"#).unwrap(),
-            Expr::value(Decimal::new(202, 2))
+            Expr::parse_json(r#"{"decimal": 2.02}"#)
+                .unwrap()
+                .to_string(),
+            "d2.02"
         );
     }
 
     #[test]
     fn should_parse_bool_value() {
         assert_eq!(
-            Expr::parse_json(r#"{"bool": true}"#).unwrap(),
-            Expr::value(true)
+            Expr::parse_json(r#"{"bool": true}"#).unwrap().to_string(),
+            "true"
         );
     }
 
     #[test]
     fn should_parse_none_value() {
-        assert_eq!(Expr::parse_json(r#""none""#).unwrap(), Expr::none());
+        assert_eq!(Expr::parse_json(r#""none""#).unwrap().to_string(), "none");
     }
 }
 
@@ -415,88 +418,110 @@ mod when_parsing_single_expressions {
     #[test]
     fn should_parse_mult_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"mult": [{"int": 4}, {"int": 3}]}"#).unwrap(),
-            Expr::mult(Expr::value(4), Expr::value(3))
+            Expr::parse_json(r#"{"mult": [{"int": 4}, {"int": 3}]}"#)
+                .unwrap()
+                .to_string(),
+            "(i4 * i3)"
         )
     }
 
     #[test]
     fn should_parse_div_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"div": [{"int": 4}, {"int": 3}]}"#).unwrap(),
-            Expr::div(Expr::value(4), Expr::value(3))
+            Expr::parse_json(r#"{"div": [{"int": 4}, {"int": 3}]}"#)
+                .unwrap()
+                .to_string(),
+            "(i4 / i3)"
         )
     }
 
     #[test]
     fn should_parse_add_expr() {
         assert_eq!(
-            Expr::parse_json(r#"{"add": [{"int": 4}, {"int": 3}]}"#).unwrap(),
-            Expr::add(Expr::value(4), Expr::value(3))
+            Expr::parse_json(r#"{"add": [{"int": 4}, {"int": 3}]}"#)
+                .unwrap()
+                .to_string(),
+            "(i4 + i3)"
         );
     }
 
     #[test]
     fn should_parse_sub_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"sub": [{"int": 4}, {"int": 3}]}"#).unwrap(),
-            Expr::sub(Expr::value(4), Expr::value(3))
+            Expr::parse_json(r#"{"sub": [{"int": 4}, {"int": 3}]}"#)
+                .unwrap()
+                .to_string(),
+            "(i4 - i3)"
         )
     }
 
     #[test]
     fn should_parse_eq_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"eq": [{"bool": true}, {"bool": true}]}"#).unwrap(),
-            Expr::eq(Expr::value(true), Expr::value(true))
+            Expr::parse_json(r#"{"eq": [{"bool": true}, {"bool": true}]}"#)
+                .unwrap()
+                .to_string(),
+            "(true == true)"
         )
     }
 
     #[test]
     fn should_parse_neq_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"neq": [{"bool": true}, {"bool": false}]}"#).unwrap(),
-            Expr::neq(Expr::value(true), Expr::value(false))
+            Expr::parse_json(r#"{"neq": [{"bool": true}, {"bool": false}]}"#)
+                .unwrap()
+                .to_string(),
+            "(true != false)"
         )
     }
 
     #[test]
     fn should_parse_gt_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"gt": [{"int": 4}, {"int": 15}]}"#).unwrap(),
-            Expr::gt(Expr::value(4), Expr::value(15))
+            Expr::parse_json(r#"{"gt": [{"int": 4}, {"int": 15}]}"#)
+                .unwrap()
+                .to_string(),
+            "(i4 > i15)"
         )
     }
 
     #[test]
     fn should_parse_gte_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"gte": [{"int": 12}, {"int": 12}]}"#).unwrap(),
-            Expr::gte(Expr::value(12), Expr::value(12))
+            Expr::parse_json(r#"{"gte": [{"int": 12}, {"int": 12}]}"#)
+                .unwrap()
+                .to_string(),
+            "(i12 >= i12)"
         )
     }
 
     #[test]
     fn should_parse_lt_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"lt": [{"int": 14}, {"int": 12}]}"#).unwrap(),
-            Expr::lt(Expr::value(14), Expr::value(12))
+            Expr::parse_json(r#"{"lt": [{"int": 14}, {"int": 12}]}"#)
+                .unwrap()
+                .to_string(),
+            "(i14 < i12)"
         )
     }
 
     #[test]
     fn should_parse_lte_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"lte": [{"int": 80}, {"int": 3}]}"#).unwrap(),
-            Expr::lte(Expr::value(80), Expr::value(3))
+            Expr::parse_json(r#"{"lte": [{"int": 80}, {"int": 3}]}"#)
+                .unwrap()
+                .to_string(),
+            "(i80 <= i3)"
         )
     }
 
     #[test]
     fn should_parse_and_expression() {
         assert_eq!(
-            Expr::parse_json(r#"{"and": [{"bool": true}, {"bool": false}]}"#).unwrap(),
-            Expr::and(Expr::value(true), Expr::value(false))
+            Expr::parse_json(r#"{"and": [{"bool": true}, {"bool": false}]}"#)
+                .unwrap()
+                .to_string(),
+            "(true and false)"
         );
     }
 

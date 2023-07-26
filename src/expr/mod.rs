@@ -248,16 +248,16 @@ impl Display for Expr {
             Expr::Int(_) => todo!(),
             Expr::Float(_) => todo!(),
             Expr::Dec(_) => todo!(),
-            Expr::Mult(left, right) => write!(formatter, "({left}*{right})"),
-            Expr::Div(left, right) => write!(formatter, "({left}/{right})"),
-            Expr::Add(left, right) => write!(formatter, "({left}+{right})"),
-            Expr::Sub(left, right) => write!(formatter, "({left}-{right})"),
-            Expr::Equals(left, right) => write!(formatter, "({left}=={right})"),
-            Expr::NotEquals(left, right) => write!(formatter, "({left}!={right})"),
-            Expr::GreaterThan(left, right) => write!(formatter, "({left}>{right})"),
-            Expr::GreaterThanEquals(left, right) => write!(formatter, "({left}>={right})"),
-            Expr::LessThan(left, right) => write!(formatter, "({left}<{right})"),
-            Expr::LessThanEquals(left, right) => write!(formatter, "({left}<={right})"),
+            Expr::Mult(left, right) => write!(formatter, "({left} * {right})"),
+            Expr::Div(left, right) => write!(formatter, "({left} / {right})"),
+            Expr::Add(left, right) => write!(formatter, "({left} + {right})"),
+            Expr::Sub(left, right) => write!(formatter, "({left} - {right})"),
+            Expr::Equals(left, right) => write!(formatter, "({left} == {right})"),
+            Expr::NotEquals(left, right) => write!(formatter, "({left} != {right})"),
+            Expr::GreaterThan(left, right) => write!(formatter, "({left} > {right})"),
+            Expr::GreaterThanEquals(left, right) => write!(formatter, "({left} >= {right})"),
+            Expr::LessThan(left, right) => write!(formatter, "({left} < {right})"),
+            Expr::LessThanEquals(left, right) => write!(formatter, "({left} <= {right})"),
             Expr::And(left, right) => write!(formatter, "({left} and {right})"),
             Expr::Or(left, right) => write!(formatter, "({left} or {right})"),
             Expr::Contains(_, _) => todo!(),
@@ -282,7 +282,7 @@ mod when_displaying_expr {
                 Expr::div(Expr::value(5), Expr::sub(Expr::value(6), Expr::value(7)))
             )
             .to_string(),
-            "((i3+i4)*(i5/(i6-i7)))"
+            "((i3 + i4) * (i5 / (i6 - i7)))"
         );
     }
 
@@ -297,7 +297,7 @@ mod when_displaying_expr {
                 )
             )
             .to_string(),
-            "((i3!=(i4<=i9))==((i5<i8)>=(i6>i7)))"
+            "((i3 != (i4 <= i9)) == ((i5 < i8) >= (i6 > i7)))"
         );
     }
 }
