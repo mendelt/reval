@@ -33,6 +33,7 @@ Term: Expr = {
     FloatValue => Expr::Value(<>),
     DecimalValue => Expr::Value(<>),
     BoolValue => Expr::Value(<>),
+    NoneValue => Expr::Value(<>),
     "(" <Expr> ")"
 };
 
@@ -43,3 +44,4 @@ BoolValue: Value = {
     "true" => Value::Bool(true),
     "false" => Value::Bool(false)
 };
+NoneValue: Value = "none" => Value::None;
