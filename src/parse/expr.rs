@@ -10,7 +10,7 @@ impl Parsers for Expr {
 
     fn parse(input: &str) -> Result<Expr, Error> {
         reval::ExprParser::new()
-            .parse(&input)
+            .parse(input)
             .map_err(|error| Error::ExprParseError(error.to_string()))
     }
 }
