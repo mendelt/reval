@@ -51,6 +51,9 @@ pub enum Error {
 
     /// Error parsing rule from json {0}
     JsonParseError(#[from] serde_json::Error),
+
+    /// Error parsing expression
+    ExprParseError(String),
 }
 
 impl Error {

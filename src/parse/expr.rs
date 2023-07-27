@@ -9,7 +9,9 @@ impl Parsers for Expr {
     type Parseable = Expr;
 
     fn parse(input: &str) -> Result<Expr, Error> {
-        Ok(reval::ExprParser::new().parse(input).unwrap())
+        reval::ExprParser::new()
+            .parse(&input)
+            .map_err(|error| Error::ExprParseError(error.to_string()))
     }
 }
 
