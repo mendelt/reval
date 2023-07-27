@@ -118,7 +118,7 @@ mod when_parsing_none {
 }
 
 #[cfg(test)]
-mod when_parsing_expressions {
+mod when_parsing_comparison_expressions {
     use super::*;
 
     #[test]
@@ -155,54 +155,52 @@ mod when_parsing_expressions {
     fn should_parse_equality_operators_left_associatively() {
         // TODO:
     }
+}
+
+#[cfg(test)]
+mod when_parsing_calculation_expressions {
+    use super::*;
 
     #[test]
     fn should_parse_add() {
-        assert_eq!(
-            Expr::parse("i1+i4").unwrap(),
-            Expr::add(Expr::value(1), Expr::value(4))
-        );
+        assert_eq!(Expr::parse("i1+i4").unwrap().to_string(), "(i1 + i4)");
     }
 
     #[test]
     fn should_parse_subtraction() {
-        assert_eq!(
-            Expr::parse("i12-i4").unwrap(),
-            Expr::sub(Expr::value(12), Expr::value(4))
-        );
+        assert_eq!(Expr::parse("i12-i4").unwrap().to_string(), "(i12 - i4)");
     }
 
     #[test]
     fn should_parse_add_and_sub_left_associatively() {
         assert_eq!(
-            Expr::parse("i1-i15+i25").unwrap(),
-            Expr::add(Expr::sub(Expr::value(1), Expr::value(15)), Expr::value(25))
+            Expr::parse("i1-i15+i25").unwrap().to_string(),
+            "((i1 - i15) + i25)"
         );
     }
 
     #[test]
     fn should_parse_mult() {
-        assert_eq!(
-            Expr::parse("i1*i4").unwrap(),
-            Expr::mult(Expr::value(1), Expr::value(4))
-        );
+        assert_eq!(Expr::parse("i1*i4").unwrap().to_string(), "(i1 * i4)");
     }
 
     #[test]
     fn should_parse_div() {
-        assert_eq!(
-            Expr::parse("i1/i15").unwrap(),
-            Expr::div(Expr::value(1), Expr::value(15))
-        );
+        assert_eq!(Expr::parse("i1/i15").unwrap().to_string(), "(i1 / i15)");
     }
 
     #[test]
     fn should_parse_div_and_mult_left_associatively() {
         assert_eq!(
-            Expr::parse("i1/i15*i25").unwrap(),
-            Expr::mult(Expr::div(Expr::value(1), Expr::value(15)), Expr::value(25))
+            Expr::parse("i1/i15*i25").unwrap().to_string(),
+            "((i1 / i15) * i25)"
         );
     }
+}
+
+#[cfg(test)]
+mod when_parsing_expression_precedence {
+    use super::*;
 
     #[test]
     fn should_parse_correct_precedence() {
@@ -222,40 +220,38 @@ mod when_parsing_expressions {
     #[test]
     fn should_ignore_space_and_newlines() {
         assert_eq!(
-            Expr::parse("i3 * i4\r\n    +i8\r\n  ").unwrap(),
-            Expr::add(Expr::mult(Expr::value(3), Expr::value(4)), Expr::value(8)),
+            Expr::parse("i3 * i4\r\n    +i8\r\n  ").unwrap().to_string(),
+            "((i3 * i4) + i8)"
         );
     }
 
     #[test]
     fn should_parse_simple_parentheses() {
-        assert_eq!(Expr::parse("(i5)").unwrap(), Expr::value(5));
+        assert_eq!(Expr::parse("(i5)").unwrap().to_string(), "i5");
     }
 
     #[test]
     fn should_parse_expression_inside_parentheses() {
+        assert_eq!(Expr::parse("(i1+i1)").unwrap().to_string(), "(i1 + i1)");
+    }
+
+    #[test]
+    fn should_override_precedence_with_parentheses() {
         assert_eq!(
-            Expr::parse("(i1+i1)").unwrap(),
-            Expr::add(Expr::value(1), Expr::value(1))
+            Expr::parse("(i3+i2)*(i1-i5)").unwrap().to_string(),
+            "((i3 + i2) * (i1 - i5))",
         );
     }
 
-    // #[test]
-    // fn should_override_precedence_with_parentheses() {
-    //     should_parse(
-    //         expr("(3+2)*(1-5)"),
-    //         Expr::mult(
-    //             Expr::add(Expr::value(3), Expr::value(2)),
-    //             Expr::sub(Expr::value(1), Expr::value(5)),
-    //         ),
-    //     );
-    // }
-
-    // #[ignore]
-    // #[test]
-    // fn should_parse_nested_parentheses() {
-    //     todo!()
-    // }
+    #[test]
+    fn should_parse_nested_parentheses() {
+        assert_eq!(
+            Expr::parse("(i3+i2)*(i1-(i5!=((i7))))")
+                .unwrap()
+                .to_string(),
+            "((i3 + i2) * (i1 - (i5 != i7)))",
+        );
+    }
 }
 
 #[cfg(test)]
