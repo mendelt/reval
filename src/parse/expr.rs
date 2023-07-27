@@ -118,6 +118,64 @@ mod when_parsing_none {
 }
 
 #[cfg(test)]
+mod when_parsing_vec_value {
+    use super::*;
+    use crate::value::Value;
+
+    #[ignore]
+    #[test]
+    fn should_parse_empty_vec() {
+        assert_eq!(
+            Expr::parse("[]").unwrap(),
+            Expr::Value(Value::Vec(Vec::new()))
+        )
+    }
+
+    #[ignore]
+    #[test]
+    fn should_parse_vec_items() {
+        todo!()
+    }
+
+    #[ignore]
+    #[test]
+    fn should_parse_nested_vec() {
+        todo!()
+    }
+}
+
+#[cfg(test)]
+mod when_parsing_map_value {
+    use super::*;
+    use crate::value::Value;
+    use std::collections::HashMap;
+
+    #[ignore]
+    #[test]
+    fn should_parse_empty_map() {
+        assert_eq!(
+            Expr::parse("{}").unwrap(),
+            Expr::Value(Value::Map(HashMap::new()))
+        )
+    }
+
+    #[ignore]
+    #[test]
+    fn should_parse_map_keys_and_items() {
+        assert_eq!(
+            Expr::parse("{item1:i15,item4:d2.2}}").unwrap().to_string(),
+            "{item1 : i15, item4 : d2.2}"
+        )
+    }
+
+    #[ignore]
+    #[test]
+    fn should_parse_nested_map() {
+        todo!()
+    }
+}
+
+#[cfg(test)]
 mod when_parsing_comparison_expressions {
     use super::*;
 
