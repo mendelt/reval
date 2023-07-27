@@ -238,7 +238,7 @@ impl Display for Expr {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Expr::Value(value) => write!(formatter, "{value}"),
-            Expr::Reference(_) => todo!(),
+            Expr::Reference(ident) => write!(formatter, "{ident}"),
             Expr::Function(_, _) => todo!(),
             Expr::Index(_, _) => todo!(),
             Expr::If(_, _, _) => todo!(),

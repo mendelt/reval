@@ -257,3 +257,21 @@ mod when_parsing_expressions {
     //     todo!()
     // }
 }
+
+#[cfg(test)]
+mod when_parsing_ref_expression {
+    use super::*;
+
+    #[test]
+    fn should_parse_simple_ref() {
+        assert_eq!(
+            Expr::parse("simple_ident").unwrap().to_string(),
+            "simple_ident"
+        );
+    }
+
+    #[test]
+    fn should_not_parse_invalid_ident_as_ref() {
+        assert!(Expr::parse("stuff&").is_err());
+    }
+}
