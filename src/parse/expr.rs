@@ -122,7 +122,6 @@ mod when_parsing_vec_value {
     use super::*;
     use crate::value::Value;
 
-    #[ignore]
     #[test]
     fn should_parse_empty_vec() {
         assert_eq!(
@@ -150,7 +149,6 @@ mod when_parsing_map_value {
     use crate::value::Value;
     use std::collections::HashMap;
 
-    #[ignore]
     #[test]
     fn should_parse_empty_map() {
         assert_eq!(
