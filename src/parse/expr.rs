@@ -130,16 +130,22 @@ mod when_parsing_vec_value {
         )
     }
 
-    #[ignore]
     #[test]
-    fn should_parse_vec_items() {
-        todo!()
+    fn should_parse_vec_item() {
+        assert_eq!(Expr::parse("[i3]").unwrap().to_string(), "[i3]");
     }
 
-    #[ignore]
+    #[test]
+    fn should_parse_vec_with_multiple_items() {
+        assert_eq!(Expr::parse("[i3,i12]").unwrap().to_string(), "[i3, i12]");
+    }
+
     #[test]
     fn should_parse_nested_vec() {
-        todo!()
+        assert_eq!(
+            Expr::parse("[i3,[i4,i67]]").unwrap().to_string(),
+            "[i3, [i4, i67]]"
+        )
     }
 }
 
@@ -157,19 +163,30 @@ mod when_parsing_map_value {
         )
     }
 
-    #[ignore]
     #[test]
-    fn should_parse_map_keys_and_items() {
+    fn should_parse_map_key_and_item() {
         assert_eq!(
-            Expr::parse("{item1:i15,item4:d2.2}}").unwrap().to_string(),
-            "{item1 : i15, item4 : d2.2}"
+            Expr::parse("{item1:i15}").unwrap().to_string(),
+            "{item1: i15}"
         )
     }
 
-    #[ignore]
+    #[test]
+    fn should_parse_map_with_multiple_keys_and_items() {
+        assert_eq!(
+            Expr::parse("{item1:i15,item4:d2.2}").unwrap().to_string(),
+            // Compare with the raw ast here because hashmap does no preserve order so testing
+            // against the formatted version is unstable right now
+            Expr::Value(Value::Map(HashMap::new()))
+        )
+    }
+
     #[test]
     fn should_parse_nested_map() {
-        todo!()
+        assert_eq!(
+            Expr::parse("{item3:{nested1:d4}}").unwrap().to_string(),
+            "{item3: {nested1: d4}}"
+        )
     }
 }
 

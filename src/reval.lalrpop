@@ -1,33 +1,34 @@
 use crate::{expr::Expr, value::Value};
 use rust_decimal::Decimal; 
-use std::{str::FromStr, collections::HashMap};
+use std::str::FromStr;
 
 grammar;
 
 match {
     "==" => OP_EQ,
     "!=" => OP_NEQ,
-     ">" => OP_GT,
-     "<" => OP_LT,
-     ">=" => OP_GTE,
-     "<=" => OP_LTE,
-     "+" => OP_ADD,
-     "-" => OP_SUB,
-     "*" => OP_MULT,
-     "/" => OP_DIV,
-     "," => COMMA,
-     "(" => LPAREN,
-     ")" => RPAREN,
-     "[" => LBRACKET,
-     "]" => RBRACKET,
-     "{" => LBRACE,
-     "}" => RBRACE,
-     r"i[+-]?[0-9]+" => INT,
-     r"f[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?" => FLOAT,
-     r"d[+-]?[0-9]*\.?[0-9]+" => DECIMAL,
-     "true" => TRUE,
-     "false" => FALSE,
-     "none" => NONE,
+    ">" => OP_GT,
+    "<" => OP_LT,
+    ">=" => OP_GTE,
+    "<=" => OP_LTE,
+    "+" => OP_ADD,
+    "-" => OP_SUB,
+    "*" => OP_MULT,
+    "/" => OP_DIV,
+    "," => COMMA,
+    ":" => COLON,
+    "(" => LPAREN,
+    ")" => RPAREN,
+    "[" => LBRACKET,
+    "]" => RBRACKET,
+    "{" => LBRACE,
+    "}" => RBRACE,
+    r"i[+-]?[0-9]+" => INT,
+    r"f[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?" => FLOAT,
+    r"d[+-]?[0-9]*\.?[0-9]+" => DECIMAL,
+    "true" => TRUE,
+    "false" => FALSE,
+    "none" => NONE,
 }
 else {
     r"[a-zA-Z][_a-zA-Z0-9]*" => IDENT,
@@ -82,6 +83,10 @@ BoolValue: Value = {
     TRUE => Value::Bool(true),
     FALSE => Value::Bool(false)
 };
-VecValue: Value = LBRACKET RBRACKET => Value::Vec(Vec::new());
-MapValue: Value = LBRACE RBRACE => Value::Map(HashMap::new());
+
+VecValue: Value = LBRACKET <v0:(<Value> COMMA)*> <v1:Value?> RBRACKET => Value::Vec(v0.into_iter().chain(v1).collect());
+
+MapItem: (String, Value) = <k:IDENT> COLON <v:Value> => (k.to_string(), v);
+MapValue: Value = LBRACE <v0:(<MapItem> COMMA)*> <v1:MapItem?> RBRACE => Value::Map(v0.into_iter().chain(v1).collect());
+
 NoneValue: Value = NONE => Value::None;
