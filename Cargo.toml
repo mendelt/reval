@@ -17,6 +17,7 @@ anyhow = "1"
 async-recursion = "1"
 async-trait = "0.1"
 displaydoc = "0.2"
+itertools = "0.11"
 lalrpop-util = { version = "0.20.0", features = ["lexer", "unicode"] }
 rust_decimal = "1"
 serde = { version = "1", features = ["derive"], optional = true }

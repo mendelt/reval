@@ -6,6 +6,7 @@ pub mod ser;
 #[cfg(feature = "value_serializer")]
 mod string_ser;
 
+use itertools::Itertools;
 use rust_decimal::Decimal;
 use std::{collections::HashMap, fmt::Display};
 
@@ -16,8 +17,8 @@ pub enum Value {
     Float(f64),
     Decimal(Decimal),
     Bool(bool),
-    Map(HashMap<String, Value>),
     Vec(Vec<Value>),
+    Map(HashMap<String, Value>),
     None,
 }
 
@@ -29,8 +30,20 @@ impl Display for Value {
             Value::Float(value) => write!(formatter, "f{value}"),
             Value::Decimal(value) => write!(formatter, "d{value}"),
             Value::Bool(value) => write!(formatter, "{value}"),
-            Value::Map(_) => todo!(),
-            Value::Vec(_) => todo!(),
+            Value::Vec(values) => {
+                write!(
+                    formatter,
+                    "[{}]",
+                    values.iter().map(ToString::to_string).join(", ")
+                )
+            }
+            Value::Map(map) => write!(
+                formatter,
+                "{{{}}}",
+                map.iter()
+                    .map(|(key, value)| format!("{key}: {value}"))
+                    .join(", ")
+            ),
             Value::None => write!(formatter, "none"),
         }
     }
