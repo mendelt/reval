@@ -1,58 +1,81 @@
+use itertools::Itertools;
+
 use super::Parsers;
-use crate::{ruleset::rule::Rule, Error};
+use crate::{expr::Expr, ruleset::rule::Rule, Error};
 
 impl Parsers for Rule {
     type Error = Error;
     type Parseable = Rule;
 
-    fn parse(_input: &str) -> Result<Rule, Error> {
-        todo!();
+    fn parse(input: &str) -> Result<Rule, Error> {
+        let mut comment_lines = input
+            .lines()
+            .filter_map(|line| line.trim_start().strip_prefix("//").map(str::trim));
+
+        match comment_lines.next() {
+            Some(name_line) => {
+                let name = name_line.trim();
+                let description = comment_lines.map(|line| line.trim()).join("\n");
+
+                Ok(Rule::new(name, description, Expr::parse(input)?))
+            }
+            None => Err(Error::MissingRuleName),
+        }
     }
 }
 
 #[cfg(test)]
 mod when_parsing_rules {
-    // use super::*;
+    use super::*;
 
     #[test]
-    #[ignore]
-    fn should_error_when_first_line_not_rule_name() {
-        todo!()
+    fn should_error_when_rule_name_missing() {
+        assert!(Rule::parse("not a rule name\ni3").is_err());
     }
 
     #[test]
-    #[ignore]
-    fn should_parse_comments_as_decription() {
-        todo!()
+    fn should_parse_rule_name() {
+        assert_eq!(Rule::parse("//rule name\ni3").unwrap().name(), "rule name");
     }
 
     #[test]
-    #[ignore]
     fn should_trim_rule_name() {
-        todo!()
+        assert_eq!(
+            Rule::parse("// valid rule name   \t\ni3").unwrap().name(),
+            "valid rule name"
+        );
     }
 
     #[test]
-    #[ignore]
-    fn should_trim_rule_name_spaces() {
-        todo!()
+    fn should_parse_comments_as_description() {
+        assert_eq!(
+            Rule::parse("//name\n//descr1\ni3").unwrap().description(),
+            Some("descr1")
+        );
     }
 
     #[test]
-    #[ignore]
     fn should_error_when_no_expression() {
-        todo!()
+        assert!(Rule::parse("//name\n//descr1\n").is_err());
     }
 
     #[test]
-    #[ignore]
     fn should_parse_multiline_expression() {
-        todo!()
+        assert_eq!(
+            Rule::parse("//name\n// descr1\n// descr2  \ni3")
+                .unwrap()
+                .description(),
+            Some("descr1\ndescr2")
+        );
     }
 
     #[test]
-    #[ignore]
     fn should_parse_comments_in_between_expression() {
-        todo!()
+        assert_eq!(
+            Rule::parse("//name\n// descr1  \t\ni3\n// descr2")
+                .unwrap()
+                .description(),
+            Some("descr1\ndescr2")
+        );
     }
 }

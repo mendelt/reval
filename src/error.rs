@@ -13,7 +13,10 @@ pub enum Error {
     /// User-function name {0} is not valid
     InvalidFunctionName(String),
 
-    /// Duplicate user-function or rule name; {0}
+    /// Rule has no name specified
+    MissingRuleName,
+
+    /// Duplicate user-function name; {0}
     DuplicateFunctionName(String),
 
     /// Duplicate rule name; {0}
