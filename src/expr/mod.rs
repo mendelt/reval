@@ -241,7 +241,9 @@ impl Display for Expr {
             Expr::Reference(ident) => write!(formatter, "{ident}"),
             Expr::Function(_, _) => todo!(),
             Expr::Index(_, _) => todo!(),
-            Expr::If(_, _, _) => todo!(),
+            Expr::If(check, true_case, false_case) => {
+                write!(formatter, "(if {check} then {true_case} else {false_case})")
+            }
             Expr::Map(_) => todo!(),
             Expr::Vec(_) => todo!(),
             Expr::Not(_) => todo!(),

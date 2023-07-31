@@ -198,6 +198,29 @@ mod when_parsing_map_value {
 }
 
 #[cfg(test)]
+mod when_parsing_if_expression {
+    use super::*;
+
+    #[test]
+    fn should_parse_simple_if_then_else() {
+        assert_eq!(
+            Expr::parse("if true then i1 else i2").unwrap(),
+            Expr::iif(Expr::value(true), Expr::value(1), Expr::value(2))
+        );
+    }
+
+    #[test]
+    fn should_parse_sub_expresions() {
+        assert_eq!(
+            Expr::parse("if(i1==d2.2)then d4.5 + d2.3 else false == false")
+                .unwrap()
+                .to_string(),
+            "(if (i1 == d2.2) then (d4.5 + d2.3) else (false == false))"
+        );
+    }
+}
+
+#[cfg(test)]
 mod when_parsing_logic_expressions {
     use super::*;
 

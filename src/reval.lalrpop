@@ -17,6 +17,9 @@ match {
     "/" => OP_DIV,
     "and" => OP_AND,
     "or" => OP_OR,
+    "if" => IF_KWD,
+    "then" => THEN_KWD,
+    "else" => ELSE_KWD,
     "," => COMMA,
     ":" => COLON,
     "(" => LPAREN,
@@ -36,7 +39,12 @@ else {
     r"[a-zA-Z][_a-zA-Z0-9]*" => IDENT,
 }
 
-pub Expr: Expr = LogExpr;
+pub Expr: Expr = IfExpr;
+
+IfExpr: Expr = {
+    IF_KWD <iif:LogExpr> THEN_KWD <thn:LogExpr> ELSE_KWD <els:LogExpr> => Expr::iif(iif, thn, els),
+    LogExpr
+}
 
 LogExpr: Expr = {
     <l:LogExpr> OP_AND <r:EqExpr> => Expr::and(l, r),
