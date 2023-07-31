@@ -41,6 +41,9 @@ match {
     "true" => TRUE,
     "false" => FALSE,
     "none" => NONE,
+
+    r"\s*" => { }, // The default whitespace skipping is disabled if an `ignore pattern` is specified
+    r"//[^\n\r]*[\n\r]*" => { }, // Skip `// comments`
 }
 else {
     r"[a-zA-Z][_a-zA-Z0-9]*" => IDENT,
