@@ -174,11 +174,18 @@ mod when_parsing_map_value {
     #[test]
     fn should_parse_map_with_multiple_keys_and_items() {
         assert_eq!(
-            Expr::parse("{item1:i15,item4:d2.2}").unwrap().to_string(),
+            Expr::parse("{item1:i15,item4:f2.2}").unwrap(),
             // Compare with the raw ast here because hashmap does no preserve order so testing
             // against the formatted version is unstable right now
-            Expr::Value(Value::Map(HashMap::new()))
-        )
+            Expr::Value(Value::Map(
+                [
+                    ("item1".to_string(), Value::Int(15)),
+                    ("item4".to_string(), Value::Float(2.2))
+                ]
+                .into_iter()
+                .collect()
+            ))
+        );
     }
 
     #[test]
