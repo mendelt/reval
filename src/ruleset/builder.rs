@@ -1,6 +1,5 @@
 use crate::{
     error::{Error, Result},
-    expr::keywords::{is_reserved_keyword, is_valid_identifier},
     function::{UserFunction, UserFunctions},
     ruleset::{rule::Rule, RuleSet},
 };
@@ -23,14 +22,6 @@ impl Builder {
     /// Add a rule to the ruleset
     pub fn with_rule(mut self, rule: Rule) -> Result<Self> {
         let name = rule.name();
-
-        if is_reserved_keyword(name) {
-            return Err(Error::InvalidRuleName(name.to_string()));
-        }
-
-        if is_valid_identifier(name) {
-            return Err(Error::InvalidRuleName(name.to_string()));
-        }
 
         if self.rules.iter().any(|r| r.name() == name) {
             return Err(Error::DuplicateRuleName(rule.name));

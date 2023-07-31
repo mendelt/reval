@@ -22,3 +22,28 @@ pub(crate) fn is_valid_identifier(name: &str) -> bool {
         None => false,
     }
 }
+
+#[cfg(test)]
+mod when_testing_identifier {
+    use crate::expr::keywords::is_valid_identifier;
+
+    #[test]
+    fn should_allow_leading_underscore() {
+        assert!(is_valid_identifier("_id"));
+    }
+
+    #[test]
+    fn should_allow_leading_letter() {
+        assert!(is_valid_identifier("id"));
+    }
+
+    #[test]
+    fn should_disallow_leading_number() {
+        assert!(!is_valid_identifier("1id"));
+    }
+
+    #[test]
+    fn should_allow_trailing_number() {
+        assert!(is_valid_identifier("id1"));
+    }
+}

@@ -1,22 +1,21 @@
 //! Parse rules writting in the Reval json format
 
-use crate::{expr::Expr, ruleset::rule::Rule, value::Value};
+use crate::{expr::Expr, ruleset::rule::Rule, value::Value, Error};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use serde_json::Error;
 use std::collections::HashMap;
 
 impl Rule {
     /// Parse a rule written in the Reval json format
     pub fn parse_json(input: &str) -> Result<Rule, Error> {
-        serde_json::from_str::<ParseRule>(input).map(Into::<Rule>::into)
+        Ok(serde_json::from_str::<ParseRule>(input)?.into())
     }
 }
 
 impl Expr {
     /// Parse an expression written in the Reval json format
     pub fn parse_json(input: &str) -> Result<Expr, Error> {
-        serde_json::from_str::<ParseExpr>(input).map(Into::<Expr>::into)
+        Ok(serde_json::from_str::<ParseExpr>(input)?.into())
     }
 }
 
@@ -28,7 +27,7 @@ struct ParseRule {
 }
 
 impl From<ParseRule> for Rule {
-    fn from(value: ParseRule) -> Rule {
+    fn from(value: ParseRule) -> Self {
         Rule::new(&value.name, value.description, value.expr.into())
     }
 }

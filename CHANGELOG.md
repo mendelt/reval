@@ -6,33 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+### Added
 - implement `Display` for `Value` and `Expr` types
+
+### Changed
+- Return wrapped error type from json parsing rules
+- Remove faulty check for valid identifier for rules names
 
 ## [0.6.6] - 2023-07-03
 
-## Changed
+### Changed
 - gt, gte, lt and lte now return false if the first parameter is `None`
 
 ## [0.6.5] - 2023-06-27
 
-## Added
+### Added
 - `contains` expression for checking if a vec contains an item or a map contains a key
 
-## Changed
+### Changed
 - Split UnknownValue error into UnknownRef and UnknownIndex
 
 ## [0.6.4] - 2023-03-28
 
-## Added
+### Added
 - Added `Rule::expr` getter to read the expression from a rule
 - Re-introduced `add_functions` to add multiple functions at once on the `RuleSet` `Builder`
 
-## Changed
+### Changed
 - Made `Expr::func` constructor more flexible by taking Into<String> for the function name
 
 ## [0.6.3] - 2023-03-17
 
-## Added
+### Added
 - A direct conversion from Value::Map to a BTreeMap<String, Value>
 
 ### Fixed
