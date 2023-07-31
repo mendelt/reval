@@ -1,13 +1,9 @@
 use unicode_xid::UnicodeXID;
 
-const IF: &str = "if";
-const REF: &str = "ref";
-const NEG: &str = "neg";
-const FLOAT: &str = "float";
-const INT: &str = "int";
-const DEC: &str = "dec";
-
-const KEYWORDS: [&str; 6] = [IF, REF, NEG, FLOAT, INT, DEC];
+const KEYWORDS: [&str; 13] = [
+    "and", "or", "if", "then", "else", "is_some", "is_none", "int", "float", "dec", "true",
+    "false", "none",
+];
 
 pub(crate) fn is_reserved_keyword(name: &str) -> bool {
     KEYWORDS.contains(&name)
