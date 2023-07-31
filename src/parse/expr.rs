@@ -490,3 +490,23 @@ mod when_parsing_ref_expression {
         assert!(Expr::parse("stuff&").is_err());
     }
 }
+
+#[cfg(test)]
+mod when_parsing_comments {
+    use super::*;
+
+    #[test]
+    fn should_ignore_single_line_comment() {
+        assert_eq!(Expr::parse(" // comment \ni3").unwrap().to_string(), "i3");
+    }
+
+    #[test]
+    fn should_ignore_end_of_line_comment() {
+        assert_eq!(
+            Expr::parse("i3 // comment 1 \n+i4// comment 2")
+                .unwrap()
+                .to_string(),
+            "(i3 + i4)"
+        );
+    }
+}
