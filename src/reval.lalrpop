@@ -15,6 +15,8 @@ match {
     "-" => OP_SUB,
     "*" => OP_MULT,
     "/" => OP_DIV,
+    "and" => OP_AND,
+    "or" => OP_OR,
     "," => COMMA,
     ":" => COLON,
     "(" => LPAREN,
@@ -34,7 +36,13 @@ else {
     r"[a-zA-Z][_a-zA-Z0-9]*" => IDENT,
 }
 
-pub Expr: Expr = EqExpr;
+pub Expr: Expr = LogExpr;
+
+LogExpr: Expr = {
+    <l:LogExpr> OP_AND <r:EqExpr> => Expr::and(l, r),
+    <l:LogExpr> OP_OR <r:EqExpr> => Expr::or(l, r),
+    EqExpr
+}
 
 EqExpr: Expr = {
     <l:EqExpr> OP_EQ <r:AddExpr> => Expr::eq(l, r),

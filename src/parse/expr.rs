@@ -198,6 +198,37 @@ mod when_parsing_map_value {
 }
 
 #[cfg(test)]
+mod when_parsing_logic_expressions {
+    use super::*;
+
+    #[test]
+    fn should_parse_and() {
+        assert_eq!(
+            Expr::parse("true and false").unwrap().to_string(),
+            "(true and false)"
+        );
+    }
+
+    #[test]
+    fn should_parse_or() {
+        assert_eq!(
+            Expr::parse("true or false").unwrap().to_string(),
+            "(true or false)"
+        );
+    }
+
+    #[test]
+    fn should_parse_logic_operators_left_left_associatively() {
+        assert_eq!(
+            Expr::parse("true and false or true and false")
+                .unwrap()
+                .to_string(),
+            "(((true and false) or true) and false)"
+        );
+    }
+}
+
+#[cfg(test)]
 mod when_parsing_comparison_expressions {
     use super::*;
 
