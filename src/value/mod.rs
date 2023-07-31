@@ -22,6 +22,13 @@ pub enum Value {
     None,
 }
 
+impl Value {
+    pub fn sanitize_string(value: &str) -> Value {
+        // TODO unescape value
+        Value::String(value[1..value.len() - 1].to_string())
+    }
+}
+
 impl Display for Value {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
