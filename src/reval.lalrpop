@@ -15,11 +15,17 @@ match {
     "-" => OP_SUB,
     "*" => OP_MULT,
     "/" => OP_DIV,
+    "!" => OP_NOT,
     "and" => OP_AND,
     "or" => OP_OR,
     "if" => IF_KWD,
     "then" => THEN_KWD,
     "else" => ELSE_KWD,
+    "is_some" => KWD_IS_SOME,
+    "is_none" => KWD_IS_NONE,
+    "int" => KWD_INT,
+    "float" => KWD_FLOAT,
+    "dec" => KWD_DEC,
     "," => COMMA,
     ":" => COLON,
     "(" => LPAREN,
@@ -28,6 +34,7 @@ match {
     "]" => RBRACKET,
     "{" => LBRACE,
     "}" => RBRACE,
+    r#""([^"])*""# => STRING,
     r"i[+-]?[0-9]+" => INT,
     r"f[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?" => FLOAT,
     r"d[+-]?[0-9]*\.?[0-9]+" => DECIMAL,
@@ -75,14 +82,26 @@ MultExpr: Expr = {
 }
 
 Term: Expr = {
+    Func,
     Ref,
     Value => Expr::Value(<>),
     LPAREN <Expr> RPAREN
 };
 
+Func: Expr = {
+    KWD_INT LPAREN <e:Expr> RPAREN => Expr::int(e),
+    KWD_FLOAT LPAREN <e:Expr> RPAREN => Expr::float(e),
+    KWD_DEC LPAREN <e:Expr> RPAREN => Expr::dec(e),
+    KWD_IS_SOME LPAREN <e:Expr> RPAREN => Expr::is_some(e),
+    KWD_IS_NONE LPAREN <e:Expr> RPAREN => Expr::is_none(e),
+    OP_SUB LPAREN <e:Expr> RPAREN => Expr::neg(e),
+    OP_NOT LPAREN <e:Expr> RPAREN => Expr::not(e),
+}
+
 Ref: Expr = <s:IDENT> => Expr::reff(<>);
 
 Value: Value = {
+    StringValue,
     IntValue,
     FloatValue,
     DecimalValue,
@@ -92,6 +111,7 @@ Value: Value = {
     NoneValue,
 };
 
+StringValue: Value = <s:STRING> => Value::sanitize_string(s);
 IntValue: Value = <s:INT> => Value::Int(i128::from_str(&s[1..]).unwrap());
 FloatValue: Value = <s:FLOAT> => Value::Float(f64::from_str(&s[1..]).unwrap());
 DecimalValue: Value = <s:DECIMAL> => Value::Decimal(Decimal::from_str(&s[1..]).unwrap());

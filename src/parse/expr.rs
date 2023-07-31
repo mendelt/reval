@@ -17,19 +17,38 @@ impl Parsers for Expr {
 
 #[cfg(test)]
 mod when_parsing_string {
-    // use super::*;
+    use super::*;
 
-    // #[test]
-    // fn should_parse_quoted_string() {
-    //     assert_eq!(
-    //         string_value("\"string value\"").unwrap().1,
-    //         Value::String("string value".to_string())
-    //     );
-    // }
+    #[test]
+    fn should_parse_quoted_string() {
+        assert_eq!(
+            Expr::parse("\"string value\"").unwrap(),
+            Expr::value("string value".to_string())
+        );
+    }
 
-    // fn should_parse_string_with_escaped_characters() {
-    //     todo!()
-    // }
+    #[ignore]
+    #[test]
+    fn should_parse_escaped_quotes() {
+        assert_eq!(
+            Expr::parse("\"string \\\" \\n value\"").unwrap(),
+            Expr::value("string \\\" \n value".to_string())
+        );
+    }
+
+    #[ignore]
+    #[test]
+    fn should_unescape_escaped_characters() {
+        todo!();
+    }
+
+    #[test]
+    fn should_not_trim_whitespace() {
+        assert_eq!(
+            Expr::parse("\"  string  value\"").unwrap(),
+            Expr::value("  string  value".to_string())
+        );
+    }
 }
 
 #[cfg(test)]
@@ -194,6 +213,72 @@ mod when_parsing_map_value {
             Expr::parse("{item3:{nested1:d4}}").unwrap().to_string(),
             "{item3: {nested1: d4}}"
         )
+    }
+}
+
+#[cfg(test)]
+mod when_parsing_func {
+    use super::*;
+
+    #[test]
+    fn should_parse_simple_not() {
+        assert_eq!(
+            Expr::parse("!(true)").unwrap(),
+            Expr::not(Expr::value(true))
+        );
+    }
+
+    #[test]
+    fn should_parse_simple_neg() {
+        assert_eq!(Expr::parse("-(i3)").unwrap(), Expr::neg(Expr::value(3)));
+    }
+
+    #[test]
+    fn should_parse_simple_is_none() {
+        assert_eq!(
+            Expr::parse("is_none(none)").unwrap(),
+            Expr::is_none(Expr::value(None))
+        );
+    }
+
+    #[test]
+    fn should_parse_simple_is_some() {
+        assert_eq!(
+            Expr::parse("is_some(none)").unwrap(),
+            Expr::is_some(Expr::value(None))
+        );
+    }
+
+    #[test]
+    fn should_parse_simple_int_conversion() {
+        assert_eq!(
+            Expr::parse("int(\"2\")").unwrap(),
+            Expr::int(Expr::value("2"))
+        );
+    }
+
+    #[test]
+    fn should_parse_simple_float_conversion() {
+        assert_eq!(
+            Expr::parse("float(\"2.2\")").unwrap(),
+            Expr::float(Expr::value("2.2"))
+        );
+    }
+
+    #[test]
+    fn should_parse_simple_dec_conversion() {
+        assert_eq!(
+            Expr::parse("dec(\"2.2\")").unwrap(),
+            Expr::dec(Expr::value("2.2"))
+        );
+    }
+
+    #[test]
+    fn should_parse_sub_expr() {
+        assert_eq!(
+            Expr::parse("!(i2==i3)").unwrap().to_string(),
+            "!((i2 == i3))"
+        );
     }
 }
 
