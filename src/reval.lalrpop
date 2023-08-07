@@ -26,6 +26,8 @@ match {
     "int" => KWD_INT,
     "float" => KWD_FLOAT,
     "dec" => KWD_DEC,
+    "contains" => KWD_CONTAINS,
+    "in" => KWD_IN,
     "," => COMMA,
     ":" => COLON,
     "(" => LPAREN,
@@ -79,8 +81,14 @@ AddExpr: Expr = {
 }
 
 MultExpr: Expr = {
-    <l:MultExpr> OP_MULT <r:Term> => Expr::mult(l, r),
-    <l:MultExpr> OP_DIV <r:Term> => Expr::div(l, r),
+    <l:MultExpr> OP_MULT <r:ContainsExpr> => Expr::mult(l, r),
+    <l:MultExpr> OP_DIV <r:ContainsExpr> => Expr::div(l, r),
+    ContainsExpr
+}
+
+ContainsExpr: Expr = {
+    <l:Term> KWD_CONTAINS <r:Term> => Expr::contains(l, r),
+    <l:Term> KWD_IN <r:Term> => Expr::contains(r, l),
     Term
 }
 

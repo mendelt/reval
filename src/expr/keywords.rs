@@ -1,8 +1,8 @@
 use unicode_xid::UnicodeXID;
 
-const KEYWORDS: [&str; 13] = [
+const KEYWORDS: [&str; 15] = [
     "and", "or", "if", "then", "else", "is_some", "is_none", "int", "float", "dec", "true",
-    "false", "none",
+    "false", "none", "contains", "in",
 ];
 
 pub(crate) fn is_reserved_keyword(name: &str) -> bool {

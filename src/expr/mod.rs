@@ -265,7 +265,7 @@ impl Display for Expr {
             Expr::LessThanEquals(left, right) => write!(formatter, "({left} <= {right})"),
             Expr::And(left, right) => write!(formatter, "({left} and {right})"),
             Expr::Or(left, right) => write!(formatter, "({left} or {right})"),
-            Expr::Contains(_, _) => todo!(),
+            Expr::Contains(left, right) => write!(formatter, "({left} contains {right})"),
         }
     }
 }
