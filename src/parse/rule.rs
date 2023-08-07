@@ -1,12 +1,9 @@
 use itertools::Itertools;
 
-use super::Parsers;
 use crate::{expr::Expr, parse::Error, ruleset::rule::Rule};
 
-impl Parsers for Rule {
-    type Parseable = Rule;
-
-    fn parse(input: &str) -> Result<Rule, Error> {
+impl Rule {
+    pub fn parse(input: &str) -> Result<Self, Error> {
         let mut comment_lines = input
             .lines()
             .filter_map(|line| line.trim_start().strip_prefix("//").map(str::trim));
