@@ -1,11 +1,10 @@
-use super::Parsers;
-use crate::{expr::Expr, Error};
+use super::{Error, Parsers};
+use crate::expr::Expr;
 use lalrpop_util::lalrpop_mod;
 
 lalrpop_mod!(pub reval);
 
 impl Parsers for Expr {
-    type Error = Error;
     type Parseable = Expr;
 
     fn parse(input: &str) -> Result<Expr, Error> {

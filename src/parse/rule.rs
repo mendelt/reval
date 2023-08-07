@@ -1,10 +1,9 @@
 use itertools::Itertools;
 
 use super::Parsers;
-use crate::{expr::Expr, ruleset::rule::Rule, Error};
+use crate::{expr::Expr, parse::Error, ruleset::rule::Rule};
 
 impl Parsers for Rule {
-    type Error = Error;
     type Parseable = Rule;
 
     fn parse(input: &str) -> Result<Rule, Error> {
@@ -30,7 +29,7 @@ mod when_parsing_rules {
 
     #[test]
     fn should_error_when_rule_name_missing() {
-        assert!(Rule::parse("not a rule name\ni3").is_err());
+        assert!(matches!(Rule::parse("i3"), Err(Error::MissingRuleName)));
     }
 
     #[test]
@@ -57,6 +56,11 @@ mod when_parsing_rules {
     #[test]
     fn should_error_when_no_expression() {
         assert!(Rule::parse("//name\n//descr1\n").is_err());
+    }
+
+    #[test]
+    fn should_error_when_expression_invalid() {
+        assert!(Rule::parse("//name\n34").is_err(),);
     }
 
     #[test]

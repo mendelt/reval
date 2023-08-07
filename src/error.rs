@@ -13,9 +13,6 @@ pub enum Error {
     /// User-function name {0} is not valid
     InvalidFunctionName(String),
 
-    /// Rule has no name specified
-    MissingRuleName,
-
     /// Duplicate user-function name; {0}
     DuplicateFunctionName(String),
 
@@ -54,9 +51,6 @@ pub enum Error {
 
     /// Error parsing rule from json {0}
     JsonParseError(#[from] serde_json::Error),
-
-    /// Error parsing expression
-    ExprParseError(String),
 }
 
 impl Error {
