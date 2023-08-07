@@ -415,6 +415,37 @@ mod when_parsing_calculation_expressions {
 }
 
 #[cfg(test)]
+mod when_parsing_contains_expressions {
+    use super::*;
+
+    #[test]
+    fn should_parse_contains() {
+        assert_eq!(
+            Expr::parse("list contains i3").unwrap(),
+            Expr::contains(Expr::Reference(String::from("list")), Expr::value(3))
+        );
+    }
+
+    #[test]
+    fn should_not_chain_contains() {
+        assert!(Expr::parse("list contains i3 contains \"value\"").is_err())
+    }
+
+    #[test]
+    fn should_parse_in() {
+        assert_eq!(
+            Expr::parse("i3 in list").unwrap(),
+            Expr::contains(Expr::Reference(String::from("list")), Expr::value(3))
+        );
+    }
+
+    #[test]
+    fn should_not_chain_in() {
+        assert!(Expr::parse("i3 in \"value\" in list").is_err())
+    }
+}
+
+#[cfg(test)]
 mod when_parsing_expression_precedence {
     use super::*;
 
