@@ -1,6 +1,7 @@
 //! Evaluate Expressions
 
-use crate::{error::Result, expr::Expr, function::FunctionContext, value::Value, Error};
+use super::{Expr, Index};
+use crate::{error::Result, function::FunctionContext, value::Value, Error};
 use async_recursion::async_recursion;
 use rust_decimal::prelude::*;
 use std::collections::HashMap;
@@ -11,10 +12,7 @@ impl Expr {
         match self {
             Expr::Value(value) => Ok(value.clone()),
             Expr::Reference(name) => reference(facts, name),
-            Expr::Index(value, idx) => index(
-                value.evaluate(context, facts).await?,
-                idx.evaluate(context, facts).await?,
-            ),
+            Expr::Index(value, idx) => index(value.evaluate(context, facts).await?, idx),
             Expr::Function(name, value) => {
                 let param = value.evaluate(context, facts).await?;
                 context.call(name, param).await
@@ -84,13 +82,13 @@ fn reference(facts: &Value, name: &str) -> Result<Value> {
     .map(Clone::clone)
 }
 
-fn index(value: Value, idx: Value) -> Result<Value> {
-    match (&value, idx) {
-        (Value::Map(map), Value::String(field)) => map
-            .get(&field)
+fn index(value: Value, index: &Index) -> Result<Value> {
+    match (&value, index) {
+        (Value::Map(map), Index::Map(field)) => map
+            .get(field)
             .ok_or_else(|| Error::UnknownIndex(field.to_owned())),
-        (Value::Vec(vec), Value::Int(index)) => vec
-            .get(index as usize)
+        (Value::Vec(vec), Index::Vec(index)) => vec
+            .get(*index)
             .ok_or_else(|| Error::UnknownIndex(index.to_string())),
         (_, _) => Err(Error::InvalidType),
     }

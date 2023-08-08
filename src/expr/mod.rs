@@ -1,5 +1,8 @@
 mod eval;
+pub mod index;
 pub(crate) mod keywords;
+
+pub use index::Index;
 
 use crate::value::Value;
 use std::{collections::HashMap, fmt::Display};
@@ -17,7 +20,7 @@ pub enum Expr {
     Function(String, Box<Expr>),
 
     /// Index a dictionary or an array value
-    Index(Box<Expr>, Box<Expr>),
+    Index(Box<Expr>, Index),
 
     /// Evaluates to one of two expressions based on the boolean value of the first expression
     If(Box<Expr>, Box<Expr>, Box<Expr>),
@@ -111,8 +114,8 @@ impl Expr {
     }
 
     /// Index expression constructor
-    pub fn index(value: Expr, index: Expr) -> Self {
-        Expr::Index(Box::new(value), Box::new(index))
+    pub fn index(value: Expr, index: Index) -> Self {
+        Expr::Index(Box::new(value), index)
     }
 
     /// If expression constructor
