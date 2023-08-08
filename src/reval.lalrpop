@@ -103,6 +103,8 @@ IndexExpr: Expr = {
 Term: Expr = {
     Func,
     Ref,
+    VecExpr,
+    MapExpr,
     Value => Expr::Value(<>),
     LPAREN <Expr> RPAREN
 };
@@ -120,14 +122,17 @@ Func: Expr = {
 
 Ref: Expr = <s:IDENT> => Expr::reff(<>);
 
+VecExpr: Expr = LBRACKET <e0:(<Expr> COMMA)*> <e1:Expr?> RBRACKET => Expr::Vec(e0.into_iter().chain(e1).collect());
+
+MapExpr: Expr = LBRACE <kv0:(<MapItem> COMMA)*> <kv1:MapItem?> RBRACE => Expr::Map(kv0.into_iter().chain(kv1).collect());
+MapItem: (String, Expr) = <k:IDENT> COLON <e:Expr> => (k.to_string(), e);
+
 Value: Value = {
     StringValue,
     IntValue,
     FloatValue,
     DecimalValue,
     BoolValue,
-    VecValue,
-    MapValue,
     NoneValue,
 };
 
@@ -140,9 +145,5 @@ BoolValue: Value = {
     FALSE => Value::Bool(false)
 };
 
-VecValue: Value = LBRACKET <v0:(<Value> COMMA)*> <v1:Value?> RBRACKET => Value::Vec(v0.into_iter().chain(v1).collect());
-
-MapItem: (String, Value) = <k:IDENT> COLON <v:Value> => (k.to_string(), v);
-MapValue: Value = LBRACE <v0:(<MapItem> COMMA)*> <v1:MapItem?> RBRACE => Value::Map(v0.into_iter().chain(v1).collect());
 
 NoneValue: Value = NONE => Value::None;
