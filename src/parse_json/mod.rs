@@ -1,6 +1,11 @@
 //! Parse rules writting in the Reval json format
 
-use crate::{expr::Expr, ruleset::rule::Rule, value::Value, Error};
+use crate::{
+    expr::{Expr, Index},
+    ruleset::rule::Rule,
+    value::Value,
+    Error,
+};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -81,17 +86,13 @@ enum ParseIndex {
 
     /// Usize index to index vec elements
     Vec(usize),
-
-    /// An expression that can be evaluated into an index
-    Expr(Box<ParseExpr>),
 }
 
-impl From<ParseIndex> for Expr {
+impl From<ParseIndex> for Index {
     fn from(value: ParseIndex) -> Self {
         match value {
-            ParseIndex::Map(index) => Expr::value(index),
-            ParseIndex::Vec(index) => Expr::value(index),
-            ParseIndex::Expr(expr) => (*expr).into(),
+            ParseIndex::Map(index) => index.into(),
+            ParseIndex::Vec(index) => index.into(),
         }
     }
 }
@@ -265,7 +266,7 @@ mod when_parsing_value_expressions {
 mod when_parsing_single_expressions {
     use std::collections::HashMap;
 
-    use crate::expr::Expr;
+    use crate::expr::{Expr, Index};
 
     #[test]
     fn should_parse_reference() {
@@ -288,7 +289,10 @@ mod when_parsing_single_expressions {
     fn should_parse_index_by_string() {
         assert_eq!(
             Expr::parse_json(r#"{"idx": [{"ref": "some_map_value"}, "field"]}"#).unwrap(),
-            Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
+            Expr::index(
+                Expr::reff("some_map_value"),
+                Index::Map("field".to_string())
+            )
         );
     }
 
@@ -296,16 +300,7 @@ mod when_parsing_single_expressions {
     fn should_parse_index_by_usize() {
         assert_eq!(
             Expr::parse_json(r#"{"idx": [{"ref": "some_vec_value"}, 5]}"#).unwrap(),
-            Expr::index(Expr::reff("some_vec_value"), Expr::value(5usize))
-        );
-    }
-
-    #[test]
-    fn should_parse_index_by_expression() {
-        assert_eq!(
-            Expr::parse_json(r#"{"idx": [{"ref": "some_map_value"}, {"string": "field"}]}"#)
-                .unwrap(),
-            Expr::index(Expr::reff("some_map_value"), Expr::value("field"))
+            Expr::index(Expr::reff("some_vec_value"), Index::Vec(5))
         );
     }
 
