@@ -3,6 +3,7 @@ pub mod index;
 pub(crate) mod keywords;
 
 pub use index::Index;
+use itertools::Itertools;
 
 use crate::value::Value;
 use std::{collections::HashMap, fmt::Display};
@@ -244,8 +245,20 @@ impl Display for Expr {
             Expr::If(check, true_case, false_case) => {
                 write!(formatter, "(if {check} then {true_case} else {false_case})")
             }
-            Expr::Map(_) => todo!(),
-            Expr::Vec(_) => todo!(),
+            Expr::Vec(values) => {
+                write!(
+                    formatter,
+                    "[{}]",
+                    values.iter().map(ToString::to_string).join(", ")
+                )
+            }
+            Expr::Map(map) => write!(
+                formatter,
+                "{{{}}}",
+                map.iter()
+                    .map(|(key, value)| format!("{key}: {value}"))
+                    .join(", ")
+            ),
             Expr::Not(inner) => write!(formatter, "!({inner})"),
             Expr::Neg(inner) => write!(formatter, "-({inner})"),
             Expr::IsSome(inner) => write!(formatter, "is_some({inner})"),

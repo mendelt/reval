@@ -136,14 +136,10 @@ mod when_parsing_none {
 #[cfg(test)]
 mod when_parsing_vec_value {
     use super::*;
-    use crate::value::Value;
 
     #[test]
     fn should_parse_empty_vec() {
-        assert_eq!(
-            Expr::parse("[]").unwrap(),
-            Expr::Value(Value::Vec(Vec::new()))
-        )
+        assert_eq!(Expr::parse("[]").unwrap(), Expr::Vec(Vec::new()))
     }
 
     #[test]
@@ -154,6 +150,14 @@ mod when_parsing_vec_value {
     #[test]
     fn should_parse_vec_with_multiple_items() {
         assert_eq!(Expr::parse("[i3,i12]").unwrap().to_string(), "[i3, i12]");
+    }
+
+    #[test]
+    fn should_parse_vec_with_expr_items() {
+        assert_eq!(
+            Expr::parse("[i3+i4,i12]").unwrap().to_string(),
+            "[(i3 + i4), i12]"
+        );
     }
 
     #[test]
@@ -168,15 +172,11 @@ mod when_parsing_vec_value {
 #[cfg(test)]
 mod when_parsing_map_value {
     use super::*;
-    use crate::value::Value;
     use std::collections::HashMap;
 
     #[test]
     fn should_parse_empty_map() {
-        assert_eq!(
-            Expr::parse("{}").unwrap(),
-            Expr::Value(Value::Map(HashMap::new()))
-        )
+        assert_eq!(Expr::parse("{}").unwrap(), Expr::Map(HashMap::new()))
     }
 
     #[test]
@@ -193,14 +193,25 @@ mod when_parsing_map_value {
             Expr::parse("{item1:i15,item4:f2.2}").unwrap(),
             // Compare with the raw ast here because hashmap does no preserve order so testing
             // against the formatted version is unstable right now
-            Expr::Value(Value::Map(
+            Expr::Map(
                 [
-                    ("item1".to_string(), Value::Int(15)),
-                    ("item4".to_string(), Value::Float(2.2))
+                    ("item1".to_string(), Expr::value(15)),
+                    ("item4".to_string(), Expr::value(2.2))
                 ]
                 .into_iter()
                 .collect()
-            ))
+            )
+        );
+    }
+
+    #[ignore] // ignored because map order varies, TODO: use btreemap for map
+    #[test]
+    fn should_parse_map_with_expr_items() {
+        assert_eq!(
+            Expr::parse("{item1:i12+i18, item3:\"string value\"}")
+                .unwrap()
+                .to_string(),
+            "{item1: (i12 + i18), item3: \"string value\"}"
         );
     }
 
