@@ -446,6 +446,53 @@ mod when_parsing_contains_expressions {
 }
 
 #[cfg(test)]
+mod when_parsing_index_expression {
+    use super::*;
+
+    #[test]
+    fn should_parse_simple_vec_index() {
+        assert_eq!(
+            Expr::parse("ref.14").unwrap(),
+            Expr::index(Expr::reff("ref"), 14.into())
+        );
+    }
+
+    #[test]
+    fn should_parse_vec_index_left_associatively() {
+        assert_eq!(
+            Expr::parse("ref.14.15").unwrap().to_string(),
+            "((ref.14).15)"
+        );
+    }
+
+    #[test]
+    fn should_parse_simple_map_index() {
+        assert_eq!(
+            Expr::parse("ref.index").unwrap(),
+            Expr::index(Expr::reff("ref"), "index".into())
+        );
+    }
+}
+
+#[cfg(test)]
+mod when_parsing_ref_expression {
+    use super::*;
+
+    #[test]
+    fn should_parse_simple_ref() {
+        assert_eq!(
+            Expr::parse("simple_ident").unwrap().to_string(),
+            "simple_ident"
+        );
+    }
+
+    #[test]
+    fn should_not_parse_invalid_ident_as_ref() {
+        assert!(Expr::parse("stuff&").is_err());
+    }
+}
+
+#[cfg(test)]
 mod when_parsing_expression_precedence {
     use super::*;
 
@@ -498,24 +545,6 @@ mod when_parsing_expression_precedence {
                 .to_string(),
             "((i3 + i2) * (i1 - (i5 != i7)))",
         );
-    }
-}
-
-#[cfg(test)]
-mod when_parsing_ref_expression {
-    use super::*;
-
-    #[test]
-    fn should_parse_simple_ref() {
-        assert_eq!(
-            Expr::parse("simple_ident").unwrap().to_string(),
-            "simple_ident"
-        );
-    }
-
-    #[test]
-    fn should_not_parse_invalid_ident_as_ref() {
-        assert!(Expr::parse("stuff&").is_err());
     }
 }
 
