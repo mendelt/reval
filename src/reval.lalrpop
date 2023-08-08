@@ -1,4 +1,4 @@
-use crate::{expr::Expr, value::Value};
+use crate::{expr::{Expr, Index}, value::Value};
 use rust_decimal::Decimal; 
 use std::str::FromStr;
 
@@ -30,6 +30,7 @@ match {
     "in" => KWD_IN,
     "," => COMMA,
     ":" => COLON,
+    "." => DOT,
     "(" => LPAREN,
     ")" => RPAREN,
     "[" => LBRACKET,
@@ -49,6 +50,7 @@ match {
 }
 else {
     r"[a-zA-Z][_a-zA-Z0-9]*" => IDENT,
+    r"[0-9]+" => INDEX,
 }
 
 pub Expr: Expr = IfExpr;
@@ -87,8 +89,14 @@ MultExpr: Expr = {
 }
 
 ContainsExpr: Expr = {
-    <l:Term> KWD_CONTAINS <r:Term> => Expr::contains(l, r),
-    <l:Term> KWD_IN <r:Term> => Expr::contains(r, l),
+    <l:IndexExpr> KWD_CONTAINS <r:IndexExpr> => Expr::contains(l, r),
+    <l:IndexExpr> KWD_IN <r:IndexExpr> => Expr::contains(r, l),
+    IndexExpr
+}
+
+IndexExpr: Expr = {
+    <l:IndexExpr> DOT <r:IDENT> => Expr::index(l, Index::from(r)),
+    <l:IndexExpr> DOT <r:INDEX> => Expr::index(l, Index::from(usize::from_str(r).unwrap())),
     Term
 }
 

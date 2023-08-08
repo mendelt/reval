@@ -240,7 +240,7 @@ impl Display for Expr {
             Expr::Value(value) => write!(formatter, "{value}"),
             Expr::Reference(ident) => write!(formatter, "{ident}"),
             Expr::Function(_, _) => todo!(),
-            Expr::Index(_, _) => todo!(),
+            Expr::Index(left, right) => write!(formatter, "({left}.{right})"),
             Expr::If(check, true_case, false_case) => {
                 write!(formatter, "(if {check} then {true_case} else {false_case})")
             }
