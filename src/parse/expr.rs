@@ -493,6 +493,35 @@ mod when_parsing_ref_expression {
 }
 
 #[cfg(test)]
+mod when_parsing_function_call {
+    use super::*;
+
+    #[test]
+    fn should_parse_function_call_with_value_param() {
+        assert_eq!(
+            Expr::parse("function(i34)").unwrap(),
+            Expr::func("function", Expr::value(34))
+        );
+    }
+
+    #[test]
+    fn should_parse_function_with_expr_param() {
+        assert_eq!(
+            Expr::parse("function(ref_1)").unwrap(),
+            Expr::func("function", Expr::reff("ref_1"))
+        )
+    }
+
+    #[test]
+    fn should_parse_function_with_complex_expr_param() {
+        assert_eq!(
+            Expr::parse("function(i1+i2)").unwrap().to_string(),
+            "function((i1 + i2))"
+        );
+    }
+}
+
+#[cfg(test)]
 mod when_parsing_expression_precedence {
     use super::*;
 

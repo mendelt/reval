@@ -239,7 +239,7 @@ impl Display for Expr {
         match self {
             Expr::Value(value) => write!(formatter, "{value}"),
             Expr::Reference(ident) => write!(formatter, "{ident}"),
-            Expr::Function(_, _) => todo!(),
+            Expr::Function(ident, param) => write!(formatter, "{ident}({param})"),
             Expr::Index(left, right) => write!(formatter, "({left}.{right})"),
             Expr::If(check, true_case, false_case) => {
                 write!(formatter, "(if {check} then {true_case} else {false_case})")

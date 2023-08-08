@@ -115,6 +115,7 @@ Func: Expr = {
     KWD_IS_NONE LPAREN <e:Expr> RPAREN => Expr::is_none(e),
     OP_SUB LPAREN <e:Expr> RPAREN => Expr::neg(e),
     OP_NOT LPAREN <e:Expr> RPAREN => Expr::not(e),
+    <f:IDENT> LPAREN <e:Expr> RPAREN => Expr::func(f, e),
 }
 
 Ref: Expr = <s:IDENT> => Expr::reff(<>);
