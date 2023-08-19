@@ -8,7 +8,7 @@ mod string_ser;
 
 use itertools::Itertools;
 use rust_decimal::Decimal;
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::BTreeMap, fmt::Display};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
@@ -18,7 +18,7 @@ pub enum Value {
     Decimal(Decimal),
     Bool(bool),
     Vec(Vec<Value>),
-    Map(HashMap<String, Value>),
+    Map(BTreeMap<String, Value>),
     None,
 }
 

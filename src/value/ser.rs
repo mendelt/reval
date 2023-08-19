@@ -9,7 +9,7 @@ use serde::{
     },
     Serialize, Serializer,
 };
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::BTreeMap, fmt::Display};
 
 pub struct ValueSerializer;
 
@@ -142,7 +142,7 @@ impl Serializer for ValueSerializer {
     where
         T: serde::Serialize,
     {
-        let mut values = HashMap::new();
+        let mut values: BTreeMap<String, Value> = BTreeMap::new();
         values.insert(String::from(variant), value.serialize(self)?);
         Ok(Value::Map(values))
     }
@@ -180,7 +180,7 @@ impl Serializer for ValueSerializer {
 
     fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap> {
         Ok(SerializeMapValue {
-            map: HashMap::new(),
+            map: BTreeMap::new(),
             next_key: None,
         })
     }
@@ -198,7 +198,7 @@ impl Serializer for ValueSerializer {
     ) -> Result<Self::SerializeStructVariant> {
         Ok(SerializeStructVariantValue {
             name: String::from(variant),
-            map: HashMap::new(),
+            map: BTreeMap::new(),
         })
     }
 }
@@ -274,7 +274,7 @@ impl SerializeTupleVariant for SerializeTupleVariantValue {
     }
 
     fn end(self) -> Result<Value> {
-        let mut map = HashMap::new();
+        let mut map: BTreeMap<String, Value> = BTreeMap::new();
 
         map.insert(self.name, Value::Vec(self.vec));
 
@@ -283,7 +283,7 @@ impl SerializeTupleVariant for SerializeTupleVariantValue {
 }
 
 pub struct SerializeMapValue {
-    map: HashMap<String, Value>,
+    map: BTreeMap<String, Value>,
     next_key: Option<String>,
 }
 
@@ -334,7 +334,7 @@ impl SerializeStruct for SerializeMapValue {
 
 pub struct SerializeStructVariantValue {
     name: String,
-    map: HashMap<String, Value>,
+    map: BTreeMap<String, Value>,
 }
 
 impl SerializeStructVariant for SerializeStructVariantValue {
@@ -351,7 +351,7 @@ impl SerializeStructVariant for SerializeStructVariantValue {
     }
 
     fn end(self) -> Result<Value> {
-        let mut map = HashMap::new();
+        let mut map: BTreeMap<String, Value> = BTreeMap::new();
 
         map.insert(self.name, Value::Map(self.map));
 
@@ -466,7 +466,7 @@ mod when_serializing_to_value {
 
         assert_serialized(
             TestEnum::Variant(14),
-            Value::Map(HashMap::from([("Variant".to_owned(), Value::Int(14))])),
+            Value::Map(BTreeMap::from([("Variant".to_owned(), Value::Int(14))])),
         );
     }
 
@@ -479,7 +479,7 @@ mod when_serializing_to_value {
 
         assert_serialized(
             TestEnum::Variant(14, "Test".to_owned()),
-            Value::Map(HashMap::from([(
+            Value::Map(BTreeMap::from([(
                 "Variant".to_owned(),
                 Value::Vec(vec![Value::Int(14), Value::String("Test".to_owned())]),
             )])),
@@ -495,9 +495,9 @@ mod when_serializing_to_value {
 
         assert_serialized(
             TestEnum::Variant { value: 16 },
-            Value::Map(HashMap::from([(
+            Value::Map(BTreeMap::from([(
                 "Variant".to_owned(),
-                Value::Map(HashMap::from([("value".to_owned(), Value::Int(16))])),
+                Value::Map(BTreeMap::from([("value".to_owned(), Value::Int(16))])),
             )])),
         );
     }
@@ -512,7 +512,7 @@ mod when_serializing_to_value {
 
         assert_serialized(
             TestEnum::Variant { value: 16 },
-            Value::Map(HashMap::from([
+            Value::Map(BTreeMap::from([
                 ("type".to_owned(), Value::String("Variant".to_owned())),
                 ("value".to_owned(), Value::Int(16)),
             ])),
@@ -523,7 +523,7 @@ mod when_serializing_to_value {
     fn should_serialize_map() {
         assert_serialized(
             BTreeMap::from([("key", "value")]),
-            Value::Map(HashMap::from([(
+            Value::Map(BTreeMap::from([(
                 "key".to_owned(),
                 Value::String("value".to_owned()),
             )])),
@@ -543,7 +543,7 @@ mod when_serializing_to_value {
                 age: 21,
                 name: "Frank".to_owned(),
             },
-            Value::Map(HashMap::from([
+            Value::Map(BTreeMap::from([
                 ("age".to_owned(), Value::Int(21)),
                 ("name".to_owned(), Value::String("Frank".to_owned())),
             ])),

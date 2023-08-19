@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Return wrapped error type from json parsing rules
 - Remove faulty check for valid identifier for rules names
 - Simplified index expressions so you can only index by string or usize, not by expressions anymore
+- Move to using BTreeMap for Value::Map
 
 ### Removed
 - The half-finished nom-based parser for reval DSL rules is removed in favor of the lalrpop version
