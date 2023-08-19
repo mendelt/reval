@@ -19,31 +19,30 @@ mod when_parsing_string {
     #[test]
     fn should_parse_quoted_string() {
         assert_eq!(
-            Expr::parse("\"string value\"").unwrap(),
+            Expr::parse(r#""string value""#).unwrap(),
             Expr::value("string value".to_string())
         );
     }
 
-    #[ignore]
     #[test]
     fn should_parse_escaped_quotes() {
         assert_eq!(
-            Expr::parse("\"string \\\" \\n value\"").unwrap(),
-            Expr::value("string \\\" \n value".to_string())
+            Expr::parse(r#""string \" value""#).unwrap(),
+            Expr::value(r#"string \" value"#.to_string())
         );
     }
 
-    #[ignore]
     #[test]
+    #[ignore]
     fn should_unescape_escaped_characters() {
-        todo!();
+        todo!(); // TODO implement this
     }
 
     #[test]
     fn should_not_trim_whitespace() {
         assert_eq!(
-            Expr::parse("\"  string  value\"").unwrap(),
-            Expr::value("  string  value".to_string())
+            Expr::parse(r#""  string  value ""#).unwrap(),
+            Expr::value(r#"  string  value "#.to_string())
         );
     }
 }
@@ -204,7 +203,7 @@ mod when_parsing_map_value {
         );
     }
 
-    #[ignore] // ignored because map order varies, TODO: use btreemap for map
+    #[ignore] // TODO ignored because map order varies, use btreemap for map
     #[test]
     fn should_parse_map_with_expr_items() {
         assert_eq!(
@@ -380,7 +379,10 @@ mod when_parsing_comparison_expressions {
 
     #[test]
     fn should_parse_equality_operators_left_associatively() {
-        // TODO:
+        assert_eq!(
+            Expr::parse("i12>=i4==i6<=i3").unwrap().to_string(),
+            "(((i12 >= i4) == i6) <= i3)"
+        )
     }
 }
 
