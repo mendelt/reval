@@ -15,7 +15,7 @@ pub struct ValueSerializer;
 
 impl SerError for Error {
     fn custom<T: Display>(_msg: T) -> Self {
-        todo!()
+        todo!() // TODO implement this
     }
 }
 
