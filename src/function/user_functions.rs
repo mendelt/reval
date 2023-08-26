@@ -52,7 +52,7 @@ impl UserFunctions {
 
     /// Merge two sets of user-functions
     pub fn merge(&mut self, functions: UserFunctions) -> &mut Self {
-        self.functions.extend(functions.functions.into_iter());
+        self.functions.extend(functions.functions);
         self
     }
 }
