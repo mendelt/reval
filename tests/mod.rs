@@ -11,25 +11,22 @@ use serde::Serialize;
 #[tokio::test]
 async fn should_ref_input() {
     // Reference the event field from the input and return it
-    let expr = r#"{"ref": "event"}"#;
-
-    assert_eq!(eval_expr(expr, simple_event()).await, "Simple".into())
+    assert_eq!(eval_expr("event", simple_event()).await, "Simple".into())
 }
 
 #[tokio::test]
 async fn should_eval_eq_on_input_event() {
-    let expr = r#"{"eq": [{"ref": "event"}, {"string": "Simple"}]}"#;
-
-    assert_eq!(eval_expr(expr, simple_event()).await, true.into())
+    assert_eq!(
+        eval_expr(r#"event == "Simple""#, simple_event()).await,
+        true.into()
+    )
 }
 
 #[tokio::test]
 async fn should_eval_contains_expr_on_list() {
-    let expr = r#"{"contains": [{"ref": "list"}, {"string": "2"}]}"#;
-
     assert_eq!(
         eval_expr(
-            expr,
+            r#"list contains "2""#,
             Event::List {
                 list: vec!["1".to_string(), "2".to_string(), "3".to_string()]
             },
@@ -39,7 +36,7 @@ async fn should_eval_contains_expr_on_list() {
     );
     assert_eq!(
         eval_expr(
-            expr,
+            r#"list contains "2""#,
             Event::List {
                 list: vec!["1".to_string(), "4".to_string(), "3".to_string()]
             },
@@ -53,7 +50,7 @@ async fn should_eval_contains_expr_on_list() {
 async fn eval_expr<E: Serialize>(expr: &str, event: E) -> Value {
     let event = event.serialize(ValueSerializer).unwrap();
 
-    let expr = Expr::parse_json(expr).unwrap();
+    let expr = Expr::parse(expr).unwrap();
 
     let functions = UserFunctions::default();
     let mut context: FunctionContext = (&functions).into();
