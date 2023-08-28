@@ -67,6 +67,9 @@ impl Expr {
             Expr::Or(left, right) => or(context, facts, left, right).await,
 
             Expr::Contains(coll, item) => contains(context, facts, coll, item).await,
+
+            Expr::ToUpper(value) => to_upper(context, facts, value).await,
+            Expr::ToLower(value) => to_lower(context, facts, value).await,
         }
     }
 }
@@ -370,6 +373,30 @@ async fn contains<'a>(
     match (coll, item) {
         (Value::Map(map), Value::String(key)) => Ok(Value::Bool(map.contains_key(&key))),
         (Value::Vec(vec), item) => Ok(Value::Bool(vec.contains(&item))),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+async fn to_upper<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    value: &Expr,
+) -> Result<Value> {
+    let value = value.evaluate(context, facts).await?;
+    match value {
+        Value::String(value) => Ok(Value::String(value.to_uppercase())),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+async fn to_lower<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    value: &Expr,
+) -> Result<Value> {
+    let value = value.evaluate(context, facts).await?;
+    match value {
+        Value::String(value) => Ok(Value::String(value.to_lowercase())),
         _ => Err(Error::InvalidType),
     }
 }

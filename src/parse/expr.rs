@@ -287,6 +287,22 @@ mod when_parsing_func {
             "!((i2 == i3))"
         );
     }
+
+    #[test]
+    fn should_parse_to_upper_expr() {
+        assert_eq!(
+            Expr::parse(r#"to_upper("String")"#).unwrap(),
+            Expr::to_upper(Expr::value("String"))
+        );
+    }
+
+    #[test]
+    fn should_parse_to_lower_expr() {
+        assert_eq!(
+            Expr::parse(r#"to_lower("String")"#).unwrap(),
+            Expr::to_lower(Expr::value("String"))
+        );
+    }
 }
 
 #[cfg(test)]

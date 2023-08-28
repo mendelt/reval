@@ -91,6 +91,12 @@ pub enum Expr {
 
     /// Checks if a vec contains an item or if a map contains a key
     Contains(Box<Expr>, Box<Expr>),
+
+    /// Convert a string to upper case
+    ToUpper(Box<Expr>),
+
+    // Convert a string to lower case
+    ToLower(Box<Expr>),
 }
 
 impl Expr {
@@ -227,6 +233,14 @@ impl Expr {
     pub fn contains(list: Expr, key: Expr) -> Self {
         Expr::Contains(Box::new(list), Box::new(key))
     }
+
+    pub fn to_upper(param: Expr) -> Self {
+        Expr::ToUpper(Box::new(param))
+    }
+
+    pub fn to_lower(param: Expr) -> Self {
+        Expr::ToLower(Box::new(param))
+    }
 }
 
 impl From<Value> for Expr {
@@ -279,6 +293,8 @@ impl Display for Expr {
             Expr::And(left, right) => write!(formatter, "({left} and {right})"),
             Expr::Or(left, right) => write!(formatter, "({left} or {right})"),
             Expr::Contains(left, right) => write!(formatter, "({left} contains {right})"),
+            Expr::ToUpper(param) => write!(formatter, "to_upper({param})"),
+            Expr::ToLower(param) => write!(formatter, "to_lower({param})"),
         }
     }
 }

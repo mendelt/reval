@@ -27,6 +27,8 @@ match {
     "float" => KWD_FLOAT,
     "dec" => KWD_DEC,
     "contains" => KWD_CONTAINS,
+    "to_upper" => KWD_TO_UPPER,
+    "to_lower" => KWD_TO_LOWER,
     "in" => KWD_IN,
     "," => COMMA,
     ":" => COLON,
@@ -117,6 +119,8 @@ Func: Expr = {
     KWD_IS_NONE LPAREN <e:Expr> RPAREN => Expr::is_none(e),
     OP_SUB LPAREN <e:Expr> RPAREN => Expr::neg(e),
     OP_NOT LPAREN <e:Expr> RPAREN => Expr::not(e),
+    KWD_TO_UPPER LPAREN <e:Expr> RPAREN => Expr::to_upper(e),
+    KWD_TO_LOWER LPAREN <e:Expr> RPAREN => Expr::to_lower(e),
     <f:IDENT> LPAREN <e:Expr> RPAREN => Expr::func(f, e),
 }
 

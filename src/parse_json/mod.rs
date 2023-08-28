@@ -74,6 +74,10 @@ enum ParseExpr {
     And(Vec<ParseExpr>),
     Or(Vec<ParseExpr>),
     Contains(Box<ParseExpr>, Box<ParseExpr>),
+    #[serde(rename = "to_upper")]
+    ToUpper(Box<ParseExpr>),
+    #[serde(rename = "to_lower")]
+    ToLower(Box<ParseExpr>),
 }
 
 /// Index type for parsing an index into a map or vec, can be a String, a usize
@@ -134,6 +138,8 @@ impl From<ParseExpr> for Expr {
             ParseExpr::And(params) => operands(params, Expr::and),
             ParseExpr::Or(params) => operands(params, Expr::or),
             ParseExpr::Contains(list, key) => Expr::contains((*list).into(), (*key).into()),
+            ParseExpr::ToUpper(param) => Expr::to_upper((*param).into()),
+            ParseExpr::ToLower(param) => Expr::to_lower((*param).into()),
         }
     }
 }
@@ -542,6 +548,22 @@ mod when_parsing_single_expressions {
                 Expr::value("test 2")
             )
         );
+    }
+
+    #[test]
+    fn should_parse_to_upper_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"to_upper": {"string": "test"}}"#).unwrap(),
+            Expr::to_upper(Expr::value("test"))
+        )
+    }
+
+    #[test]
+    fn should_parse_to_lower_expression() {
+        assert_eq!(
+            Expr::parse_json(r#"{"to_lower": {"string": "test"}}"#).unwrap(),
+            Expr::to_lower(Expr::value("test"))
+        )
     }
 }
 
