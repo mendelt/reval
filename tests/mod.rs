@@ -46,6 +46,27 @@ async fn should_eval_contains_expr_on_list() {
     )
 }
 
+#[tokio::test]
+async fn should_eval_contains_expr_on_strings() {
+    assert_eq!(
+        eval_expr(
+            r#""this is a string" contains "is""#,
+            Event::List { list: Vec::new() },
+        )
+        .await,
+        true.into(),
+    );
+
+    assert_eq!(
+        eval_expr(
+            r#""this is a string" contains "something else""#,
+            Event::List { list: Vec::new() },
+        )
+        .await,
+        false.into(),
+    );
+}
+
 /// Evaluate a simple expression against an event
 async fn eval_expr<E: Serialize>(expr: &str, event: E) -> Value {
     let event = event.serialize(ValueSerializer).unwrap();

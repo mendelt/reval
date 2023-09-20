@@ -373,6 +373,7 @@ async fn contains<'a>(
     match (coll, item) {
         (Value::Map(map), Value::String(key)) => Ok(Value::Bool(map.contains_key(&key))),
         (Value::Vec(vec), item) => Ok(Value::Bool(vec.contains(&item))),
+        (Value::String(coll), Value::String(item)) => Ok(Value::Bool(coll.contains(&item))),
         _ => Err(Error::InvalidType),
     }
 }
