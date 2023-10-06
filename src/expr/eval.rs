@@ -87,15 +87,11 @@ fn reference(facts: &Value, name: &str) -> Result<Value> {
 
 fn index(value: Value, index: &Index) -> Result<Value> {
     match (&value, index) {
-        (Value::Map(map), Index::Map(field)) => map
-            .get(field)
-            .ok_or_else(|| Error::UnknownIndex(field.to_owned())),
-        (Value::Vec(vec), Index::Vec(index)) => vec
-            .get(*index)
-            .ok_or_else(|| Error::UnknownIndex(index.to_string())),
+        (Value::Map(map), Index::Map(field)) => Ok(map.get(field).cloned().unwrap_or(Value::None)),
+        (Value::Vec(vec), Index::Vec(index)) => Ok(vec.get(*index).cloned().unwrap_or(Value::None)),
+        (Value::None, _) => Ok(Value::None),
         (_, _) => Err(Error::InvalidType),
     }
-    .map(Clone::clone)
 }
 
 async fn iif(
@@ -374,6 +370,7 @@ async fn contains<'a>(
         (Value::Map(map), Value::String(key)) => Ok(Value::Bool(map.contains_key(&key))),
         (Value::Vec(vec), item) => Ok(Value::Bool(vec.contains(&item))),
         (Value::String(coll), Value::String(item)) => Ok(Value::Bool(coll.contains(&item))),
+        (Value::None, _) => Ok(Value::Bool(false)),
         _ => Err(Error::InvalidType),
     }
 }
