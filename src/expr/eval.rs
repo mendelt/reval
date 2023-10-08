@@ -111,6 +111,8 @@ async fn iif(
 fn not(value: Value) -> Result<Value> {
     match value {
         Value::Bool(value) => Ok(Value::Bool(!value)),
+
+        Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -121,6 +123,7 @@ fn neg(value: Value) -> Result<Value> {
         Value::Float(value) => Ok(Value::Float(-value)),
         Value::Decimal(value) => Ok(Value::Decimal(-value)),
 
+        Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -177,6 +180,7 @@ fn int(value: Value) -> Result<Value> {
             .map(Value::Int)
             .map_err(|_| Error::InvalidCast(value, "Value::Int".to_owned())),
 
+        Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -193,6 +197,7 @@ fn float(value: Value) -> Result<Value> {
             .map(Value::Float)
             .map_err(|_| Error::InvalidCast(value, "Value::Float".to_owned())),
 
+        Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -208,6 +213,7 @@ fn dec(value: Value) -> Result<Value> {
             .map(Value::Decimal)
             .map_err(|_| Error::InvalidCast(value, "Value::Decimal".to_owned())),
 
+        Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -218,6 +224,7 @@ fn mult(left: Value, right: Value) -> Result<Value> {
         (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left * right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left * right)),
 
+        (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -228,6 +235,7 @@ fn div(left: Value, right: Value) -> Result<Value> {
         (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left / right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left / right)),
 
+        (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -238,6 +246,7 @@ fn add(left: Value, right: Value) -> Result<Value> {
         (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left + right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left + right)),
 
+        (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -248,6 +257,7 @@ fn sub(left: Value, right: Value) -> Result<Value> {
         (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left - right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left - right)),
 
+        (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -272,44 +282,44 @@ async fn eq<'a>(
 
 fn gt(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::None, _) => Ok(false.into()),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left > right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left > right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left > right)),
 
+        (Value::None, _) | (_, Value::None) => Ok(false.into()),
         _ => Err(Error::InvalidType),
     }
 }
 
 fn gte(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::None, _) => Ok(false.into()),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left >= right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left >= right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left >= right)),
 
+        (Value::None, _) | (_, Value::None) => Ok(false.into()),
         _ => Err(Error::InvalidType),
     }
 }
 
 fn lt(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::None, _) => Ok(false.into()),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left < right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left < right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left < right)),
 
+        (Value::None, _) | (_, Value::None) => Ok(false.into()),
         _ => Err(Error::InvalidType),
     }
 }
 
 fn lte(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::None, _) => Ok(false.into()),
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left <= right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left <= right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left <= right)),
 
+        (Value::None, _) | (_, Value::None) => Ok(false.into()),
         _ => Err(Error::InvalidType),
     }
 }
@@ -370,6 +380,7 @@ async fn contains<'a>(
         (Value::Map(map), Value::String(key)) => Ok(Value::Bool(map.contains_key(&key))),
         (Value::Vec(vec), item) => Ok(Value::Bool(vec.contains(&item))),
         (Value::String(coll), Value::String(item)) => Ok(Value::Bool(coll.contains(&item))),
+
         (Value::None, _) => Ok(Value::Bool(false)),
         _ => Err(Error::InvalidType),
     }
@@ -383,6 +394,8 @@ async fn to_upper<'a>(
     let value = value.evaluate(context, facts).await?;
     match value {
         Value::String(value) => Ok(Value::String(value.to_uppercase())),
+
+        Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -395,6 +408,8 @@ async fn to_lower<'a>(
     let value = value.evaluate(context, facts).await?;
     match value {
         Value::String(value) => Ok(Value::String(value.to_lowercase())),
+
+        Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
