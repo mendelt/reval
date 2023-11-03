@@ -366,6 +366,7 @@ mod when_parsing_comparison_expressions {
     #[test]
     fn should_parse_equal() {
         assert_eq!(Expr::parse("i2==i8").unwrap().to_string(), "(i2 == i8)");
+        assert_eq!(Expr::parse("i2=i8").unwrap().to_string(), "(i2 == i8)");
     }
 
     #[test]

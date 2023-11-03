@@ -5,7 +5,8 @@ use std::str::FromStr;
 grammar;
 
 match {
-    "==" => OP_EQ,
+    "=" => OP_EQ1,
+    "==" => OP_EQ2,
     "!=" => OP_NEQ,
     ">" => OP_GT,
     "<" => OP_LT,
@@ -69,7 +70,8 @@ LogExpr: Expr = {
 }
 
 EqExpr: Expr = {
-    <l:EqExpr> OP_EQ <r:AddExpr> => Expr::eq(l, r),
+    <l:EqExpr> OP_EQ1 <r:AddExpr> => Expr::eq(l, r),
+    <l:EqExpr> OP_EQ2 <r:AddExpr> => Expr::eq(l, r),
     <l:EqExpr> OP_NEQ <r:AddExpr> => Expr::neq(l, r),
     <l:EqExpr> OP_GT <r:AddExpr> => Expr::gt(l, r),
     <l:EqExpr> OP_LT <r:AddExpr> => Expr::lt(l, r),
