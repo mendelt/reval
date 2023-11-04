@@ -21,20 +21,16 @@
 //! struct Data {
 //!     age: u16,
 //! }
+//!
 //! // Set up an "age check" rule that checks if the "age" input field is
 //! // greater than or equal to 21
-//! let rule = r#"
-//! {
-//!     "name": "age check",
-//!     "expr": {
-//!         "gte": [
-//!             {"ref": "age"},
-//!             {"int": 21}
-//!         ]
-//!     }
-//! }"#;
+//! let rule = r"
+//! // age check
+//! age >= i21
+//! ";
+//!
 //! // Set up the ruleset builder, add the rule and build the `RuleSet`
-//! let ruleset = ruleset().with_rule(Rule::parse_json(rule).unwrap()).unwrap().build();
+//! let ruleset = ruleset().with_rule(Rule::parse(rule).unwrap()).unwrap().build();
 //! // Set up input data
 //! let facts = Data { age: 16 };
 //! // Evaluate the ruleset on the input data and check if the rule returns
@@ -57,6 +53,7 @@
 //! struct Data {
 //!     age: u16,
 //! }
+//!
 //! // Set up a FakeId UserFunction that increments an integer `Value` to
 //! // bypass the age check
 //! struct FakeId;
@@ -71,23 +68,19 @@
 //!         "fake_id"
 //!     }
 //! }
+//!
 //! // Set up an "age check" rule that checks if the "age" input field is
 //! // greater than or equal to 21. But it first calls the `fake_id` user-
 //! // function.
-//! let rule = r#"
-//! {
-//!     "name": "age check",
-//!     "expr": {
-//!         "gte": [
-//!             {"func": ["fake_id", {"ref": "age"}]},
-//!             {"int": 21}
-//!         ]
-//!     }
-//! }"#;
+//! let rule = r"
+//! // age check
+//! fake_id(age) >= i21
+//! ";
+//!
 //! // Set up the ruleset builder, add the rule, add the user-function and
 //! // build the `RuleSet`
 //! let ruleset = ruleset()
-//!     .with_rule(Rule::parse_json(rule).unwrap()).unwrap()
+//!     .with_rule(Rule::parse(rule).unwrap()).unwrap()
 //!     .with_function(FakeId {}).unwrap()
 //!     .build();
 //! // Set up input data

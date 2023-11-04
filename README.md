@@ -26,16 +26,11 @@ struct Data {
 }
 // Set up an "age check" rule that checks if the "age" input field is
 // greater than or equal to 21
-let rule = r#"
-{
-    "name": "age check",
-    "expr": {
-        "gte": [
-            {"ref": "age"},
-            {"int": 21}
-        ]
-    }
-}"#;
+let rule = r"
+// age check
+age >= 21
+";
+
 // Set up the ruleset builder, add the rule and build the `RuleSet`
 let ruleset = ruleset().with_rule(Rule::parse_json(rule).unwrap()).unwrap().build();
 // Set up input data
@@ -75,16 +70,11 @@ impl UserFunction for FakeId {
 // Set up an "age check" rule that checks if the "age" input field is
 // greater than or equal to 21. But it first calls the `fake_id` user-
 // function.
-let rule = r#"
-{
-    "name": "age check",
-    "expr": {
-        "gte": [
-            {"func": ["fake_id", {"ref": "age"}]},
-            {"int": 21}
-        ]
-    }
-}"#;
+let rule = r"
+// age check
+fake_id(age) >= i21
+";
+
 // Set up the ruleset builder, add the rule, add the user-function and
 // build the `RuleSet`
 let ruleset = ruleset()

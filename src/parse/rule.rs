@@ -1,6 +1,5 @@
-use itertools::Itertools;
-
 use crate::{expr::Expr, parse::Error, ruleset::rule::Rule};
+use itertools::Itertools;
 
 impl Rule {
     pub fn parse(input: &str) -> Result<Self, Error> {
