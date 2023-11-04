@@ -1,21 +1,21 @@
 //! Evaluate Expressions
 
 use super::{Expr, Index};
-use crate::{error::Result, function::FunctionContext, value::Value, Error};
+use crate::{error::Result, expr::EvaluationContext, value::Value, Error};
 use async_recursion::async_recursion;
 use rust_decimal::prelude::*;
 use std::collections::HashMap;
 
 impl Expr {
     #[async_recursion]
-    pub async fn evaluate(&self, context: &mut FunctionContext, facts: &Value) -> Result<Value> {
+    pub async fn evaluate(&self, context: &mut EvaluationContext, facts: &Value) -> Result<Value> {
         match self {
             Expr::Value(value) => Ok(value.clone()),
             Expr::Reference(name) => reference(facts, name),
             Expr::Index(value, idx) => index(value.evaluate(context, facts).await?, idx),
             Expr::Function(name, value) => {
                 let param = value.evaluate(context, facts).await?;
-                context.call(name, param).await
+                context.call_function(name, param).await
             }
             Expr::If(switch, left, right) => iif(context, facts, switch, left, right).await,
             Expr::Not(value) => not(value.evaluate(context, facts).await?),
@@ -100,7 +100,7 @@ fn index(value: Value, index: &Index) -> Result<Value> {
 }
 
 async fn iif(
-    context: &mut FunctionContext<'_>,
+    context: &mut EvaluationContext<'_>,
     facts: &Value,
     switch: &Expr,
     left: &Expr,
@@ -149,7 +149,7 @@ fn is_none(value: Value) -> Result<Value> {
 
 async fn eval_map(
     map: &HashMap<String, Expr>,
-    context: &mut FunctionContext<'_>,
+    context: &mut EvaluationContext<'_>,
     facts: &Value,
 ) -> Result<Value> {
     let mut result = HashMap::<String, Value>::new();
@@ -163,7 +163,7 @@ async fn eval_map(
 
 async fn eval_vec(
     vec: &Vec<Expr>,
-    context: &mut FunctionContext<'_>,
+    context: &mut EvaluationContext<'_>,
     facts: &Value,
 ) -> Result<Value> {
     let mut result = Vec::<Value>::new();
@@ -268,7 +268,7 @@ fn sub(left: Value, right: Value) -> Result<Value> {
 }
 
 async fn eq<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     left: &Expr,
     right: &Expr,
@@ -331,7 +331,7 @@ fn lte(left: Value, right: Value) -> Result<Value> {
 
 /// Lazilly evaluate an and expression
 async fn and<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     left: &Expr,
     right: &Expr,
@@ -348,7 +348,7 @@ async fn and<'a>(
 
 /// Lazilly evaluate an or expression
 async fn or<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     left: &Expr,
     right: &Expr,
@@ -365,7 +365,7 @@ async fn or<'a>(
 
 /// Helper function that evaluates an expression and checks if its a boolean
 async fn eval_to_bool<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     expr: &Expr,
 ) -> Result<bool> {
@@ -373,7 +373,7 @@ async fn eval_to_bool<'a>(
 }
 
 async fn bitwise_and<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     left: &Expr,
     right: &Expr,
@@ -389,7 +389,7 @@ async fn bitwise_and<'a>(
 }
 
 async fn bitwise_or<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     left: &Expr,
     right: &Expr,
@@ -405,7 +405,7 @@ async fn bitwise_or<'a>(
 }
 
 async fn bitwise_xor<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     left: &Expr,
     right: &Expr,
@@ -421,7 +421,7 @@ async fn bitwise_xor<'a>(
 }
 
 async fn contains<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     coll: &Expr,
     item: &Expr,
@@ -441,7 +441,7 @@ async fn contains<'a>(
 }
 
 async fn to_upper<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     value: &Expr,
 ) -> Result<Value> {
@@ -455,7 +455,7 @@ async fn to_upper<'a>(
 }
 
 async fn to_lower<'a>(
-    context: &mut FunctionContext<'a>,
+    context: &mut EvaluationContext<'a>,
     facts: &Value,
     value: &Expr,
 ) -> Result<Value> {

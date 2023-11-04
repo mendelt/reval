@@ -1,11 +1,12 @@
+mod context;
 mod eval;
-pub mod index;
 pub(crate) mod keywords;
 
+pub mod index;
+use crate::value::Value;
+pub use context::EvaluationContext;
 pub use index::Index;
 use itertools::Itertools;
-
-use crate::value::Value;
 use std::{collections::HashMap, fmt::Display};
 
 /// The Reval expression abstract syntax tree
