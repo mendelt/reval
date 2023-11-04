@@ -1,4 +1,4 @@
-use crate::{expr::Expr, function::FunctionContext, value::Value, Result};
+use crate::{expr::EvaluationContext, expr::Expr, value::Value, Result};
 
 /// A rule is an expression with a name
 #[derive(Debug, Clone, PartialEq)]
@@ -22,9 +22,12 @@ impl Rule {
         }
     }
 
-    /// Evaluate a rule on some data using the user-functions provided by the
-    /// context
-    pub async fn evaluate<'a>(&self, context: &mut FunctionContext<'a>, facts: &Value) -> Outcome {
+    /// Evaluate a rule on some data using the user-functions provided by the context
+    pub async fn evaluate<'a>(
+        &self,
+        context: &mut EvaluationContext<'a>,
+        facts: &Value,
+    ) -> Outcome {
         Outcome {
             value: self.expr.evaluate(context, facts).await,
             rule: &self.name,
