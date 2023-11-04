@@ -33,8 +33,7 @@ tokio-test = "0.4"
 lalrpop = "0.20.0"
 
 [features]
-default = ["json_parser", "value_serializer"]
-json_parser = ["dep:serde", "dep:serde_json"]
+default = ["value_serializer"]
 value_serializer = ["dep:serde"]
 
 [[test]]

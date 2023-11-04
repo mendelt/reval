@@ -97,8 +97,6 @@ pub mod error;
 pub mod expr;
 pub mod function;
 pub mod parse;
-#[cfg(feature = "json_parser")]
-pub mod parse_json;
 pub mod ruleset;
 pub mod value;
 
