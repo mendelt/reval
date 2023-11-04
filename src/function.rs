@@ -1,18 +1,43 @@
-use super::UserFunction;
+//! User functions
 use crate::{
     expr::keywords::{is_reserved_keyword, is_valid_identifier},
+    value::Value,
     Error, Result,
 };
+use async_trait::async_trait;
 use std::collections::HashMap;
+use std::result;
+
+lazy_static::lazy_static!(
+    pub(crate) static ref EMPTY_FUNCTIONS: UserFunctions = {
+        UserFunctions::default()
+    };
+);
+
+/// User functions should implement this trait
+#[async_trait]
+pub trait UserFunction {
+    /// Call the userfunction, parameters are passed in as a Value
+    async fn call(&self, params: Value) -> FunctionResult;
+
+    /// The name of the user-function
+    fn name(&self) -> &'static str;
+
+    /// Indicates if results of this function can be cached,
+    /// true by default
+    fn cacheable(&self) -> bool {
+        true
+    }
+}
+
+/// Result type returned from UserFunction
+pub type FunctionResult = result::Result<Value, anyhow::Error>;
 
 /// Stores user-functions so they can be easilly called
 #[derive(Default)]
-pub struct UserFunctions {
+pub(crate) struct UserFunctions {
     functions: HashMap<&'static str, BoxedFunction>,
 }
-
-/// Convenience type for passing around boxed user-function implementations
-pub(crate) type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
 
 impl UserFunctions {
     /// Get a userfunction by name
@@ -23,7 +48,7 @@ impl UserFunctions {
     }
 
     /// Add a user-function to the collection
-    pub fn add_function(
+    pub(crate) fn add_function(
         &mut self,
         function: impl UserFunction + Send + Sync + 'static,
     ) -> Result<()> {
@@ -50,17 +75,47 @@ impl UserFunctions {
         Ok(())
     }
 
-    /// Merge two sets of user-functions
-    pub fn merge(&mut self, functions: UserFunctions) -> &mut Self {
-        self.functions.extend(functions.functions);
-        self
+    pub(crate) async fn call(
+        &self,
+        name: &str,
+        param: Value,
+        results_cache: &mut HashMap<String, Value>,
+    ) -> Result<Value> {
+        let function = self.get(name)?;
+
+        if function.cacheable() {
+            let cache_key = format!("{name}-{param:?}");
+
+            match results_cache.get(&cache_key) {
+                Some(value) => Ok(value.clone()),
+                None => {
+                    let result = call_function(function, param, name).await?;
+                    results_cache.insert(cache_key, result.clone());
+                    Ok(result)
+                }
+            }
+        } else {
+            call_function(function, param, name).await
+        }
     }
 }
+
+async fn call_function(function: &BoxedFunction, params: Value, name: &str) -> Result<Value> {
+    function
+        .call(params)
+        .await
+        .map_err(|err| Error::UserFunctionError {
+            function: name.to_owned(),
+            error: err,
+        })
+}
+
+/// Convenience type for passing around boxed user-function implementations
+pub(crate) type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
 
 #[cfg(test)]
 mod when_managing_user_functions {
     use super::*;
-    use crate::prelude::*;
     use async_trait::async_trait;
 
     #[test]
