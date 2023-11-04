@@ -14,18 +14,15 @@ async fn main() {
     }
 
     // Set up a simple rule that passes the decimal value out without change
-    let rule = r#"
-    {
-        "name": "pass decimal",
-        "expr": { "gt": [
-            {"cdecimal": {"ref": "amount"}},
-            {"decimal": 900}
-        ]}
-    }"#;
+    let rule = r"
+// decimal
+// decimals are passed in as string (because of serde limitations) so we need to convert it using the `dec` function
+dec(amount) > d900
+";
 
     // Set up the ruleset builder, add the rule and build the `RuleSet`
     let ruleset = ruleset()
-        .with_rule(Rule::parse_json(rule).unwrap())
+        .with_rule(Rule::parse(rule).unwrap())
         .unwrap()
         .build();
 
@@ -37,6 +34,6 @@ async fn main() {
     // Evaluate the ruleset on the input data and check if the rule returns
     // `false`
     for outcome in ruleset.evaluate(&facts).await.unwrap() {
-        assert_eq!(outcome.value.unwrap(), Value::String("11".to_string()));
+        assert_eq!(outcome.value.unwrap(), Value::Bool(true));
     }
 }

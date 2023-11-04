@@ -15,20 +15,14 @@ async fn main() {
 
     // Set up an "age check" rule that checks if the "age" input field is
     // greater than or equal to 21
-    let rule = r#"
-    {
-        "name": "age check",
-        "expr": {
-            "gte": [
-                {"ref": "age"},
-                {"int": 21}
-            ]
-        }
-    }"#;
+    let rule = r"
+// age check
+age >= i21
+";
 
     // Set up the ruleset builder, add the rule and build the `RuleSet`
     let ruleset = ruleset()
-        .with_rule(Rule::parse_json(rule).unwrap())
+        .with_rule(Rule::parse(rule).unwrap())
         .unwrap()
         .build();
 
