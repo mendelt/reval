@@ -48,9 +48,6 @@ pub enum Error {
     #[error("No user function with name {0}")]
     UnknownUserFunction(String),
 
-    #[error("Error parsing rule from json {0}")]
-    JsonParseError(#[from] serde_json::Error),
-
     #[error("Value {0} out of bounds for function {1}")]
     ValueOutOfBounds(Value, String),
 }
