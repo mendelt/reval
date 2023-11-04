@@ -1,11 +1,7 @@
 //! Shared functionality, types and data for testing
 
 use chrono::prelude::*;
-use reval::{
-    function::{FunctionContext, UserFunctions},
-    prelude::*,
-    value::ser::ValueSerializer,
-};
+use reval::{expr::EvaluationContext, prelude::*, value::ser::ValueSerializer};
 use serde::Serialize;
 
 pub fn simple_event() -> Event {
@@ -48,10 +44,9 @@ pub async fn eval_expr<E: Serialize>(expr: &str, event: E) -> Value {
 
     let expr = Expr::parse(expr).unwrap();
 
-    let functions = UserFunctions::default();
-    let mut context: FunctionContext = (&functions).into();
-
-    expr.evaluate(&mut context, &event).await.unwrap()
+    expr.evaluate(&mut EvaluationContext::default(), &event)
+        .await
+        .unwrap()
 }
 
 pub fn check_float(value: Value, expected: f64) {
