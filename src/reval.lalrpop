@@ -140,6 +140,7 @@ IndexExpr: Expr = {
 Term: Expr = {
     Func,
     Ref,
+    Symbol,
     VecExpr,
     MapExpr,
     Value => Expr::Value(<>),
@@ -178,6 +179,8 @@ Func: Expr = {
 }
 
 Ref: Expr = <s:IDENT> => Expr::reff(<>);
+
+Symbol: Expr = COLON <s:IDENT> => Expr::symbol(s);
 
 VecExpr: Expr = LBRACKET <e0:(<Expr> COMMA)*> <e1:Expr?> RBRACKET => Expr::Vec(e0.into_iter().chain(e1).collect());
 

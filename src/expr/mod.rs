@@ -18,6 +18,9 @@ pub enum Expr {
     /// Access a parameter passed in to the expression
     Reference(String),
 
+    /// Insert a symbol from the loaded symbol table
+    Symbol(String),
+
     /// Evaluate a user functions by name
     Function(String, Box<Expr>),
 
@@ -167,6 +170,11 @@ impl Expr {
     /// Reference an input value
     pub fn reff(name: impl ToString) -> Self {
         Expr::Reference(name.to_string())
+    }
+
+    /// Symbol expression constructor
+    pub fn symbol(name: impl ToString) -> Self {
+        Expr::Symbol(name.to_string())
     }
 
     /// Index expression constructor
@@ -367,6 +375,7 @@ impl Display for Expr {
         match self {
             Expr::Value(value) => write!(formatter, "{value}"),
             Expr::Reference(ident) => write!(formatter, "{ident}"),
+            Expr::Symbol(ident) => write!(formatter, ":{ident}"),
             Expr::Function(ident, param) => write!(formatter, "{ident}({param})"),
             Expr::Index(left, right) => write!(formatter, "({left}.{right})"),
             Expr::If(check, true_case, false_case) => {

@@ -706,6 +706,30 @@ mod when_parsing_ref_expression {
 }
 
 #[cfg(test)]
+mod when_parsing_symbol_expression {
+    use super::*;
+
+    #[test]
+    fn should_parse_simple_symbol() {
+        assert_eq!(
+            Expr::parse(":simple_ident").unwrap().to_string(),
+            ":simple_ident"
+        );
+    }
+
+    #[test]
+    fn should_not_parse_invalid_ident_as_symbol() {
+        assert!(Expr::parse(":stuff&").is_err());
+    }
+
+    #[ignore]
+    #[test]
+    fn should_not_parse_symbol_with_space() {
+        assert!(Expr::parse(": symbol").is_err());
+    }
+}
+
+#[cfg(test)]
 mod when_parsing_function_call {
     use super::*;
 
