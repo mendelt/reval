@@ -10,7 +10,7 @@ use std::result;
 
 lazy_static::lazy_static!(
     pub(crate) static ref EMPTY_FUNCTIONS: UserFunctions = {
-        UserFunctions::default()
+        Default::default()
     };
 );
 

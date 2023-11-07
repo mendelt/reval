@@ -53,6 +53,9 @@ pub enum Error {
 
     #[error("Division by zero")]
     DivisionByZero,
+
+    #[error("Invalid symbol; {0}")]
+    InvalidSymbol(String),
 }
 
 impl Error {
