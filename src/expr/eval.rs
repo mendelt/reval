@@ -118,8 +118,8 @@ fn reference(facts: &Value, name: &str) -> Result<Value> {
     .cloned()
 }
 
-fn symbol(_name: &str, _context: &EvaluationContext<'_>) -> Result<Value> {
-    Ok(Value::None) // TODO: implement
+fn symbol(name: &str, context: &EvaluationContext<'_>) -> Result<Value> {
+    context.get_symbol(name).cloned()
 }
 
 fn index(value: Value, index: &Index) -> Result<Value> {

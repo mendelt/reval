@@ -50,6 +50,9 @@ pub enum Error {
 
     #[error("Value {0} out of bounds for function {1}")]
     ValueOutOfBounds(Value, String),
+
+    #[error("Invalid symbol; {0}")]
+    InvalidSymbol(String),
 }
 
 impl Error {
