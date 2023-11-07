@@ -2,13 +2,16 @@ use crate::{
     error::{Error, Result},
     function::{UserFunction, UserFunctions},
     ruleset::{rule::Rule, RuleSet},
+    symbol::Symbols,
+    value::Value,
 };
 
 /// Start building a ruleset
 pub fn ruleset() -> Builder {
     Builder {
         rules: Vec::new(),
-        functions: UserFunctions::default(),
+        functions: Default::default(),
+        symbols: Default::default(),
     }
 }
 
@@ -16,6 +19,7 @@ pub fn ruleset() -> Builder {
 pub struct Builder {
     rules: Vec<Rule>,
     functions: UserFunctions,
+    symbols: Symbols,
 }
 
 impl Builder {
@@ -59,11 +63,25 @@ impl Builder {
         Ok(self)
     }
 
+    pub fn with_symbol(mut self, symbol: impl ToString, value: Value) -> Self {
+        self.symbols.insert(symbol, value);
+        self
+    }
+
+    pub fn with_symbols(
+        mut self,
+        values: impl IntoIterator<Item = (impl ToString, Value)>,
+    ) -> Self {
+        self.symbols.append(values);
+        self
+    }
+
     /// Finalize the builder and create the RuleSet
     pub fn build(self) -> RuleSet {
         RuleSet {
             rules: self.rules,
             functions: self.functions,
+            symbols: self.symbols,
         }
     }
 }
@@ -71,7 +89,6 @@ impl Builder {
 #[cfg(test)]
 pub mod when_building_ruleset {
     use super::*;
-    use crate::prelude::*;
 
     /// Test helper that creates an empty rule
     fn rule(name: &str) -> Rule {

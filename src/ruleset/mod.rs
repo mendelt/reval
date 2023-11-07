@@ -5,7 +5,9 @@ pub mod rule;
 
 use crate::{
     error::Result,
+    expr::EvaluationContext,
     function::UserFunctions,
+    symbol::Symbols,
     value::{ser::ValueSerializer, Value},
 };
 use serde::Serialize;
@@ -15,6 +17,7 @@ use self::rule::{Outcome, Rule};
 pub struct RuleSet {
     rules: Vec<Rule>,
     functions: UserFunctions,
+    symbols: Symbols,
 }
 
 impl RuleSet {
@@ -25,7 +28,7 @@ impl RuleSet {
     }
 
     pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Outcome>> {
-        let mut context = (&self.functions).into();
+        let mut context = EvaluationContext::init(&self.symbols, &self.functions);
 
         let mut results = Vec::new();
 

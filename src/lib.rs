@@ -98,6 +98,7 @@ pub mod expr;
 pub mod function;
 pub mod parse;
 pub mod ruleset;
+pub mod symbol;
 pub mod value;
 
 pub use error::{Error, Result};
