@@ -380,6 +380,7 @@ async fn contains<'a>(
         (Value::Map(map), Value::String(key)) => Ok(Value::Bool(map.contains_key(&key))),
         (Value::Vec(vec), item) => Ok(Value::Bool(vec.contains(&item))),
         (Value::String(coll), Value::String(item)) => Ok(Value::Bool(coll.contains(&item))),
+        (Value::Int(flags), Value::Int(flag)) => Ok(Value::Bool((flags & flag) != 0)),
 
         (Value::None, _) => Ok(Value::Bool(false)),
         _ => Err(Error::InvalidType),

@@ -67,6 +67,45 @@ async fn should_eval_contains_expr_on_strings() {
     );
 }
 
+#[tokio::test]
+async fn should_eval_contains_expr_on_int() {
+    assert_eq!(
+        eval_expr(
+            "flags contains flag",
+            Event::Flags {
+                flags: 0b01001000,
+                flag: 0b00001000
+            }
+        )
+        .await,
+        true.into()
+    );
+
+    assert_eq!(
+        eval_expr(
+            "flag in flags",
+            Event::Flags {
+                flags: 0b01001000,
+                flag: 0b00001000
+            }
+        )
+        .await,
+        true.into()
+    );
+
+    assert_eq!(
+        eval_expr(
+            "flag in flags",
+            Event::Flags {
+                flags: 0b01001000,
+                flag: 0b00100000
+            }
+        )
+        .await,
+        false.into()
+    );
+}
+
 /// Evaluate a simple expression against an event
 async fn eval_expr<E: Serialize>(expr: &str, event: E) -> Value {
     let event = event.serialize(ValueSerializer).unwrap();

@@ -19,6 +19,7 @@ pub enum Event {
     Simple(SimpleEvent),
     List { list: Vec<String> },
     Map { map: HashMap<String, String> },
+    Flags { flags: u8, flag: u8 },
 }
 
 /// A simple event with a name and id
