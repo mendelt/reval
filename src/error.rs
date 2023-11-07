@@ -47,6 +47,9 @@ pub enum Error {
 
     #[error("No user function with name {0}")]
     UnknownUserFunction(String),
+
+    #[error("Invalid symbol; {0}")]
+    InvalidSymbol(String),
 }
 
 impl Error {
