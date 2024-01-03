@@ -99,6 +99,3 @@ mod when_displaying_value {
         assert_eq!(Value::None.to_string(), "none");
     }
 }
-
-// #[cfg(test)]
-// fn display(value: Value)
