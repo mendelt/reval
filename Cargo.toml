@@ -29,6 +29,8 @@ unicode-xid = "0.2"
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 tokio-test = "0.4"
+serde_json = "1"
+rstest = "0.18"
 
 [build-dependencies] # <-- We added this and everything after!
 lalrpop = "0.20.0"
