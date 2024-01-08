@@ -3,9 +3,6 @@ pub mod convert;
 #[cfg(feature = "value_serializer")]
 pub mod ser;
 
-#[cfg(feature = "value_serializer")]
-mod string_ser;
-
 use itertools::Itertools;
 use rust_decimal::Decimal;
 use std::{collections::BTreeMap, fmt::Display};
