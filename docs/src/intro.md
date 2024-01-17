@@ -9,10 +9,17 @@ This document is targeted at people writing rules for Reval. It describes the sy
 
 ### Rules
 
-Rules are pieces of text describing how to process input data to generate the required output. How the input and output data is structured depends depends on your particular Reval implementation.
+Rules are pieces of text describing how to process input data to generate a required output. How the input and output data is structured depends depends on your particular Reval implementation.
 Each rule has a name, this name is used to identify the rule in error messages and other output and should be unique in a ruleset. Each rule also contains an expression, this is the actual rule that will be evaluated to generate the output.
 
-Rules can be writting in one of two languages. First is a language based on the Json text format. This is a very precise but verbose way of expressing rules. A rule written in the Json language will look like this;
+Rules can be written in one of two languages. The Reval language is the simpelest and most concise language to write rules. A simple rule written in the Reval language looks like this;
+```
+// Example rule
+input_field >= i5
+```
+
+Rules can also be written in a language based on Json, this used to be the only way to write rules and is still available for backward compatibility. Parsing Json rules will be deprecated in version `0.8.0` of Reval and the Json rules parser will be removed in `0.9.0`.
+The same rule that was specified above looks like this in Json, its quite a bit more verbose and harder to look at;
 ```json
 {
     "name": "Example rule",
@@ -20,25 +27,35 @@ Rules can be writting in one of two languages. First is a language based on the 
 }
 ```
 
-This rule has the name `"Example rule"` and compares the value in `input_field` with the integer `5`. It will return `true` if it is greater than or equal to 5 and `false` otherwise. This rule will return an error if `input_field` does not contain a value with an integer type.
+The rule has the name `"Example rule"` and compares the value in `input_field` with the integer `5`. It will return `true` if it is greater than or equal to 5 and `false` otherwise. This rule will return an error if `input_field` does not contain a value with an integer type.
 
-Reval will also support a more concise Reval language. Right now this language is still experimental and only supports a small subset of the Reval features. In the future it might replace the json language. The rule that we just looked at might look like this in the Reval language
-```
-### Example rule
-[input_field] >= 5
-```
+### Values and data types
 
-### Rulesets
+Values can either be passed in to the the rules as input data or specified in the rule itself.
+Values passed in to the rules are named and can be used in rules by specifying the name similar to `input_field` in the example rule above.
+The value `i5` in the example rule is a value that is specified in the rule itself. The prefix `i` specifies that the value has the Integer type, and `5` specifies the value.
 
-Rules are bundled into rulesets. A ruleset will typically contain rules that work on the same type of input data and produce the same type of output data. Normally all the rules in a ruleset are run on each piece of input data. The output from running each of the rules is then combined.
-A ruleset that is used to trigger some action might contain rules that will each return a boolean, like the example rule in the previous paragraph. The values output by each of the rules will then be combined so that the action is triggered when one of the rules was triggered. Or outputs of rules might also be averaged or added together.
+Reval supports a range of data-types. The `String` type for text, a number of numeric types, a boolean type and a 
 
-Data passed into the rules is usually one or more named values. These can be accessed inside the rule. These values can have primitive types like `string`, `integer`, `decimal`, `float` or `boolean`, or they can themselves be structured values, they can be a `map` or a `vector` containing either named values or numbered values.
+| Type | Example | Description |
+| --- | --- | --- |
+| String  | `"this is a String"i` | Values of the string type contain text. String values are delimited with `"` characters. |
+| Integer | `i5`                 | This is a numeric type that can contain whole values. Integers can be positive or negative. `Integer` values are prefixed with `i` in rules |
+| Float   | `f.14e-5`            | `Float` is a numeric type that contains floating point values. Float types can contain fractional values, positive or negative. `Float` values are prefixed with `f` |
+| Decimal | `d14.25`             | `Decimal` is a numeric type that can contain fractional values. This data-type is similar to `Float` has different trade-offs. Decimal is typically used for monetary values. `Decimal` values are prefixed with `d` |
+| Boolean | `false` or `true`    | The `Boolean` data type represent truth values and can be `true` or `false` |
+| None    | `none`               | `None` is used to indicate that a value does is not set or unspecified. |
+| Vec     | `[i4, i6, i12]`      | Vec values contain a list or vector of other values. |
+| Map     | `{one: i1, two: i2}` | Map values map names to values, They are similar to a vec but every value in the list has a name that can be used to access that value |
 
-### Functions
+### Operators
 
-A ruleset can also have custom functions that allow rules to access functionality provided by the software that embeds the Reval rules-engine. Functions have a name, take a value as their input and return a value as output. Depending on how the function is implemented the output can be cached. So calling it multiple times might not incur a performance impact. 
+todo
 
-### Tests
+### Built in Functions
 
-T.B.D.
+todo
+
+### User-Functions
+
+A ruleset can have custom functions that allow rules to access functionality provided by the software that embeds the Reval rules-engine. Functions have a name, take a value as their input and return a value as output. Depending on how the function is implemented the output can be cached. So calling it multiple times might not incur a performance impact. 
