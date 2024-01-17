@@ -148,28 +148,44 @@
 This document is targeted at people writing rules for Reval. It describes the syntax and structure of the rules. This document does not describe details of a specific Reval implementation. Any information on the structure of input data, output data or extra functions provided by any system that uses Reval should be described in the documentation of that system.</p>
 <h2 id="concepts"><a class="header" href="#concepts">Concepts</a></h2>
 <h3 id="rules"><a class="header" href="#rules">Rules</a></h3>
-<p>Rules are pieces of text describing how to process input data to generate the required output. How the input and output data is structured depends depends on your particular Reval implementation.
+<p>Rules are pieces of text describing how to process input data to generate a required output. How the input and output data is structured depends depends on your particular Reval implementation.
 Each rule has a name, this name is used to identify the rule in error messages and other output and should be unique in a ruleset. Each rule also contains an expression, this is the actual rule that will be evaluated to generate the output.</p>
-<p>Rules can be writting in one of two languages. First is a language based on the Json text format. This is a very precise but verbose way of expressing rules. A rule written in the Json language will look like this;</p>
+<p>Rules can be written in one of two languages. The Reval language is the simpelest and most concise language to write rules. A simple rule written in the Reval language looks like this;</p>
+<pre><code>// Example rule
+input_field &gt;= i5
+</code></pre>
+<p>Rules can also be written in a language based on Json, this used to be the only way to write rules and is still available for backward compatibility. Parsing Json rules will be deprecated in version <code>0.8.0</code> of Reval and the Json rules parser will be removed in <code>0.9.0</code>.
+The same rule that was specified above looks like this in Json, its quite a bit more verbose and harder to look at;</p>
 <pre><code class="language-json">{
     &quot;name&quot;: &quot;Example rule&quot;,
     &quot;expr&quot;: {&quot;gte&quot;: [{&quot;ref&quot;: &quot;input_field&quot;}, {&quot;int&quot;: &quot;5&quot;}]}
 }
 </code></pre>
-<p>This rule has the name <code>&quot;Example rule&quot;</code> and compares the value in <code>input_field</code> with the integer <code>5</code>. It will return <code>true</code> if it is greater than or equal to 5 and <code>false</code> otherwise. This rule will return an error if <code>input_field</code> does not contain a value with an integer type.</p>
-<p>Reval will also support a more concise Reval language. Right now this language is still experimental and only supports a small subset of the Reval features. In the future it might replace the json language. The rule that we just looked at might look like this in the Reval language</p>
-<pre><code>### Example rule
-[input_field] &gt;= 5
-</code></pre>
-<h3 id="rulesets"><a class="header" href="#rulesets">Rulesets</a></h3>
-<p>Rules are bundled into rulesets. A ruleset will typically contain rules that work on the same type of input data and produce the same type of output data. Normally all the rules in a ruleset are run on each piece of input data. The output from running each of the rules is then combined.
-A ruleset that is used to trigger some action might contain rules that will each return a boolean, like the example rule in the previous paragraph. The values output by each of the rules will then be combined so that the action is triggered when one of the rules was triggered. Or outputs of rules might also be averaged or added together.</p>
-<p>Data passed into the rules is usually one or more named values. These can be accessed inside the rule. These values can have primitive types like <code>string</code>, <code>integer</code>, <code>decimal</code>, <code>float</code> or <code>boolean</code>, or they can themselves be structured values, they can be a <code>map</code> or a <code>vector</code> containing either named values or numbered values.</p>
-<h3 id="functions"><a class="header" href="#functions">Functions</a></h3>
-<p>A ruleset can also have custom functions that allow rules to access functionality provided by the software that embeds the Reval rules-engine. Functions have a name, take a value as their input and return a value as output. Depending on how the function is implemented the output can be cached. So calling it multiple times might not incur a performance impact. </p>
-<h3 id="tests"><a class="header" href="#tests">Tests</a></h3>
-<p>T.B.D.</p>
+<p>The rule has the name <code>&quot;Example rule&quot;</code> and compares the value in <code>input_field</code> with the integer <code>5</code>. It will return <code>true</code> if it is greater than or equal to 5 and <code>false</code> otherwise. This rule will return an error if <code>input_field</code> does not contain a value with an integer type.</p>
+<h3 id="values-and-data-types"><a class="header" href="#values-and-data-types">Values and data types</a></h3>
+<p>Values can either be passed in to the the rules as input data or specified in the rule itself.
+Values passed in to the rules are named and can be used in rules by specifying the name similar to <code>input_field</code> in the example rule above.
+The value <code>i5</code> in the example rule is a value that is specified in the rule itself. The prefix <code>i</code> specifies that the value has the Integer type, and <code>5</code> specifies the value.</p>
+<p>Reval supports a range of data-types. The <code>String</code> type for text, a number of numeric types, a boolean type and a </p>
+<div class="table-wrapper"><table><thead><tr><th>Type</th><th>Example</th><th>Description</th></tr></thead><tbody>
+<tr><td>String</td><td><code>&quot;this is a String&quot;i</code></td><td>Values of the string type contain text. String values are delimited with <code>&quot;</code> characters.</td></tr>
+<tr><td>Integer</td><td><code>i5</code></td><td>This is a numeric type that can contain whole values. Integers can be positive or negative. <code>Integer</code> values are prefixed with <code>i</code> in rules</td></tr>
+<tr><td>Float</td><td><code>f.14e-5</code></td><td><code>Float</code> is a numeric type that contains floating point values. Float types can contain fractional values, positive or negative. <code>Float</code> values are prefixed with <code>f</code></td></tr>
+<tr><td>Decimal</td><td><code>d14.25</code></td><td><code>Decimal</code> is a numeric type that can contain fractional values. This data-type is similar to <code>Float</code> has different trade-offs. Decimal is typically used for monetary values. <code>Decimal</code> values are prefixed with <code>d</code></td></tr>
+<tr><td>Boolean</td><td><code>false</code> or <code>true</code></td><td>The <code>Boolean</code> data type represent truth values and can be <code>true</code> or <code>false</code></td></tr>
+<tr><td>None</td><td><code>none</code></td><td><code>None</code> is used to indicate that a value does is not set or unspecified.</td></tr>
+<tr><td>Vec</td><td><code>[i4, i6, i12]</code></td><td>Vec values contain a list or vector of other values.</td></tr>
+<tr><td>Map</td><td><code>{one: i1, two: i2}</code></td><td>Map values map names to values, They are similar to a vec but every value in the list has a name that can be used to access that value</td></tr>
+</tbody></table>
+</div>
+<h3 id="operators"><a class="header" href="#operators">Operators</a></h3>
+<p>todo</p>
+<h3 id="built-in-functions"><a class="header" href="#built-in-functions">Built in Functions</a></h3>
+<p>todo</p>
+<h3 id="user-functions"><a class="header" href="#user-functions">User-Functions</a></h3>
+<p>A ruleset can have custom functions that allow rules to access functionality provided by the software that embeds the Reval rules-engine. Functions have a name, take a value as their input and return a value as output. Depending on how the function is implemented the output can be cached. So calling it multiple times might not incur a performance impact. </p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="json-rules"><a class="header" href="#json-rules">Json rules</a></h1>
+<p>Rules written in json will be deprecated in version <code>0.8.0</code> and support will be removed in version <code>0.9.0</code> in favor of rules written in the <a href="json/../reval/index.html">Reval DSL</a>.</p>
 <p>A rule is written as a json structure with a name and an associated expression. The name is what identifies the rule and should be unique in the rule-set.
 The expression is what will be evaluated.
 The expression is a nested tree-structure. At the root is the first expression that will be evaluated. Expressions can have parameters and depending on the expression these parameters can themselves be expressions.</p>
