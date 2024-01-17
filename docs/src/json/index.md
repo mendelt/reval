@@ -1,5 +1,7 @@
 # Json rules
 
+Rules written in json will be deprecated in version `0.8.0` and support will be removed in version `0.9.0` in favor of rules written in the [Reval DSL](../reval/index.html).
+
 A rule is written as a json structure with a name and an associated expression. The name is what identifies the rule and should be unique in the rule-set.
 The expression is what will be evaluated.
 The expression is a nested tree-structure. At the root is the first expression that will be evaluated. Expressions can have parameters and depending on the expression these parameters can themselves be expressions.
