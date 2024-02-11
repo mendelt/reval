@@ -28,14 +28,16 @@ mod when_parsing_string {
     fn should_parse_escaped_quotes() {
         assert_eq!(
             Expr::parse(r#""string \" value""#).unwrap(),
-            Expr::value(r#"string \" value"#.to_string())
+            Expr::value(r#"string " value"#.to_string())
         );
     }
 
     #[test]
-    #[ignore]
     fn should_unescape_escaped_characters() {
-        todo!(); // TODO implement this
+        assert_eq!(
+            Expr::parse(r#""line 1 \"\n \\ line 2""#).unwrap(),
+            Expr::value("line 1 \"\n \\ line 2".to_string())
+        );
     }
 
     #[test]

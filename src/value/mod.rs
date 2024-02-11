@@ -21,8 +21,12 @@ pub enum Value {
 
 impl Value {
     pub fn sanitize_string(value: &str) -> Value {
-        // TODO unescape value
-        Value::String(value[1..value.len() - 1].to_string())
+        let unquoted = &value[1..value.len() - 1];
+        let unescaped = unquoted
+            .replace(r#"\""#, "\"")
+            .replace(r#"\n"#, "\n")
+            .replace(r#"\\"#, "\\");
+        Value::String(unescaped)
     }
 }
 
