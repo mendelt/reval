@@ -61,9 +61,7 @@ where
             source: e,
             string: unicode_seq,
         })
-        .and_then(|u| {
-            char::from_u32(u).ok_or_else(|| ParseUnicodeError::ParseUnicodeFailed { value: u })
-        })
+        .and_then(|u| char::from_u32(u).ok_or(ParseUnicodeError::ParseUnicodeFailed { value: u }))
 }
 
 /// Error type of [unescape](unescape).
