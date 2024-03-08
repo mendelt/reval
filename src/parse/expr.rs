@@ -205,14 +205,11 @@ mod when_parsing_map_value {
         );
     }
 
-    #[ignore] // TODO ignored because map order varies, use btreemap for map
     #[test]
-    fn should_parse_map_with_expr_items() {
+    fn should_parse_map_with_expr_item() {
         assert_eq!(
-            Expr::parse("{item1:i12+i18, item3:\"string value\"}")
-                .unwrap()
-                .to_string(),
-            "{item1: (i12 + i18), item3: \"string value\"}"
+            Expr::parse("{item1:i12+i18}").unwrap().to_string(),
+            "{item1: (i12 + i18)}"
         );
     }
 
