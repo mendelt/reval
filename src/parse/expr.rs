@@ -60,7 +60,27 @@ mod when_parsing_integer {
 
     #[test]
     fn should_parse_negative_integer() {
-        assert_eq!(Expr::parse("i-6").unwrap().to_string(), "i-6")
+        assert_eq!(Expr::parse("i-6").unwrap().to_string(), "i-6");
+    }
+
+    #[test]
+    fn should_parse_hex_integer() {
+        assert_eq!(Expr::parse("0xff").unwrap().to_string(), "i255");
+    }
+
+    #[test]
+    fn should_parse_upper_case_hex_integer() {
+        assert_eq!(Expr::parse("0xFF").unwrap().to_string(), "i255");
+    }
+
+    #[test]
+    fn should_parse_oct_integer() {
+        assert_eq!(Expr::parse("0o17").unwrap().to_string(), "i15");
+    }
+
+    #[test]
+    fn should_parse_bin_integer() {
+        assert_eq!(Expr::parse("0b10101010").unwrap().to_string(), "i170");
     }
 }
 
