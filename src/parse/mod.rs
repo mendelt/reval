@@ -3,11 +3,11 @@
 mod expr;
 mod rule;
 
-#[derive(Debug, PartialEq, Eq, displaydoc::Display, thiserror::Error)]
+#[derive(Debug, PartialEq, Eq, thiserror::Error)]
 pub enum Error {
-    /// Rule has no name specified
+    #[error("Rule has no name")]
     MissingRuleName,
 
-    /// Error parsing expression
+    #[error("Error parsing expression")]
     ExprParseError(String),
 }

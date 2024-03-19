@@ -16,21 +16,19 @@ autotests = false
 anyhow = "1"
 async-recursion = "1"
 async-trait = "0.1"
-displaydoc = "0.2"
-itertools = "0.11"
+itertools = "0.12"
 lalrpop-util = { version = "0.20.0", features = ["lexer", "unicode"] }
 rust_decimal = "1"
 serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
 thiserror = "1"
-unicode-normalization = "0.1"
 unicode-xid = "0.2"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 tokio-test = "0.4"
 
-[build-dependencies] # <-- We added this and everything after!
+[build-dependencies]
 lalrpop = "0.20.0"
 
 [features]
