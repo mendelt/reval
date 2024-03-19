@@ -1,5 +1,5 @@
-use crate::{expr::{Expr, Index}, value::Value};
-use rust_decimal::Decimal; 
+use crate::{expr::{Expr, Index}, value::Value, parse::helpers::*};
+use lalrpop_util::ParseError;
 use std::str::FromStr;
 
 grammar;
@@ -41,7 +41,7 @@ match {
     "{" => LBRACE,
     "}" => RBRACE,
     r#""[^"\\]*(?:\\.[^"\\]*)*""# => STRING,
-    r"i[+-]?[0-9]+" => PREFIXED_INT,
+    r"i[+-]?[0-9]+" => INT,
     r"0x[0-9a-fA-F]+" => HEX_INT,
     r"0o[0-8]+" => OCT_INT,
     r"0b[01]+" => BIN_INT,
@@ -138,7 +138,7 @@ MapItem: (String, Expr) = <k:IDENT> COLON <e:Expr> => (k.to_string(), e);
 
 Value: Value = {
     StringValue,
-    PrefixedIntValue,
+    IntValue,
     HexIntValue,
     OctIntValue,
     BinIntValue,
@@ -148,17 +148,15 @@ Value: Value = {
     NoneValue,
 };
 
-StringValue: Value = <s:STRING> => Value::sanitize_string(s).unwrap();
-PrefixedIntValue: Value = <s:PREFIXED_INT> => Value::Int(i128::from_str(&s[1..]).unwrap());
-HexIntValue: Value = <s:HEX_INT> => Value::Int(i128::from_str_radix(&s[2..], 16).unwrap());
-OctIntValue: Value = <s:OCT_INT> => Value::Int(i128::from_str_radix(&s[2..], 8).unwrap());
-BinIntValue: Value = <s:BIN_INT> => Value::Int(i128::from_str_radix(&s[2..], 2).unwrap());
-FloatValue: Value = <s:FLOAT> => Value::Float(f64::from_str(&s[1..]).unwrap());
-DecimalValue: Value = <s:DECIMAL> => Value::Decimal(Decimal::from_str(&s[1..]).unwrap());
+StringValue: Value = <s:STRING> =>? parse_string_literal(s).map_err(|_| ParseError::User { error: "Invalid string" });
+IntValue: Value = <s:INT> =>? parse_int_value(s).map_err(|_| ParseError::User { error: "Invalid integer" });
+HexIntValue: Value = <s:HEX_INT> =>? parse_hex_int_value(s).map_err(|_| ParseError::User { error: "Invalid hexadecimal integer" });
+OctIntValue: Value = <s:OCT_INT> =>? parse_oct_int_value(s).map_err(|_| ParseError::User { error: "Invalid octal integer" });
+BinIntValue: Value = <s:BIN_INT> =>? parse_bin_int_value(s).map_err(|_| ParseError::User { error: "Invalid binary integer" });
+FloatValue: Value = <s:FLOAT> =>? parse_float_value(s).map_err(|_| ParseError::User { error: "Invalid float"});
+DecimalValue: Value = <s:DECIMAL> =>? parse_decimal_value(s).map_err(|_| ParseError::User { error: "Invalid decimal" });
 BoolValue: Value = {
     TRUE => Value::Bool(true),
     FALSE => Value::Bool(false)
 };
-
-
 NoneValue: Value = NONE => Value::None;

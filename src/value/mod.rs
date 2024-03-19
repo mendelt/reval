@@ -2,7 +2,6 @@
 pub mod convert;
 #[cfg(feature = "value_serializer")]
 pub mod ser;
-pub mod unescape;
 
 use itertools::Itertools;
 use rust_decimal::Decimal;
@@ -18,15 +17,6 @@ pub enum Value {
     Vec(Vec<Value>),
     Map(BTreeMap<String, Value>),
     None,
-}
-
-impl Value {
-    pub fn sanitize_string(value: &str) -> Result<Value, unescape::UnescapeError> {
-        let unquoted = &value[1..value.len() - 1];
-        let unescaped = unescape::unescape(unquoted)?;
-
-        Ok(Value::String(unescaped))
-    }
 }
 
 impl Display for Value {
