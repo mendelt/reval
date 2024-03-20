@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Added
+- Bitwise `&`, `|` and `^` operators
+
 ### Changed
 - Improved error handling parsing rules
 
