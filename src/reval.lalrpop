@@ -20,11 +20,14 @@ match {
     "*" => OP_MULT,
     "/" => OP_DIV,
     "!" => OP_NOT,
-    "and" => OP_AND,
-    "or" => OP_OR,
-    "if" => IF_KWD,
-    "then" => THEN_KWD,
-    "else" => ELSE_KWD,
+    "&" => OP_BIT_AND,
+    "|" => OP_BIT_OR,
+    "^" => OP_BIT_XOR,
+    "and" => KWD_AND,
+    "or" => KWD_OR,
+    "if" => KWD_IF,
+    "then" => KWD_THEN,
+    "else" => KWD_ELSE,
     "is_some" => KWD_IS_SOME,
     "is_none" => KWD_IS_NONE,
     "int" => KWD_INT,
@@ -65,13 +68,13 @@ else {
 pub Expr: Expr = IfExpr;
 
 IfExpr: Expr = {
-    IF_KWD <iif:LogExpr> THEN_KWD <thn:LogExpr> ELSE_KWD <els:LogExpr> => Expr::iif(iif, thn, els),
+    KWD_IF <iif:LogExpr> KWD_THEN <thn:LogExpr> KWD_ELSE <els:LogExpr> => Expr::iif(iif, thn, els),
     LogExpr
 }
 
 LogExpr: Expr = {
-    <l:LogExpr> OP_AND <r:EqExpr> => Expr::and(l, r),
-    <l:LogExpr> OP_OR <r:EqExpr> => Expr::or(l, r),
+    <l:LogExpr> KWD_AND <r:EqExpr> => Expr::and(l, r),
+    <l:LogExpr> KWD_OR <r:EqExpr> => Expr::or(l, r),
     EqExpr
 }
 
@@ -93,8 +96,15 @@ AddExpr: Expr = {
 }
 
 MultExpr: Expr = {
-    <l:MultExpr> OP_MULT <r:ContainsExpr> => Expr::mult(l, r),
-    <l:MultExpr> OP_DIV <r:ContainsExpr> => Expr::div(l, r),
+    <l:MultExpr> OP_MULT <r:BitExpr> => Expr::mult(l, r),
+    <l:MultExpr> OP_DIV <r:BitExpr> => Expr::div(l, r),
+    BitExpr
+}
+
+BitExpr: Expr = {
+    <l:BitExpr> OP_BIT_AND <r:ContainsExpr> => Expr::bitwise_and(l, r),
+    <l:BitExpr> OP_BIT_OR <r:ContainsExpr> => Expr::bitwise_or(l, r),
+    <l:BitExpr> OP_BIT_XOR <r:ContainsExpr> => Expr::bitwise_xor(l, r),
     ContainsExpr
 }
 

@@ -89,6 +89,15 @@ pub enum Expr {
     /// Or operation on two subexpressions
     Or(Box<Expr>, Box<Expr>),
 
+    /// Bitwise and operation
+    BitAnd(Box<Expr>, Box<Expr>),
+
+    /// Bitwise or operation
+    BitOr(Box<Expr>, Box<Expr>),
+
+    /// Bitwise xor operation
+    BitXor(Box<Expr>, Box<Expr>),
+
     /// Checks if a vec contains an item or if a map contains a key
     Contains(Box<Expr>, Box<Expr>),
 
@@ -230,6 +239,18 @@ impl Expr {
         Expr::Or(Box::new(left), Box::new(right))
     }
 
+    pub fn bitwise_and(left: Expr, right: Expr) -> Self {
+        Expr::BitAnd(Box::new(left), Box::new(right))
+    }
+
+    pub fn bitwise_or(left: Expr, right: Expr) -> Self {
+        Expr::BitOr(Box::new(left), Box::new(right))
+    }
+
+    pub fn bitwise_xor(left: Expr, right: Expr) -> Self {
+        Expr::BitXor(Box::new(left), Box::new(right))
+    }
+
     pub fn contains(list: Expr, key: Expr) -> Self {
         Expr::Contains(Box::new(list), Box::new(key))
     }
@@ -292,6 +313,9 @@ impl Display for Expr {
             Expr::LessThanEquals(left, right) => write!(formatter, "({left} <= {right})"),
             Expr::And(left, right) => write!(formatter, "({left} and {right})"),
             Expr::Or(left, right) => write!(formatter, "({left} or {right})"),
+            Expr::BitAnd(left, right) => write!(formatter, "{left} & {right}"),
+            Expr::BitOr(left, right) => write!(formatter, "{left} | {right}"),
+            Expr::BitXor(left, right) => write!(formatter, "{left} ^ {right}"),
             Expr::Contains(left, right) => write!(formatter, "({left} contains {right})"),
             Expr::ToUpper(param) => write!(formatter, "to_upper({param})"),
             Expr::ToLower(param) => write!(formatter, "to_lower({param})"),

@@ -379,6 +379,35 @@ mod when_parsing_logic_expressions {
 }
 
 #[cfg(test)]
+mod when_parsing_bitwise_expressions {
+    use super::*;
+
+    #[test]
+    fn should_parse_bitwise_and() {
+        assert_eq!(
+            Expr::parse("0b0101 & 0b0101").unwrap().to_string(),
+            "i5 & i5"
+        );
+    }
+
+    #[test]
+    fn should_parse_bitwise_or() {
+        assert_eq!(
+            Expr::parse("0b0101 | 0b0101").unwrap().to_string(),
+            "i5 | i5"
+        );
+    }
+
+    #[test]
+    fn should_parse_bitwise_xor() {
+        assert_eq!(
+            Expr::parse("0b0101 ^ 0b0101").unwrap().to_string(),
+            "i5 ^ i5"
+        );
+    }
+}
+
+#[cfg(test)]
 mod when_parsing_comparison_expressions {
     use super::*;
 

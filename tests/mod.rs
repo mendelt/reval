@@ -106,6 +106,24 @@ async fn should_eval_contains_expr_on_int() {
     );
 }
 
+#[tokio::test]
+async fn should_eval_bitwise_and() {
+    assert_eq!(eval_expr("0b010111 & 0b011101", ()).await, 0b010101.into());
+    assert_eq!(eval_expr("true & false", ()).await, false.into());
+}
+
+#[tokio::test]
+async fn should_eval_bitwise_or() {
+    assert_eq!(eval_expr("0b010111 | 0b011101", ()).await, 0b011111.into());
+    assert_eq!(eval_expr("true | false", ()).await, true.into());
+}
+
+#[tokio::test]
+async fn should_eval_bitwise_xor() {
+    assert_eq!(eval_expr("0b010111 ^ 0b011101", ()).await, 0b001010.into());
+    assert_eq!(eval_expr("true ^ false", ()).await, true.into());
+}
+
 /// Evaluate a simple expression against an event
 async fn eval_expr<E: Serialize>(expr: &str, event: E) -> Value {
     let event = event.serialize(ValueSerializer).unwrap();

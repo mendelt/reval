@@ -63,8 +63,13 @@ impl Expr {
                 left.evaluate(context, facts).await?,
                 right.evaluate(context, facts).await?,
             ),
+
             Expr::And(left, right) => and(context, facts, left, right).await,
             Expr::Or(left, right) => or(context, facts, left, right).await,
+
+            Expr::BitAnd(left, right) => bitwise_and(context, facts, left, right).await,
+            Expr::BitOr(left, right) => bitwise_or(context, facts, left, right).await,
+            Expr::BitXor(left, right) => bitwise_xor(context, facts, left, right).await,
 
             Expr::Contains(coll, item) => contains(context, facts, coll, item).await,
 
@@ -365,6 +370,54 @@ async fn eval_to_bool<'a>(
     expr: &Expr,
 ) -> Result<bool> {
     TryInto::<bool>::try_into(expr.evaluate(context, facts).await?).map_err(|_| Error::InvalidType)
+}
+
+async fn bitwise_and<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    left: &Expr,
+    right: &Expr,
+) -> Result<Value> {
+    match (
+        left.evaluate(context, facts).await?,
+        right.evaluate(context, facts).await?,
+    ) {
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left & right)),
+        (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left & right)),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+async fn bitwise_or<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    left: &Expr,
+    right: &Expr,
+) -> Result<Value> {
+    match (
+        left.evaluate(context, facts).await?,
+        right.evaluate(context, facts).await?,
+    ) {
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left | right)),
+        (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left | right)),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+async fn bitwise_xor<'a>(
+    context: &mut FunctionContext<'a>,
+    facts: &Value,
+    left: &Expr,
+    right: &Expr,
+) -> Result<Value> {
+    match (
+        left.evaluate(context, facts).await?,
+        right.evaluate(context, facts).await?,
+    ) {
+        (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left ^ right)),
+        (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left ^ right)),
+        _ => Err(Error::InvalidType),
+    }
 }
 
 async fn contains<'a>(
