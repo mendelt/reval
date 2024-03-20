@@ -43,14 +43,14 @@ pub(crate) fn parse_string_literal(value: &str) -> Result<Value, RevalParseError
 #[derive(Clone, Debug, thiserror::Error, PartialEq)]
 pub(crate) enum RevalParseError {
     #[error("Error parsing integer")]
-    IntParseError(#[from] ParseIntError),
+    ParsingInt(#[from] ParseIntError),
 
     #[error("Error parsing string")]
-    StringParseError(#[from] UnescapeError),
+    UnescapingString(#[from] UnescapeError),
 
     #[error("Error parsing float")]
-    FloatParseError(#[from] ParseFloatError),
+    ParsingFloat(#[from] ParseFloatError),
 
     #[error("Error parsing decimal")]
-    DecimalParseError(#[from] rust_decimal::Error),
+    ParsingDecimal(#[from] rust_decimal::Error),
 }
