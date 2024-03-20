@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Improved error handling parsing rules
+- Do not feature gate the serde serializer for `Value`s
+
+### Removed
+- json rules parsing, all rules now need to be written using the DSL
 
 ## [0.7.5] - 2024-03-11
 
