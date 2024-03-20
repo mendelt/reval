@@ -1,8 +1,11 @@
 use crate::{expr::{Expr, Index}, value::Value, parse::helpers::*};
-use lalrpop_util::ParseError;
 use std::str::FromStr;
 
 grammar;
+
+extern {
+    type Error = RevalParseError;
+}
 
 match {
     "=" => OP_EQ1,
@@ -148,13 +151,13 @@ Value: Value = {
     NoneValue,
 };
 
-StringValue: Value = <s:STRING> =>? parse_string_literal(s).map_err(|_| ParseError::User { error: "Invalid string" });
-IntValue: Value = <s:INT> =>? parse_int_value(s).map_err(|_| ParseError::User { error: "Invalid integer" });
-HexIntValue: Value = <s:HEX_INT> =>? parse_hex_int_value(s).map_err(|_| ParseError::User { error: "Invalid hexadecimal integer" });
-OctIntValue: Value = <s:OCT_INT> =>? parse_oct_int_value(s).map_err(|_| ParseError::User { error: "Invalid octal integer" });
-BinIntValue: Value = <s:BIN_INT> =>? parse_bin_int_value(s).map_err(|_| ParseError::User { error: "Invalid binary integer" });
-FloatValue: Value = <s:FLOAT> =>? parse_float_value(s).map_err(|_| ParseError::User { error: "Invalid float"});
-DecimalValue: Value = <s:DECIMAL> =>? parse_decimal_value(s).map_err(|_| ParseError::User { error: "Invalid decimal" });
+StringValue: Value = <s:STRING> =>? Ok(parse_string_literal(s)?);
+IntValue: Value = <s:INT> =>? Ok(parse_int_value(s)?);
+HexIntValue: Value = <s:HEX_INT> =>? Ok(parse_hex_int_value(s)?);
+OctIntValue: Value = <s:OCT_INT> =>? Ok(parse_oct_int_value(s)?);
+BinIntValue: Value = <s:BIN_INT> =>? Ok(parse_bin_int_value(s)?);
+FloatValue: Value = <s:FLOAT> =>? Ok(parse_float_value(s)?);
+DecimalValue: Value = <s:DECIMAL> =>? Ok(parse_decimal_value(s)?);
 BoolValue: Value = {
     TRUE => Value::Bool(true),
     FALSE => Value::Bool(false)
