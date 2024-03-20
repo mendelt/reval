@@ -1,6 +1,5 @@
 //! The `Value` type encodes data that can be passed in or out from expressions
 pub mod convert;
-#[cfg(feature = "value_serializer")]
 pub mod ser;
 
 use chrono::{prelude::*, TimeDelta};
