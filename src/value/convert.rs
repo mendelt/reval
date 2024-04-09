@@ -3,6 +3,7 @@
 
 use super::Value;
 use crate::Error;
+use chrono::{prelude::*, TimeDelta};
 use rust_decimal::Decimal;
 use std::collections::{BTreeMap, HashMap};
 
@@ -102,7 +103,7 @@ impl TryFrom<Value> for i128 {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Int(value) => Ok(value),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Int".to_owned())),
+            _ => Err(Error::unexpected_val_type(value, "Value::Int")),
         }
     }
 }
@@ -199,7 +200,7 @@ impl TryFrom<Value> for f64 {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Float(value) => Ok(value),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Float".to_owned())),
+            _ => Err(Error::unexpected_val_type(value, "Value::Float")),
         }
     }
 }
@@ -218,10 +219,7 @@ impl TryFrom<Value> for Decimal {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Decimal(value) => Ok(value),
-            _ => Err(Error::UnexpectedValueType(
-                value,
-                "Value::Decimal".to_owned(),
-            )),
+            _ => Err(Error::unexpected_val_type(value, "Value::Decimal")),
         }
     }
 }
@@ -240,7 +238,45 @@ impl TryFrom<Value> for bool {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Bool(value) => Ok(value),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Bool".to_owned())),
+            _ => Err(Error::unexpected_val_type(value, "Value::Bool")),
+        }
+    }
+}
+
+// Convert to and from Value::DateTime
+
+impl From<DateTime<Utc>> for Value {
+    fn from(value: DateTime<Utc>) -> Self {
+        Value::DateTime(value)
+    }
+}
+
+impl TryFrom<Value> for DateTime<Utc> {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::DateTime(value) => Ok(value),
+            _ => Err(Error::unexpected_val_type(value, "Value::DateTime")),
+        }
+    }
+}
+
+// Convert to and from Value::Duration
+
+impl From<TimeDelta> for Value {
+    fn from(value: TimeDelta) -> Self {
+        Value::Duration(value)
+    }
+}
+
+impl TryFrom<Value> for TimeDelta {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Duration(value) => Ok(value),
+            _ => Err(Error::unexpected_val_type(value, "Value::Duration")),
         }
     }
 }
@@ -284,7 +320,7 @@ impl TryFrom<Value> for HashMap<String, Value> {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Map(map) => Ok(map.into_iter().collect()),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Map".to_owned())),
+            _ => Err(Error::unexpected_val_type(value, "Value::Map")),
         }
     }
 }
@@ -295,7 +331,7 @@ impl TryFrom<Value> for BTreeMap<String, Value> {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Map(map) => Ok(map),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Map".to_owned())),
+            _ => Err(Error::unexpected_val_type(value, "Value::Map")),
         }
     }
 }
@@ -309,7 +345,7 @@ impl<V: TryFrom<Value, Error = Error>> TryFrom<Value> for HashMap<String, V> {
                 .into_iter()
                 .map(|(key, val)| val.try_into().map(|val| (key, val)))
                 .collect(),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Map".to_owned())),
+            _ => Err(Error::unexpected_val_type(value, "Value::Map")),
         }
     }
 }
@@ -323,7 +359,7 @@ impl<V: TryFrom<Value, Error = Error>> TryFrom<Value> for BTreeMap<String, V> {
                 .into_iter()
                 .map(|(key, val)| val.try_into().map(|val| (key, val)))
                 .collect(),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Map".to_owned())),
+            _ => Err(Error::unexpected_val_type(value, "Value::Map")),
         }
     }
 }
@@ -342,7 +378,7 @@ impl<V: TryFrom<Value, Error = Error>> TryFrom<Value> for Vec<V> {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Vec(vec) => vec.into_iter().map(|val| val.try_into()).collect(),
-            _ => Err(Error::UnexpectedValueType(value, "Value::Vec".to_owned())),
+            _ => Err(Error::unexpected_val_type(value, "Value::Vec")),
         }
     }
 }

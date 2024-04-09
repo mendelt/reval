@@ -3,6 +3,7 @@ pub mod convert;
 #[cfg(feature = "value_serializer")]
 pub mod ser;
 
+use chrono::{prelude::*, TimeDelta};
 use itertools::Itertools;
 use rust_decimal::Decimal;
 use std::{collections::BTreeMap, fmt::Display};
@@ -14,6 +15,8 @@ pub enum Value {
     Float(f64),
     Decimal(Decimal),
     Bool(bool),
+    DateTime(DateTime<Utc>),
+    Duration(TimeDelta),
     Vec(Vec<Value>),
     Map(BTreeMap<String, Value>),
     None,
@@ -27,6 +30,8 @@ impl Display for Value {
             Value::Float(value) => write!(formatter, "f{value}"),
             Value::Decimal(value) => write!(formatter, "d{value}"),
             Value::Bool(value) => write!(formatter, "{value}"),
+            Value::DateTime(value) => write!(formatter, "{value}"),
+            Value::Duration(value) => write!(formatter, "{value}"),
             Value::Vec(values) => {
                 write!(
                     formatter,
@@ -87,5 +92,18 @@ mod when_displaying_value {
     #[test]
     fn should_display_none() {
         assert_eq!(Value::None.to_string(), "none");
+    }
+
+    #[test]
+    fn should_display_datetime() {
+        assert_eq!(
+            Value::DateTime(Utc.with_ymd_and_hms(2015, 7, 30, 3, 26, 13).unwrap()).to_string(),
+            "2015-07-30 03:26:13 UTC"
+        );
+    }
+
+    #[test]
+    fn should_display_duration() {
+        assert_eq!(Value::Duration(TimeDelta::days(4)).to_string(), "PT345600S");
     }
 }

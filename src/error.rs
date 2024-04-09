@@ -56,4 +56,9 @@ impl Error {
     pub fn ser(error_msg: impl Into<String>) -> Self {
         Error::ValueSerializationError(error_msg.into())
     }
+
+    /// Construct UnexpectedValueType Error
+    pub fn unexpected_val_type(value: Value, expect: &str) -> Self {
+        Error::UnexpectedValueType(value, expect.to_string())
+    }
 }
