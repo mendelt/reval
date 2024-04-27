@@ -87,7 +87,7 @@ fn reference(facts: &Value, name: &str) -> Result<Value> {
             .ok_or_else(|| Error::UnknownRef(name.to_owned())),
         _ => Err(Error::InvalidType),
     }
-    .map(Clone::clone)
+    .cloned()
 }
 
 fn index(value: Value, index: &Index) -> Result<Value> {
