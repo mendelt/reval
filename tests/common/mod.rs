@@ -1,8 +1,12 @@
 //! Shared functionality, types and data for testing
 
-use std::collections::HashMap;
-
+use reval::{
+    function::{FunctionContext, UserFunctions},
+    prelude::*,
+    value::ser::ValueSerializer,
+};
 use serde::Serialize;
+use std::collections::HashMap;
 
 pub fn simple_event() -> Event {
     Event::Simple(SimpleEvent {
@@ -27,4 +31,16 @@ pub enum Event {
 pub struct SimpleEvent {
     pub name: String,
     pub id: u32,
+}
+
+/// Evaluate a simple expression against an event
+pub async fn eval_expr<E: Serialize>(expr: &str, event: E) -> Value {
+    let event = event.serialize(ValueSerializer).unwrap();
+
+    let expr = Expr::parse(expr).unwrap();
+
+    let functions = UserFunctions::default();
+    let mut context: FunctionContext = (&functions).into();
+
+    expr.evaluate(&mut context, &event).await.unwrap()
 }

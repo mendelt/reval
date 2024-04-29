@@ -68,7 +68,7 @@ else {
 pub Expr: Expr = IfExpr;
 
 IfExpr: Expr = {
-    KWD_IF <iif:LogExpr> KWD_THEN <thn:LogExpr> KWD_ELSE <els:LogExpr> => Expr::iif(iif, thn, els),
+    KWD_IF <iif:IfExpr> KWD_THEN <thn:IfExpr> KWD_ELSE <els:IfExpr> => Expr::iif(iif, thn, els),
     LogExpr
 }
 

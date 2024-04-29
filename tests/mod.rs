@@ -1,12 +1,8 @@
 pub mod common;
+pub mod iif;
 
+use crate::common::eval_expr;
 use common::{simple_event, Event};
-use reval::{
-    function::{FunctionContext, UserFunctions},
-    prelude::*,
-    value::ser::ValueSerializer,
-};
-use serde::Serialize;
 
 #[tokio::test]
 async fn should_ref_input() {
@@ -122,16 +118,4 @@ async fn should_eval_bitwise_or() {
 async fn should_eval_bitwise_xor() {
     assert_eq!(eval_expr("0b010111 ^ 0b011101", ()).await, 0b001010.into());
     assert_eq!(eval_expr("true ^ false", ()).await, true.into());
-}
-
-/// Evaluate a simple expression against an event
-async fn eval_expr<E: Serialize>(expr: &str, event: E) -> Value {
-    let event = event.serialize(ValueSerializer).unwrap();
-
-    let expr = Expr::parse(expr).unwrap();
-
-    let functions = UserFunctions::default();
-    let mut context: FunctionContext = (&functions).into();
-
-    expr.evaluate(&mut context, &event).await.unwrap()
 }
