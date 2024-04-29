@@ -16,7 +16,7 @@ autotests = false
 anyhow = "1"
 async-recursion = "1"
 async-trait = "0.1"
-chrono = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
 itertools = "0.12"
 lalrpop-util = { version = "0.20.0", features = ["lexer", "unicode"] }
 rust_decimal = "1"

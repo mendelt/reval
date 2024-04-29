@@ -53,6 +53,12 @@ pub enum Expr {
     /// Cast numerical values to decimal
     Dec(Box<Expr>),
 
+    /// Cast string or timestamp to datetime
+    DateTime(Box<Expr>),
+
+    /// Cast string or seconds to duration
+    Duration(Box<Expr>),
+
     /// Multiply two subexpressions
     Mult(Box<Expr>, Box<Expr>),
 
@@ -186,6 +192,14 @@ impl Expr {
     /// Decimal-cast expression constructor
     pub fn dec(expr: Expr) -> Self {
         Expr::Dec(Box::new(expr))
+    }
+
+    pub fn date_time(expr: Expr) -> Self {
+        Expr::DateTime(Box::new(expr))
+    }
+
+    pub fn duration(expr: Expr) -> Self {
+        Expr::Duration(Box::new(expr))
     }
 
     /// Multiply-expression constructor
@@ -329,6 +343,8 @@ impl Display for Expr {
             Expr::Int(inner) => write!(formatter, "int({inner})"),
             Expr::Float(inner) => write!(formatter, "float({inner})"),
             Expr::Dec(inner) => write!(formatter, "dec({inner})"),
+            Expr::DateTime(inner) => write!(formatter, "date_time({inner})"),
+            Expr::Duration(inner) => write!(formatter, "duration({inner})"),
             Expr::Mult(left, right) => write!(formatter, "({left} * {right})"),
             Expr::Div(left, right) => write!(formatter, "({left} / {right})"),
             Expr::Add(left, right) => write!(formatter, "({left} + {right})"),

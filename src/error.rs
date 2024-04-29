@@ -57,6 +57,11 @@ impl Error {
         Error::ValueSerializationError(error_msg.into())
     }
 
+    /// Construct InvalidCast Error
+    pub fn invalid_cast(value: Value, to: &str) -> Self {
+        Error::InvalidCast(value, to.to_string())
+    }
+
     /// Construct UnexpectedValueType Error
     pub fn unexpected_val_type(value: Value, expect: &str) -> Self {
         Error::UnexpectedValueType(value, expect.to_string())

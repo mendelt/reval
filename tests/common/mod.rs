@@ -1,5 +1,6 @@
 //! Shared functionality, types and data for testing
 
+use chrono::prelude::*;
 use reval::{
     function::{FunctionContext, UserFunctions},
     prelude::*,
@@ -22,6 +23,16 @@ pub enum Event {
     Simple(SimpleEvent),
     List { list: Vec<String> },
     Flags { flags: u8, flag: u8 },
+    ChronoTypes { date: DateTime<Utc>, dur: i64 },
+}
+
+impl Event {
+    pub(crate) fn chrono_types() -> Self {
+        Event::ChronoTypes {
+            date: Utc.with_ymd_and_hms(2015, 7, 30, 3, 26, 13).unwrap(),
+            dur: 3600,
+        }
+    }
 }
 
 /// A simple event with a name and id

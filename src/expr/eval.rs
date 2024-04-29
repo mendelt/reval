@@ -3,6 +3,7 @@
 use super::{Expr, Index};
 use crate::{error::Result, function::FunctionContext, value::Value, Error};
 use async_recursion::async_recursion;
+use chrono::{prelude::*, TimeDelta};
 use rust_decimal::prelude::*;
 use std::collections::HashMap;
 
@@ -22,6 +23,8 @@ impl Expr {
             Expr::Neg(value) => neg(value.evaluate(context, facts).await?),
             Expr::IsSome(value) => is_some(value.evaluate(context, facts).await?),
             Expr::IsNone(value) => is_none(value.evaluate(context, facts).await?),
+            Expr::DateTime(value) => date_time(value.evaluate(context, facts).await?),
+            Expr::Duration(value) => duration(value.evaluate(context, facts).await?),
             Expr::Map(map) => eval_map(map, context, facts).await,
             Expr::Vec(vec) => eval_vec(vec, context, facts).await,
             Expr::Int(value) => int(value.evaluate(context, facts).await?),
@@ -183,11 +186,11 @@ fn int(value: Value) -> Result<Value> {
         Value::Float(val) => Ok((val as i128).into()),
         Value::Decimal(val) => val
             .to_i128()
-            .ok_or_else(|| Error::InvalidCast(value, "Value::Int".to_owned()))
+            .ok_or_else(|| Error::invalid_cast(value, "Value::Int"))
             .map(Value::Int),
         Value::String(val) => i128::from_str(&val)
             .map(Value::Int)
-            .map_err(|_| Error::InvalidCast(value, "Value::Int".to_owned())),
+            .map_err(|_| Error::invalid_cast(value, "Value::Int")),
 
         Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
@@ -200,11 +203,11 @@ fn float(value: Value) -> Result<Value> {
         Value::Float(_) => Ok(value),
         Value::Decimal(val) => val
             .to_f64()
-            .ok_or_else(|| Error::InvalidCast(value, "Value::Float".to_owned()))
+            .ok_or_else(|| Error::invalid_cast(value, "Value::Float"))
             .map(Value::Float),
         Value::String(val) => f64::from_str(&val)
             .map(Value::Float)
-            .map_err(|_| Error::InvalidCast(value, "Value::Float".to_owned())),
+            .map_err(|_| Error::invalid_cast(value, "Value::Float")),
 
         Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
@@ -216,13 +219,35 @@ fn dec(value: Value) -> Result<Value> {
         Value::Int(val) => Ok(Value::Decimal(val.into())),
         Value::Float(val) => Decimal::try_from(val)
             .map(Value::Decimal)
-            .map_err(|_| Error::InvalidCast(value, "Value::Float".to_owned())),
+            .map_err(|_| Error::invalid_cast(value, "Value::Float")),
         Value::Decimal(_) => Ok(value),
         Value::String(val) => Decimal::from_str(&val)
             .map(Value::Decimal)
-            .map_err(|_| Error::InvalidCast(value, "Value::Decimal".to_owned())),
+            .map_err(|_| Error::invalid_cast(value, "Value::Decimal")),
 
         Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn date_time(value: Value) -> Result<Value> {
+    match value.clone() {
+        Value::String(val) => val
+            .parse::<DateTime<Utc>>()
+            .map(Value::DateTime)
+            .map_err(|_| Error::invalid_cast(value, "Value::DateTime")),
+        Value::Int(val) => DateTime::from_timestamp(val as i64, 0)
+            .map(Value::DateTime)
+            .ok_or(Error::invalid_cast(value, "Value::DateTime")),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn duration(value: Value) -> Result<Value> {
+    match value.clone() {
+        Value::Int(val) => TimeDelta::try_seconds(val as i64)
+            .map(Value::Duration)
+            .ok_or(Error::invalid_cast(value, "Value::Duration")),
         _ => Err(Error::InvalidType),
     }
 }
@@ -254,6 +279,7 @@ fn add(left: Value, right: Value) -> Result<Value> {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left + right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left + right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left + right)),
+        (Value::DateTime(left), Value::Duration(right)) => Ok(Value::DateTime(left + right)),
 
         (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),
@@ -265,6 +291,9 @@ fn sub(left: Value, right: Value) -> Result<Value> {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left - right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left - right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Decimal(left - right)),
+        (Value::DateTime(left), Value::DateTime(right)) => Ok(Value::Duration(left - right)),
+        (Value::DateTime(left), Value::Duration(right)) => Ok(Value::DateTime(left - right)),
+        (Value::Duration(left), Value::Duration(right)) => Ok(Value::Duration(left - right)),
 
         (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),

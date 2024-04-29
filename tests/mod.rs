@@ -3,6 +3,7 @@ mod common;
 mod iif;
 
 use crate::common::eval_expr;
+use chrono::{prelude::*, TimeDelta};
 use common::{simple_event, Event};
 
 #[tokio::test]
@@ -119,4 +120,20 @@ async fn should_eval_bitwise_or() {
 async fn should_eval_bitwise_xor() {
     assert_eq!(eval_expr("0b010111 ^ 0b011101", ()).await, 0b001010.into());
     assert_eq!(eval_expr("true ^ false", ()).await, true.into());
+}
+
+#[tokio::test]
+async fn should_pass_in_chrono_datetime() {
+    assert_eq!(
+        eval_expr("date_time(date)", Event::chrono_types()).await,
+        Utc.with_ymd_and_hms(2015, 7, 30, 3, 26, 13).unwrap().into()
+    )
+}
+
+#[tokio::test]
+async fn should_pass_in_chrono_timedelta() {
+    assert_eq!(
+        eval_expr("duration(dur)", Event::chrono_types()).await,
+        TimeDelta::seconds(3600).into()
+    )
 }
