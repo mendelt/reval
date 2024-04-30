@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bitwise `&`, `|` and `^` operators
 
 ### Changed
+- Allow nesting if statements inside if, then or else clauses without ()
+- Bump msrv to 1.74.1 to resolve pub/non-pub type issues
 - Improved error handling parsing rules
 
 ## [0.7.5] - 2024-03-11
