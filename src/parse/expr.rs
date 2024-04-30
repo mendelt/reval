@@ -322,6 +322,38 @@ mod when_parsing_func {
             Expr::to_lower(Expr::value("String"))
         );
     }
+
+    #[test]
+    fn should_parse_trim_expr() {
+        assert_eq!(
+            Expr::parse(r#"trim("String ")"#).unwrap(),
+            Expr::trim(Expr::value("String "))
+        )
+    }
+
+    #[test]
+    fn should_parse_round_expr() {
+        assert_eq!(
+            Expr::parse(r#"round(f0.2)"#).unwrap(),
+            Expr::round(Expr::value(0.2))
+        )
+    }
+
+    #[test]
+    fn should_parse_fkiir_expr() {
+        assert_eq!(
+            Expr::parse(r#"floor(f4.6)"#).unwrap(),
+            Expr::floor(Expr::value(4.6))
+        )
+    }
+
+    #[test]
+    fn should_parse_fract_expr() {
+        assert_eq!(
+            Expr::parse(r#"fract(f2.23)"#).unwrap(),
+            Expr::fract(Expr::value(2.23))
+        )
+    }
 }
 
 #[cfg(test)]

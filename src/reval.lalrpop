@@ -36,6 +36,10 @@ match {
     "contains" => KWD_CONTAINS,
     "to_upper" => KWD_TO_UPPER,
     "to_lower" => KWD_TO_LOWER,
+    "trim" => KWD_TRIM,
+    "round" => KWD_ROUND,
+    "floor" => KWD_FLOOR,
+    "fract" => KWD_FRACT,
     "in" => KWD_IN,
     "," => COMMA,
     ":" => COLON,
@@ -139,6 +143,10 @@ Func: Expr = {
     OP_NOT LPAREN <e:Expr> RPAREN => Expr::not(e),
     KWD_TO_UPPER LPAREN <e:Expr> RPAREN => Expr::to_upper(e),
     KWD_TO_LOWER LPAREN <e:Expr> RPAREN => Expr::to_lower(e),
+    KWD_TRIM LPAREN <e:Expr> RPAREN => Expr::trim(e),
+    KWD_ROUND LPAREN <e:Expr> RPAREN => Expr::round(e),
+    KWD_FLOOR LPAREN <e:Expr> RPAREN => Expr::floor(e),
+    KWD_FRACT LPAREN <e:Expr> RPAREN => Expr::fract(e),
     <f:IDENT> LPAREN <e:Expr> RPAREN => Expr::func(f, e),
 }
 

@@ -75,6 +75,10 @@ impl Expr {
 
             Expr::ToUpper(value) => to_upper(context, facts, value).await,
             Expr::ToLower(value) => to_lower(context, facts, value).await,
+            Expr::Trim(value) => trim(value.evaluate(context, facts).await?),
+            Expr::Round(value) => round(value.evaluate(context, facts).await?),
+            Expr::Floor(value) => floor(value.evaluate(context, facts).await?),
+            Expr::Fract(value) => fract(value.evaluate(context, facts).await?),
         }
     }
 }
@@ -462,6 +466,44 @@ async fn to_lower<'a>(
     let value = value.evaluate(context, facts).await?;
     match value {
         Value::String(value) => Ok(Value::String(value.to_lowercase())),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn trim(value: Value) -> Result<Value> {
+    match value {
+        Value::String(inner) => Ok(Value::String(inner.trim().to_string())),
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn floor(value: Value) -> Result<Value> {
+    match value {
+        Value::Float(inner) => Ok(Value::Float(inner.floor())),
+        Value::Decimal(inner) => Ok(Value::Decimal(inner.floor())),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn round(value: Value) -> Result<Value> {
+    match value {
+        Value::Float(inner) => Ok(Value::Float(inner.round())),
+        Value::Decimal(inner) => Ok(Value::Decimal(inner.round())),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn fract(value: Value) -> Result<Value> {
+    match value {
+        Value::Float(inner) => Ok(Value::Float(inner.fract())),
+        Value::Decimal(inner) => Ok(Value::Decimal(inner.fract())),
 
         Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),

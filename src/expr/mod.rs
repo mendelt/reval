@@ -106,6 +106,18 @@ pub enum Expr {
 
     // Convert a string to lower case
     ToLower(Box<Expr>),
+
+    /// Trim whitespace from start and end of string
+    Trim(Box<Expr>),
+
+    /// Round a float or decimal value down by removing the fractional part
+    Floor(Box<Expr>),
+
+    /// Round a float or decimal value up or down
+    Round(Box<Expr>),
+
+    /// Remove the non-fractional part of a float or decimal value
+    Fract(Box<Expr>),
 }
 
 impl Expr {
@@ -262,6 +274,22 @@ impl Expr {
     pub fn to_lower(param: Expr) -> Self {
         Expr::ToLower(Box::new(param))
     }
+
+    pub fn trim(param: Expr) -> Self {
+        Expr::Trim(Box::new(param))
+    }
+
+    pub fn round(param: Expr) -> Self {
+        Expr::Round(Box::new(param))
+    }
+
+    pub fn floor(param: Expr) -> Self {
+        Expr::Floor(Box::new(param))
+    }
+
+    pub fn fract(param: Expr) -> Self {
+        Expr::Fract(Box::new(param))
+    }
 }
 
 impl From<Value> for Expr {
@@ -319,6 +347,10 @@ impl Display for Expr {
             Expr::Contains(left, right) => write!(formatter, "({left} contains {right})"),
             Expr::ToUpper(param) => write!(formatter, "to_upper({param})"),
             Expr::ToLower(param) => write!(formatter, "to_lower({param})"),
+            Expr::Trim(param) => write!(formatter, "trim({param})"),
+            Expr::Floor(param) => write!(formatter, "floor({param})"),
+            Expr::Round(param) => write!(formatter, "round({param})"),
+            Expr::Fract(param) => write!(formatter, "fract({param})"),
         }
     }
 }

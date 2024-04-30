@@ -6,7 +6,6 @@ use reval::{
     value::ser::ValueSerializer,
 };
 use serde::Serialize;
-use std::collections::HashMap;
 
 pub fn simple_event() -> Event {
     Event::Simple(SimpleEvent {
@@ -22,7 +21,6 @@ pub fn simple_event() -> Event {
 pub enum Event {
     Simple(SimpleEvent),
     List { list: Vec<String> },
-    Map { map: HashMap<String, String> },
     Flags { flags: u8, flag: u8 },
 }
 
@@ -43,4 +41,11 @@ pub async fn eval_expr<E: Serialize>(expr: &str, event: E) -> Value {
     let mut context: FunctionContext = (&functions).into();
 
     expr.evaluate(&mut context, &event).await.unwrap()
+}
+
+pub fn check_float(value: Value, expected: f64) {
+    assert!(matches!(value, Value::Float(_)));
+    if let Value::Float(value) = value {
+        assert!(value - expected < 0.0000001);
+    }
 }

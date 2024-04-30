@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Support for binary, octal and hexadecimal integers
+- trim operation for strings
+- round, floor and fract operation for floats and decimals
 
 ### Changed
 - Better documentation for new DSL
