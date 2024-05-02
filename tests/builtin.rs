@@ -1,8 +1,7 @@
 //! Test reval builtin functions
 
-use rust_decimal::Decimal;
-
 use crate::common::{check_float, eval_expr};
+use rust_decimal::Decimal;
 
 #[tokio::test]
 async fn should_to_lower() {

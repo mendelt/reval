@@ -300,6 +300,22 @@ mod when_parsing_func {
     }
 
     #[test]
+    fn should_parse_datetime_conversion() {
+        assert_eq!(
+            Expr::parse(r#"date_time("2015-07-30T03:26:13Z")"#).unwrap(),
+            Expr::date_time(Expr::value("2015-07-30T03:26:13Z"))
+        );
+    }
+
+    #[test]
+    fn should_parse_duration_conversion() {
+        assert_eq!(
+            Expr::parse(r#"duration(i1234567)"#).unwrap(),
+            Expr::duration(Expr::value(1234567))
+        );
+    }
+
+    #[test]
     fn should_parse_sub_expr() {
         assert_eq!(
             Expr::parse("!(i2==i3)").unwrap().to_string(),
@@ -353,6 +369,62 @@ mod when_parsing_func {
             Expr::parse(r#"fract(f2.23)"#).unwrap(),
             Expr::fract(Expr::value(2.23))
         )
+    }
+
+    #[test]
+    fn should_parse_year_expr() {
+        assert_eq!(
+            Expr::parse(r#"year(date_time(i1438226773))"#).unwrap(),
+            Expr::year(Expr::date_time(Expr::value(1438226773)))
+        );
+    }
+
+    #[test]
+    fn should_parse_month_expr() {
+        assert_eq!(
+            Expr::parse(r#"month(date_time(i1438226773))"#).unwrap(),
+            Expr::month(Expr::date_time(Expr::value(1438226773)))
+        );
+    }
+
+    #[test]
+    fn should_parse_week_expr() {
+        assert_eq!(
+            Expr::parse(r#"week(i123)"#).unwrap(),
+            Expr::week(Expr::value(123))
+        );
+    }
+
+    #[test]
+    fn should_parse_day_expr() {
+        assert_eq!(
+            Expr::parse(r#"day(date_time(i1438226773))"#).unwrap(),
+            Expr::day(Expr::date_time(Expr::value(1438226773)))
+        );
+    }
+
+    #[test]
+    fn should_parse_hour_expr() {
+        assert_eq!(
+            Expr::parse(r#"hour(date_time(i1438226773))"#).unwrap(),
+            Expr::hour(Expr::date_time(Expr::value(1438226773)))
+        );
+    }
+
+    #[test]
+    fn should_parse_minute_expr() {
+        assert_eq!(
+            Expr::parse(r#"minute(date_time(i1438226773))"#).unwrap(),
+            Expr::minute(Expr::date_time(Expr::value(1438226773)))
+        );
+    }
+
+    #[test]
+    fn should_parse_second_expr() {
+        assert_eq!(
+            Expr::parse(r#"second(date_time(i1438226773))"#).unwrap(),
+            Expr::second(Expr::date_time(Expr::value(1438226773)))
+        );
     }
 }
 

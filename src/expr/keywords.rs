@@ -1,7 +1,7 @@
 use unicode_xid::UnicodeXID;
 
 /// Reserved keywords
-const KEYWORDS: [&str; 29] = [
+const KEYWORDS: [&str; 30] = [
     "and",
     "or",
     "if",
@@ -25,12 +25,13 @@ const KEYWORDS: [&str; 29] = [
     "fract",
     "date_time",
     "duration",
-    "years",
-    "months",
-    "days",
-    "hours",
-    "minutes",
-    "seconds",
+    "year",
+    "month",
+    "week",
+    "day",
+    "hour",
+    "minute",
+    "second",
 ];
 
 pub(crate) fn is_reserved_keyword(name: &str) -> bool {

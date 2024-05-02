@@ -124,6 +124,27 @@ pub enum Expr {
 
     /// Remove the non-fractional part of a float or decimal value
     Fract(Box<Expr>),
+
+    /// Extract year from a datetime or duration, or construct a duration in years
+    Year(Box<Expr>),
+
+    /// Extract month from a datetime
+    Month(Box<Expr>),
+
+    /// Extract week from a datetime or duration, or construct a duration in weeks
+    Week(Box<Expr>),
+
+    /// Extract years from a datetime or duration, or construct a duration in hours
+    Day(Box<Expr>),
+
+    /// Extract years from a datetime or duration, or construct a duration in hours
+    Hour(Box<Expr>),
+
+    /// Extract years from a datetime or duration, or construct a duration in hours
+    Minute(Box<Expr>),
+
+    /// Extract years from a datetime or duration, or construct a duration in hours
+    Second(Box<Expr>),
 }
 
 impl Expr {
@@ -304,6 +325,34 @@ impl Expr {
     pub fn fract(param: Expr) -> Self {
         Expr::Fract(Box::new(param))
     }
+
+    pub fn year(param: Expr) -> Self {
+        Expr::Year(Box::new(param))
+    }
+
+    pub fn month(param: Expr) -> Self {
+        Expr::Month(Box::new(param))
+    }
+
+    pub fn week(param: Expr) -> Self {
+        Expr::Week(Box::new(param))
+    }
+
+    pub fn day(param: Expr) -> Self {
+        Expr::Day(Box::new(param))
+    }
+
+    pub fn hour(param: Expr) -> Self {
+        Expr::Hour(Box::new(param))
+    }
+
+    pub fn minute(param: Expr) -> Self {
+        Expr::Minute(Box::new(param))
+    }
+
+    pub fn second(param: Expr) -> Self {
+        Expr::Second(Box::new(param))
+    }
 }
 
 impl From<Value> for Expr {
@@ -367,6 +416,14 @@ impl Display for Expr {
             Expr::Floor(param) => write!(formatter, "floor({param})"),
             Expr::Round(param) => write!(formatter, "round({param})"),
             Expr::Fract(param) => write!(formatter, "fract({param})"),
+
+            Expr::Year(param) => write!(formatter, "year({param})"),
+            Expr::Month(param) => write!(formatter, "month({param})"),
+            Expr::Week(param) => write!(formatter, "week({param})"),
+            Expr::Day(param) => write!(formatter, "day({param})"),
+            Expr::Hour(param) => write!(formatter, "hour({param})"),
+            Expr::Minute(param) => write!(formatter, "minute({param})"),
+            Expr::Second(param) => write!(formatter, "second({param})"),
         }
     }
 }

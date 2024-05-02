@@ -70,18 +70,38 @@ impl Expr {
             Expr::And(left, right) => and(context, facts, left, right).await,
             Expr::Or(left, right) => or(context, facts, left, right).await,
 
-            Expr::BitAnd(left, right) => bitwise_and(context, facts, left, right).await,
-            Expr::BitOr(left, right) => bitwise_or(context, facts, left, right).await,
-            Expr::BitXor(left, right) => bitwise_xor(context, facts, left, right).await,
+            Expr::BitAnd(left, right) => bitwise_and(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::BitOr(left, right) => bitwise_or(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
+            Expr::BitXor(left, right) => bitwise_xor(
+                left.evaluate(context, facts).await?,
+                right.evaluate(context, facts).await?,
+            ),
 
-            Expr::Contains(coll, item) => contains(context, facts, coll, item).await,
+            Expr::Contains(coll, item) => contains(
+                coll.evaluate(context, facts).await?,
+                item.evaluate(context, facts).await?,
+            ),
 
-            Expr::ToUpper(value) => to_upper(context, facts, value).await,
-            Expr::ToLower(value) => to_lower(context, facts, value).await,
+            Expr::ToUpper(value) => to_upper(value.evaluate(context, facts).await?),
+            Expr::ToLower(value) => to_lower(value.evaluate(context, facts).await?),
             Expr::Trim(value) => trim(value.evaluate(context, facts).await?),
             Expr::Round(value) => round(value.evaluate(context, facts).await?),
             Expr::Floor(value) => floor(value.evaluate(context, facts).await?),
             Expr::Fract(value) => fract(value.evaluate(context, facts).await?),
+
+            Expr::Year(value) => year(value.evaluate(context, facts).await?),
+            Expr::Month(value) => month(value.evaluate(context, facts).await?),
+            Expr::Week(value) => week(value.evaluate(context, facts).await?),
+            Expr::Day(value) => day(value.evaluate(context, facts).await?),
+            Expr::Hour(value) => hour(value.evaluate(context, facts).await?),
+            Expr::Minute(value) => minute(value.evaluate(context, facts).await?),
+            Expr::Second(value) => second(value.evaluate(context, facts).await?),
         }
     }
 }
@@ -405,63 +425,31 @@ async fn eval_to_bool<'a>(
     TryInto::<bool>::try_into(expr.evaluate(context, facts).await?).map_err(|_| Error::InvalidType)
 }
 
-async fn bitwise_and<'a>(
-    context: &mut FunctionContext<'a>,
-    facts: &Value,
-    left: &Expr,
-    right: &Expr,
-) -> Result<Value> {
-    match (
-        left.evaluate(context, facts).await?,
-        right.evaluate(context, facts).await?,
-    ) {
+fn bitwise_and(left: Value, right: Value) -> Result<Value> {
+    match (left, right) {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left & right)),
         (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left & right)),
         _ => Err(Error::InvalidType),
     }
 }
 
-async fn bitwise_or<'a>(
-    context: &mut FunctionContext<'a>,
-    facts: &Value,
-    left: &Expr,
-    right: &Expr,
-) -> Result<Value> {
-    match (
-        left.evaluate(context, facts).await?,
-        right.evaluate(context, facts).await?,
-    ) {
+fn bitwise_or(left: Value, right: Value) -> Result<Value> {
+    match (left, right) {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left | right)),
         (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left | right)),
         _ => Err(Error::InvalidType),
     }
 }
 
-async fn bitwise_xor<'a>(
-    context: &mut FunctionContext<'a>,
-    facts: &Value,
-    left: &Expr,
-    right: &Expr,
-) -> Result<Value> {
-    match (
-        left.evaluate(context, facts).await?,
-        right.evaluate(context, facts).await?,
-    ) {
+fn bitwise_xor(left: Value, right: Value) -> Result<Value> {
+    match (left, right) {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left ^ right)),
         (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left ^ right)),
         _ => Err(Error::InvalidType),
     }
 }
 
-async fn contains<'a>(
-    context: &mut FunctionContext<'a>,
-    facts: &Value,
-    coll: &Expr,
-    item: &Expr,
-) -> Result<Value> {
-    let coll = coll.evaluate(context, facts).await?;
-    let item = item.evaluate(context, facts).await?;
-
+fn contains(coll: Value, item: Value) -> Result<Value> {
     match (coll, item) {
         (Value::Map(map), Value::String(key)) => Ok(Value::Bool(map.contains_key(&key))),
         (Value::Vec(vec), item) => Ok(Value::Bool(vec.contains(&item))),
@@ -473,12 +461,7 @@ async fn contains<'a>(
     }
 }
 
-async fn to_upper<'a>(
-    context: &mut FunctionContext<'a>,
-    facts: &Value,
-    value: &Expr,
-) -> Result<Value> {
-    let value = value.evaluate(context, facts).await?;
+fn to_upper(value: Value) -> Result<Value> {
     match value {
         Value::String(value) => Ok(Value::String(value.to_uppercase())),
 
@@ -487,12 +470,7 @@ async fn to_upper<'a>(
     }
 }
 
-async fn to_lower<'a>(
-    context: &mut FunctionContext<'a>,
-    facts: &Value,
-    value: &Expr,
-) -> Result<Value> {
-    let value = value.evaluate(context, facts).await?;
+fn to_lower(value: Value) -> Result<Value> {
     match value {
         Value::String(value) => Ok(Value::String(value.to_lowercase())),
 
@@ -533,6 +511,88 @@ fn fract(value: Value) -> Result<Value> {
     match value {
         Value::Float(inner) => Ok(Value::Float(inner.fract())),
         Value::Decimal(inner) => Ok(Value::Decimal(inner.fract())),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn year(value: Value) -> Result<Value> {
+    match value {
+        Value::DateTime(value) => Ok(Value::Int(value.year() as i128)),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn month(value: Value) -> Result<Value> {
+    match value {
+        Value::DateTime(inner) => Ok(Value::Int(inner.month() as i128)),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn week(value: Value) -> Result<Value> {
+    match &value {
+        Value::Int(inner) => TimeDelta::try_weeks(*inner as i64)
+            .map(Value::Duration)
+            .ok_or(Error::value_out_of_bounds(value, "week")),
+        Value::Duration(value) => Ok(Value::Int(value.num_weeks() as i128)),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn day(value: Value) -> Result<Value> {
+    match &value {
+        Value::Int(inner) => TimeDelta::try_days(*inner as i64)
+            .map(Value::Duration)
+            .ok_or(Error::value_out_of_bounds(value, "day")),
+        Value::DateTime(inner) => Ok(Value::Int(inner.day() as i128)),
+        Value::Duration(inner) => Ok(Value::Int(inner.num_days() as i128)),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn hour(value: Value) -> Result<Value> {
+    match &value {
+        Value::Int(inner) => TimeDelta::try_hours(*inner as i64)
+            .map(Value::Duration)
+            .ok_or(Error::value_out_of_bounds(value, "hour")),
+        Value::DateTime(inner) => Ok(Value::Int(inner.hour() as i128)),
+        Value::Duration(inner) => Ok(Value::Int(inner.num_hours() as i128)),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn minute(value: Value) -> Result<Value> {
+    match &value {
+        Value::Int(inner) => TimeDelta::try_minutes(*inner as i64)
+            .map(Value::Duration)
+            .ok_or(Error::value_out_of_bounds(value, "minute")),
+        Value::DateTime(inner) => Ok(Value::Int(inner.minute() as i128)),
+        Value::Duration(inner) => Ok(Value::Int(inner.num_minutes() as i128)),
+
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn second(value: Value) -> Result<Value> {
+    match &value {
+        Value::Int(inner) => TimeDelta::try_seconds(*inner as i64)
+            .map(Value::Duration)
+            .ok_or(Error::value_out_of_bounds(value, "second")),
+        Value::DateTime(inner) => Ok(Value::Int(inner.second() as i128)),
+        Value::Duration(inner) => Ok(Value::Int(inner.num_seconds() as i128)),
 
         Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),

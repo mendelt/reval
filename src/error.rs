@@ -50,6 +50,9 @@ pub enum Error {
 
     #[error("Error parsing rule from json {0}")]
     JsonParseError(#[from] serde_json::Error),
+
+    #[error("Value {0} out of bounds for function {1}")]
+    ValueOutOfBounds(Value, String),
 }
 
 impl Error {
@@ -65,5 +68,9 @@ impl Error {
     /// Construct UnexpectedValueType Error
     pub fn unexpected_val_type(value: Value, expect: &str) -> Self {
         Error::UnexpectedValueType(value, expect.to_string())
+    }
+
+    pub fn value_out_of_bounds(value: Value, function: &str) -> Self {
+        Error::ValueOutOfBounds(value, function.to_string())
     }
 }
