@@ -259,6 +259,8 @@ fn date_time(value: Value) -> Result<Value> {
         Value::Int(val) => DateTime::from_timestamp(val as i64, 0)
             .map(Value::DateTime)
             .ok_or(Error::invalid_cast(value, "Value::DateTime")),
+
+        Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -268,6 +270,8 @@ fn duration(value: Value) -> Result<Value> {
         Value::Int(val) => TimeDelta::try_seconds(val as i64)
             .map(Value::Duration)
             .ok_or(Error::invalid_cast(value, "Value::Duration")),
+
+        Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -429,6 +433,8 @@ fn bitwise_and(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left & right)),
         (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left & right)),
+
+        (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -437,6 +443,8 @@ fn bitwise_or(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left | right)),
         (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left | right)),
+
+        (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
@@ -445,6 +453,8 @@ fn bitwise_xor(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Int(left ^ right)),
         (Value::Bool(left), Value::Bool(right)) => Ok(Value::Bool(left ^ right)),
+
+        (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }
