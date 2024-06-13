@@ -347,6 +347,8 @@ fn gt(left: Value, right: Value) -> Result<Value> {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left > right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left > right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left > right)),
+        (Value::DateTime(left), Value::DateTime(right)) => Ok(Value::Bool(left > right)),
+        (Value::Duration(left), Value::Duration(right)) => Ok(Value::Bool(left > right)),
 
         (Value::None, _) | (_, Value::None) => Ok(false.into()),
         _ => Err(Error::InvalidType),
@@ -358,6 +360,8 @@ fn gte(left: Value, right: Value) -> Result<Value> {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left >= right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left >= right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left >= right)),
+        (Value::DateTime(left), Value::DateTime(right)) => Ok(Value::Bool(left >= right)),
+        (Value::Duration(left), Value::Duration(right)) => Ok(Value::Bool(left >= right)),
 
         (Value::None, _) | (_, Value::None) => Ok(false.into()),
         _ => Err(Error::InvalidType),
@@ -369,6 +373,8 @@ fn lt(left: Value, right: Value) -> Result<Value> {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left < right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left < right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left < right)),
+        (Value::DateTime(left), Value::DateTime(right)) => Ok(Value::Bool(left < right)),
+        (Value::Duration(left), Value::Duration(right)) => Ok(Value::Bool(left < right)),
 
         (Value::None, _) | (_, Value::None) => Ok(false.into()),
         _ => Err(Error::InvalidType),
@@ -380,6 +386,8 @@ fn lte(left: Value, right: Value) -> Result<Value> {
         (Value::Int(left), Value::Int(right)) => Ok(Value::Bool(left <= right)),
         (Value::Float(left), Value::Float(right)) => Ok(Value::Bool(left <= right)),
         (Value::Decimal(left), Value::Decimal(right)) => Ok(Value::Bool(left <= right)),
+        (Value::DateTime(left), Value::DateTime(right)) => Ok(Value::Bool(left <= right)),
+        (Value::Duration(left), Value::Duration(right)) => Ok(Value::Bool(left <= right)),
 
         (Value::None, _) | (_, Value::None) => Ok(false.into()),
         _ => Err(Error::InvalidType),
