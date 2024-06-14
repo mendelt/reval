@@ -10,6 +10,6 @@ pub enum Error {
     #[error("Rule has no name")]
     MissingRuleName,
 
-    #[error("Error parsing expression")]
+    #[error("Error parsing expression {0}")]
     ExprParseError(String),
 }
