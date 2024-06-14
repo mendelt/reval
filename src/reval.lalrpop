@@ -30,15 +30,20 @@ match {
     "else" => KWD_ELSE,
     "is_some" => KWD_IS_SOME,
     "is_none" => KWD_IS_NONE,
+    "none" => KWD_NONE,
+    "some" => KWD_SOME,
     "int" => KWD_INT,
     "float" => KWD_FLOAT,
     "dec" => KWD_DEC,
     "contains" => KWD_CONTAINS,
     "in" => KWD_IN,
     "date_time" => KWD_DATE_TIME,
+    "datetime" => KWD_DATETIME,
     "duration" => KWD_DURATION,
     "to_upper" => KWD_TO_UPPER,
     "to_lower" => KWD_TO_LOWER,
+    "uppercase" => KWD_UPPERCASE,
+    "lowercase" => KWD_LOWERCASE,
     "trim" => KWD_TRIM,
     "round" => KWD_ROUND,
     "floor" => KWD_FLOOR,
@@ -68,7 +73,6 @@ match {
     r"d[+-]?[0-9]*\.?[0-9]+" => DECIMAL,
     "true" => TRUE,
     "false" => FALSE,
-    "none" => NONE,
 
     r"\s*" => { }, // The default whitespace skipping is disabled if an `ignore pattern` is specified
     r"//[^\n\r]*[\n\r]*" => { }, // Skip `// comments`
@@ -147,13 +151,18 @@ Func: Expr = {
     KWD_FLOAT LPAREN <e:Expr> RPAREN => Expr::float(e),
     KWD_DEC LPAREN <e:Expr> RPAREN => Expr::dec(e),
     KWD_DATE_TIME LPAREN <e:Expr> RPAREN => Expr::date_time(e),
+    KWD_DATETIME LPAREN <e:Expr> RPAREN => Expr::date_time(e),
     KWD_DURATION LPAREN <e:Expr> RPAREN => Expr::duration(e),
     KWD_IS_SOME LPAREN <e:Expr> RPAREN => Expr::is_some(e),
     KWD_IS_NONE LPAREN <e:Expr> RPAREN => Expr::is_none(e),
+    KWD_SOME LPAREN <e:Expr> RPAREN => Expr::is_some(e),
+    KWD_NONE LPAREN <e:Expr> RPAREN => Expr::is_none(e),
     OP_SUB LPAREN <e:Expr> RPAREN => Expr::neg(e),
     OP_NOT LPAREN <e:Expr> RPAREN => Expr::not(e),
     KWD_TO_UPPER LPAREN <e:Expr> RPAREN => Expr::to_upper(e),
     KWD_TO_LOWER LPAREN <e:Expr> RPAREN => Expr::to_lower(e),
+    KWD_UPPERCASE LPAREN <e:Expr> RPAREN => Expr::to_upper(e),
+    KWD_LOWERCASE LPAREN <e:Expr> RPAREN => Expr::to_lower(e),
     KWD_TRIM LPAREN <e:Expr> RPAREN => Expr::trim(e),
     KWD_ROUND LPAREN <e:Expr> RPAREN => Expr::round(e),
     KWD_FLOOR LPAREN <e:Expr> RPAREN => Expr::floor(e),
@@ -198,4 +207,4 @@ BoolValue: Value = {
     TRUE => Value::Bool(true),
     FALSE => Value::Bool(false)
 };
-NoneValue: Value = NONE => Value::None;
+NoneValue: Value = KWD_NONE => Value::None;

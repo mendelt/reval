@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `some`, `none`, `datetime`, `uppercase`, and `lowercase` keywords as alternatives for keywords with `_`
+
 ### Changed
 - Improved rule parsing error
 
