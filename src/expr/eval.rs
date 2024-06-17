@@ -2,12 +2,14 @@
 
 use super::{Expr, Index};
 use crate::{error::Result, expr::EvaluationContext, value::Value, Error};
+#[cfg(feature = "async_user_func")]
 use async_recursion::async_recursion;
 use chrono::{prelude::*, TimeDelta};
 use rust_decimal::prelude::*;
 use std::collections::HashMap;
 
 impl Expr {
+    #[cfg(feature = "async_user_func")]
     #[async_recursion]
     pub async fn evaluate(&self, context: &mut EvaluationContext, facts: &Value) -> Result<Value> {
         match self {
@@ -105,6 +107,104 @@ impl Expr {
             Expr::Second(value) => second(value.evaluate(context, facts).await?),
         }
     }
+
+    #[cfg(not(feature = "async_user_func"))]
+    pub fn evaluate(&self, context: &mut EvaluationContext, facts: &Value) -> Result<Value> {
+        match self {
+            Expr::Value(value) => Ok(value.clone()),
+            Expr::Reference(name) => reference(facts, name),
+            Expr::Symbol(name) => symbol(name, context),
+            Expr::Index(value, idx) => index(value.evaluate(context, facts)?, idx),
+            Expr::Function(name, value) => {
+                let param = value.evaluate(context, facts)?;
+                context.call_function(name, param)
+            }
+            Expr::If(switch, left, right) => iif(context, facts, switch, left, right),
+            Expr::Not(value) => not(value.evaluate(context, facts)?),
+            Expr::Neg(value) => neg(value.evaluate(context, facts)?),
+            Expr::IsSome(value) => is_some(value.evaluate(context, facts)?),
+            Expr::IsNone(value) => is_none(value.evaluate(context, facts)?),
+            Expr::DateTime(value) => date_time(value.evaluate(context, facts)?),
+            Expr::Duration(value) => duration(value.evaluate(context, facts)?),
+            Expr::Map(map) => eval_map(map, context, facts),
+            Expr::Vec(vec) => eval_vec(vec, context, facts),
+            Expr::Int(value) => int(value.evaluate(context, facts)?),
+            Expr::Float(value) => float(value.evaluate(context, facts)?),
+            Expr::Dec(value) => dec(value.evaluate(context, facts)?),
+            Expr::Mult(left, right) => mult(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+            Expr::Div(left, right) => div(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+            Expr::Add(left, right) => add(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+            Expr::Sub(left, right) => sub(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+            Expr::Equals(left, right) => eq(context, facts, left, right).map(Value::Bool),
+            Expr::NotEquals(left, right) => {
+                eq(context, facts, left, right).map(|val| Value::Bool(!val))
+            }
+            Expr::GreaterThan(left, right) => gt(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+            Expr::GreaterThanEquals(left, right) => gte(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+            Expr::LessThan(left, right) => lt(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+            Expr::LessThanEquals(left, right) => lte(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+
+            Expr::And(left, right) => and(context, facts, left, right),
+            Expr::Or(left, right) => or(context, facts, left, right),
+
+            Expr::BitAnd(left, right) => bitwise_and(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+            Expr::BitOr(left, right) => bitwise_or(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+            Expr::BitXor(left, right) => bitwise_xor(
+                left.evaluate(context, facts)?,
+                right.evaluate(context, facts)?,
+            ),
+
+            Expr::Contains(coll, item) => contains(
+                coll.evaluate(context, facts)?,
+                item.evaluate(context, facts)?,
+            ),
+
+            Expr::ToUpper(value) => to_upper(value.evaluate(context, facts)?),
+            Expr::ToLower(value) => to_lower(value.evaluate(context, facts)?),
+            Expr::Trim(value) => trim(value.evaluate(context, facts)?),
+            Expr::Round(value) => round(value.evaluate(context, facts)?),
+            Expr::Floor(value) => floor(value.evaluate(context, facts)?),
+            Expr::Fract(value) => fract(value.evaluate(context, facts)?),
+
+            Expr::Year(value) => year(value.evaluate(context, facts)?),
+            Expr::Month(value) => month(value.evaluate(context, facts)?),
+            Expr::Week(value) => week(value.evaluate(context, facts)?),
+            Expr::Day(value) => day(value.evaluate(context, facts)?),
+            Expr::Hour(value) => hour(value.evaluate(context, facts)?),
+            Expr::Minute(value) => minute(value.evaluate(context, facts)?),
+            Expr::Second(value) => second(value.evaluate(context, facts)?),
+        }
+    }
 }
 
 fn reference(facts: &Value, name: &str) -> Result<Value> {
@@ -138,9 +238,9 @@ async fn iif(
     left: &Expr,
     right: &Expr,
 ) -> Result<Value> {
-    match switch.evaluate(context, facts).await? {
-        Value::Bool(true) => left.evaluate(context, facts).await,
-        Value::Bool(false) => right.evaluate(context, facts).await,
+    match switch.evaluate(context, facts)? {
+        Value::Bool(true) => left.evaluate(context, facts),
+        Value::Bool(false) => right.evaluate(context, facts),
         _ => Err(Error::InvalidType),
     }
 }
@@ -179,6 +279,7 @@ fn none(value: Value) -> Result<Value> {
     }
 }
 
+#[cfg(feature = "async_user_func")]
 async fn eval_map(
     map: &HashMap<String, Expr>,
     context: &mut EvaluationContext<'_>,
@@ -193,6 +294,22 @@ async fn eval_map(
     Ok(result.into())
 }
 
+#[cfg(not(feature = "async_user_func"))]
+async fn eval_map(
+    map: &HashMap<String, Expr>,
+    context: &mut EvaluationContext<'_>,
+    facts: &Value,
+) -> Result<Value> {
+    let mut result = HashMap::<String, Value>::new();
+
+    for (key, expr) in map {
+        result.insert(key.clone(), expr.evaluate(context, facts)?);
+    }
+
+    Ok(result.into())
+}
+
+#[cfg(feature = "async_user_func")]
 async fn eval_vec(
     vec: &Vec<Expr>,
     context: &mut EvaluationContext<'_>,
@@ -201,6 +318,19 @@ async fn eval_vec(
     let mut result = Vec::<Value>::new();
     for expr in vec {
         result.push(expr.evaluate(context, facts).await?)
+    }
+    Ok(result.into())
+}
+
+#[cfg(not(feature = "async_user_func"))]
+async fn eval_vec(
+    vec: &Vec<Expr>,
+    context: &mut EvaluationContext<'_>,
+    facts: &Value,
+) -> Result<Value> {
+    let mut result = Vec::<Value>::new();
+    for expr in vec {
+        result.push(expr.evaluate(context, facts)?)
     }
     Ok(result.into())
 }
@@ -331,6 +461,7 @@ fn sub(left: Value, right: Value) -> Result<Value> {
     }
 }
 
+#[cfg(feature = "async_user_func")]
 async fn eq<'a>(
     context: &mut EvaluationContext<'a>,
     facts: &Value,
@@ -345,6 +476,25 @@ async fn eq<'a>(
     }
 
     let right = right.evaluate(context, facts).await?;
+
+    Ok(left == right)
+}
+
+#[cfg(not(feature = "async_user_func"))]
+fn eq<'a>(
+    context: &mut EvaluationContext<'a>,
+    facts: &Value,
+    left: &Expr,
+    right: &Expr,
+) -> Result<bool> {
+    let left = left.evaluate(context, facts)?;
+
+    if left == Value::None {
+        // Nothing equals Value::None, not even Value::None, so early return
+        return Ok(false);
+    }
+
+    let right = right.evaluate(context, facts)?;
 
     Ok(left == right)
 }
@@ -401,7 +551,7 @@ fn lte(left: Value, right: Value) -> Result<Value> {
     }
 }
 
-/// Lazilly evaluate an and expression
+#[cfg(feature = "async_user_func")]
 async fn and<'a>(
     context: &mut EvaluationContext<'a>,
     facts: &Value,
@@ -418,7 +568,24 @@ async fn and<'a>(
     .into())
 }
 
-/// Lazilly evaluate an or expression
+#[cfg(not(feature = "async_user_func"))]
+fn and<'a>(
+    context: &mut EvaluationContext<'a>,
+    facts: &Value,
+    left: &Expr,
+    right: &Expr,
+) -> Result<Value> {
+    Ok(if !eval_to_bool(context, facts, left)? {
+        // If left evaluates to false bypass right and return false immediately
+        false
+    } else {
+        // If left evaluates to true return the result of evaluating right
+        eval_to_bool(context, facts, right)?
+    }
+    .into())
+}
+
+#[cfg(feature = "async_user_func")]
 async fn or<'a>(
     context: &mut EvaluationContext<'a>,
     facts: &Value,
@@ -435,13 +602,39 @@ async fn or<'a>(
     .into())
 }
 
-/// Helper function that evaluates an expression and checks if its a boolean
+#[cfg(not(feature = "async_user_func"))]
+fn or<'a>(
+    context: &mut EvaluationContext<'a>,
+    facts: &Value,
+    left: &Expr,
+    right: &Expr,
+) -> Result<Value> {
+    Ok(if eval_to_bool(context, facts, left)? {
+        // If left evaluates to true bypass right and return true immediately
+        true
+    } else {
+        // If left evaluates to false return the result of evaluating right
+        eval_to_bool(context, facts, right)?
+    }
+    .into())
+}
+
+#[cfg(feature = "async_user_func")]
 async fn eval_to_bool<'a>(
     context: &mut EvaluationContext<'a>,
     facts: &Value,
     expr: &Expr,
 ) -> Result<bool> {
     TryInto::<bool>::try_into(expr.evaluate(context, facts).await?).map_err(|_| Error::InvalidType)
+}
+
+#[cfg(not(feature = "async_user_func"))]
+fn eval_to_bool<'a>(
+    context: &mut EvaluationContext<'a>,
+    facts: &Value,
+    expr: &Expr,
+) -> Result<bool> {
+    TryInto::<bool>::try_into(expr.evaluate(context, facts)?).map_err(|_| Error::InvalidType)
 }
 
 fn bitwise_and(left: Value, right: Value) -> Result<Value> {

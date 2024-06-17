@@ -4,6 +4,7 @@ use crate::{
     value::Value,
     Error, Result,
 };
+#[cfg(feature = "async_user_func")]
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::result;
@@ -14,11 +15,28 @@ lazy_static::lazy_static!(
     };
 );
 
+#[cfg(feature = "async_user_func")]
 /// User functions should implement this trait
 #[async_trait]
 pub trait UserFunction {
     /// Call the userfunction, parameters are passed in as a Value
     async fn call(&self, params: Value) -> FunctionResult;
+
+    /// The name of the user-function
+    fn name(&self) -> &'static str;
+
+    /// Indicates if results of this function can be cached,
+    /// true by default
+    fn cacheable(&self) -> bool {
+        true
+    }
+}
+
+#[cfg(not(feature = "async_user_func"))]
+/// User functions should implement this trait
+pub trait UserFunction {
+    /// Call the userfunction, parameters are passed in as a Value
+    fn call(&self, params: Value) -> FunctionResult;
 
     /// The name of the user-function
     fn name(&self) -> &'static str;
@@ -75,7 +93,8 @@ impl UserFunctions {
         Ok(())
     }
 
-    pub(crate) async fn call(
+    #[cfg(not(feature = "async_user_func"))]
+    pub(crate) fn call(
         &self,
         name: &str,
         param: Value,
@@ -89,21 +108,57 @@ impl UserFunctions {
             match results_cache.get(&cache_key) {
                 Some(value) => Ok(value.clone()),
                 None => {
-                    let result = call_function(function, param, name).await?;
+                    let result = call_function(function, param, name)?;
                     results_cache.insert(cache_key, result.clone());
                     Ok(result)
                 }
             }
         } else {
-            call_function(function, param, name).await
+            call_function(function, param, name)
+        }
+    }
+
+    #[cfg(not(feature = "async_user_func"))]
+    pub(crate) fn call(
+        &self,
+        name: &str,
+        param: Value,
+        results_cache: &mut HashMap<String, Value>,
+    ) -> Result<Value> {
+        let function = self.get(name)?;
+
+        if function.cacheable() {
+            let cache_key = format!("{name}-{param:?}");
+
+            match results_cache.get(&cache_key) {
+                Some(value) => Ok(value.clone()),
+                None => {
+                    let result = call_function(function, param, name)?;
+                    results_cache.insert(cache_key, result.clone());
+                    Ok(result)
+                }
+            }
+        } else {
+            call_function(function, param, name)
         }
     }
 }
 
+#[cfg(feature = "async_user_func")]
 async fn call_function(function: &BoxedFunction, params: Value, name: &str) -> Result<Value> {
     function
         .call(params)
         .await
+        .map_err(|err| Error::UserFunctionError {
+            function: name.to_owned(),
+            error: err,
+        })
+}
+
+#[cfg(not(feature = "async_user_func"))]
+fn call_function(function: &BoxedFunction, params: Value, name: &str) -> Result<Value> {
+    function
+        .call(params)
         .map_err(|err| Error::UserFunctionError {
             function: name.to_owned(),
             error: err,
@@ -116,6 +171,7 @@ pub(crate) type BoxedFunction = Box<dyn UserFunction + Send + Sync + 'static>;
 #[cfg(test)]
 mod when_managing_user_functions {
     use super::*;
+    #[cfg(feature = "async_user_func")]
     use async_trait::async_trait;
 
     #[test]
@@ -159,9 +215,21 @@ mod when_managing_user_functions {
         name: &'static str,
     }
 
+    #[cfg(feature = "async_user_func")]
     #[async_trait]
     impl UserFunction for TestFunc {
         async fn call(&self, _params: Value) -> FunctionResult {
+            Ok(Value::None)
+        }
+
+        fn name(&self) -> &'static str {
+            self.name
+        }
+    }
+
+    #[cfg(not(feature = "async_user_func"))]
+    impl UserFunction for TestFunc {
+        fn call(&self, _params: Value) -> FunctionResult {
             Ok(Value::None)
         }
 

@@ -14,8 +14,8 @@ autotests = false
 
 [dependencies]
 anyhow = "1"
-async-recursion = "1"
-async-trait = "0.1"
+async-recursion = { version = "1", optional = true }
+async-trait = { version = "0.1", optional = true }
 chrono = { version = "0.4", features = ["serde"] }
 itertools = "0.12"
 lalrpop-util = { version = "0.20.0", features = ["lexer", "unicode"] }
@@ -27,10 +27,13 @@ unicode-xid = "0.2"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
-tokio-test = "0.4"
+tokio-test = { version = "0.4" }
 
 [build-dependencies]
 lalrpop = "0.20.0"
+
+[features]
+async_user_func = ["async-recursion", "async-trait"]
 
 [[test]]
 name = "integration"
