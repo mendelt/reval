@@ -65,7 +65,8 @@ match {
     "{" => LBRACE,
     "}" => RBRACE,
     r#""[^"\\]*(?:\\.[^"\\]*)*""# => STRING,
-    r"i[+-]?[0-9]+" => INT,
+    r"i[+-]?[0-9]+" => PREFIXED_INT,
+    r"[+-]?[0-9]+" => INT,
     r"0x[0-9a-fA-F]+" => HEX_INT,
     r"0o[0-8]+" => OCT_INT,
     r"0b[01]+" => BIN_INT,
@@ -186,6 +187,7 @@ MapItem: (String, Expr) = <k:IDENT> COLON <e:Expr> => (k.to_string(), e);
 
 Value: Value = {
     StringValue,
+    PrefixedIntValue,
     IntValue,
     HexIntValue,
     OctIntValue,
@@ -197,6 +199,7 @@ Value: Value = {
 };
 
 StringValue: Value = <s:STRING> =>? Ok(parse_string_literal(s)?);
+PrefixedIntValue: Value = <s:PREFIXED_INT> =>? Ok(parse_int_value(s)?);
 IntValue: Value = <s:INT> =>? Ok(parse_int_value(s)?);
 HexIntValue: Value = <s:HEX_INT> =>? Ok(parse_hex_int_value(s)?);
 OctIntValue: Value = <s:OCT_INT> =>? Ok(parse_oct_int_value(s)?);
