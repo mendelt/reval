@@ -259,6 +259,7 @@ fn date_time(value: Value) -> Result<Value> {
         Value::Int(val) => DateTime::from_timestamp(val as i64, 0)
             .map(Value::DateTime)
             .ok_or(Error::invalid_cast(value, "Value::DateTime")),
+        Value::DateTime(_)=> Ok(value),
 
         Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
@@ -270,6 +271,7 @@ fn duration(value: Value) -> Result<Value> {
         Value::Int(val) => TimeDelta::try_seconds(val as i64)
             .map(Value::Duration)
             .ok_or(Error::invalid_cast(value, "Value::Duration")),
+        Value::Duration(_) => Ok(value),
 
         Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
