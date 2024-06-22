@@ -109,7 +109,7 @@ impl From<ParseExpr> for Expr {
             ParseExpr::Float(value) => Expr::Value(value.into()),
             ParseExpr::Decimal(value) => Expr::Value(value.into()),
             ParseExpr::Bool(value) => Expr::Value(value.into()),
-            ParseExpr::None => Expr::none(),
+            ParseExpr::None => Expr::none_value(),
             ParseExpr::Ref(name) => Expr::Reference(name),
             ParseExpr::Func(name, param) => Expr::func(name, (*param).into()),
             ParseExpr::Idx(expr, index) => Expr::index((*expr).into(), index.into()),
@@ -118,8 +118,8 @@ impl From<ParseExpr> for Expr {
             }
             ParseExpr::Not(value) => Expr::not((*value).into()),
             ParseExpr::Neg(value) => Expr::neg((*value).into()),
-            ParseExpr::IsSome(value) => Expr::is_some((*value).into()),
-            ParseExpr::IsNone(value) => Expr::is_none((*value).into()),
+            ParseExpr::IsSome(value) => Expr::some((*value).into()),
+            ParseExpr::IsNone(value) => Expr::none((*value).into()),
             ParseExpr::CInt(value) => Expr::int((*value).into()),
             ParseExpr::CFloat(value) => Expr::float((*value).into()),
             ParseExpr::CDecimal(value) => Expr::dec((*value).into()),
@@ -138,8 +138,8 @@ impl From<ParseExpr> for Expr {
             ParseExpr::And(params) => operands(params, Expr::and),
             ParseExpr::Or(params) => operands(params, Expr::or),
             ParseExpr::Contains(list, key) => Expr::contains((*list).into(), (*key).into()),
-            ParseExpr::ToUpper(param) => Expr::to_upper((*param).into()),
-            ParseExpr::ToLower(param) => Expr::to_lower((*param).into()),
+            ParseExpr::ToUpper(param) => Expr::uppercase((*param).into()),
+            ParseExpr::ToLower(param) => Expr::lowercase((*param).into()),
         }
     }
 }
@@ -341,7 +341,7 @@ mod when_parsing_single_expressions {
     fn should_parse_is_some_expression() {
         assert_eq!(
             Expr::parse_json(r#"{"is_some": {"string": "value"}}"#).unwrap(),
-            Expr::is_some(Expr::value("value"))
+            Expr::some(Expr::value("value"))
         )
     }
 
@@ -349,7 +349,7 @@ mod when_parsing_single_expressions {
     fn should_parse_is_none_expression() {
         assert_eq!(
             Expr::parse_json(r#"{"is_none": {"string": "value"}}"#).unwrap(),
-            Expr::is_none(Expr::value("value"))
+            Expr::none(Expr::value("value"))
         )
     }
 
@@ -554,7 +554,7 @@ mod when_parsing_single_expressions {
     fn should_parse_to_upper_expression() {
         assert_eq!(
             Expr::parse_json(r#"{"to_upper": {"string": "test"}}"#).unwrap(),
-            Expr::to_upper(Expr::value("test"))
+            Expr::uppercase(Expr::value("test"))
         )
     }
 
@@ -562,7 +562,7 @@ mod when_parsing_single_expressions {
     fn should_parse_to_lower_expression() {
         assert_eq!(
             Expr::parse_json(r#"{"to_lower": {"string": "test"}}"#).unwrap(),
-            Expr::to_lower(Expr::value("test"))
+            Expr::lowercase(Expr::value("test"))
         )
     }
 }

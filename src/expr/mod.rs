@@ -39,10 +39,10 @@ pub enum Expr {
     Neg(Box<Expr>),
 
     /// True if the expression is not None
-    IsSome(Box<Expr>),
+    Some(Box<Expr>),
 
     /// True if the expression is none
-    IsNone(Box<Expr>),
+    None(Box<Expr>),
 
     /// Cast numerical values to int
     Int(Box<Expr>),
@@ -108,10 +108,10 @@ pub enum Expr {
     Contains(Box<Expr>, Box<Expr>),
 
     /// Convert a string to upper case
-    ToUpper(Box<Expr>),
+    UpperCase(Box<Expr>),
 
     // Convert a string to lower case
-    ToLower(Box<Expr>),
+    LowerCase(Box<Expr>),
 
     /// Trim whitespace from start and end of string
     Trim(Box<Expr>),
@@ -154,7 +154,7 @@ impl Expr {
     }
 
     /// None value expression constructor
-    pub fn none() -> Self {
+    pub fn none_value() -> Self {
         Expr::Value(Value::None)
     }
 
@@ -191,13 +191,13 @@ impl Expr {
     }
 
     /// IsSome epression constructor
-    pub fn is_some(expr: Expr) -> Self {
-        Expr::IsSome(Box::new(expr))
+    pub fn some(expr: Expr) -> Self {
+        Expr::Some(Box::new(expr))
     }
 
     /// IsNone epression constructor
-    pub fn is_none(expr: Expr) -> Self {
-        Expr::IsNone(Box::new(expr))
+    pub fn none(expr: Expr) -> Self {
+        Expr::None(Box::new(expr))
     }
 
     /// Int-cast expression constructor
@@ -215,7 +215,7 @@ impl Expr {
         Expr::Dec(Box::new(expr))
     }
 
-    pub fn date_time(expr: Expr) -> Self {
+    pub fn datetime(expr: Expr) -> Self {
         Expr::DateTime(Box::new(expr))
     }
 
@@ -302,12 +302,12 @@ impl Expr {
         Expr::Contains(Box::new(list), Box::new(key))
     }
 
-    pub fn to_upper(param: Expr) -> Self {
-        Expr::ToUpper(Box::new(param))
+    pub fn uppercase(param: Expr) -> Self {
+        Expr::UpperCase(Box::new(param))
     }
 
-    pub fn to_lower(param: Expr) -> Self {
-        Expr::ToLower(Box::new(param))
+    pub fn lowercase(param: Expr) -> Self {
+        Expr::LowerCase(Box::new(param))
     }
 
     pub fn trim(param: Expr) -> Self {
@@ -387,8 +387,8 @@ impl Display for Expr {
             ),
             Expr::Not(inner) => write!(formatter, "!({inner})"),
             Expr::Neg(inner) => write!(formatter, "-({inner})"),
-            Expr::IsSome(inner) => write!(formatter, "some({inner})"),
-            Expr::IsNone(inner) => write!(formatter, "none({inner})"),
+            Expr::Some(inner) => write!(formatter, "some({inner})"),
+            Expr::None(inner) => write!(formatter, "none({inner})"),
             Expr::Int(inner) => write!(formatter, "int({inner})"),
             Expr::Float(inner) => write!(formatter, "float({inner})"),
             Expr::Dec(inner) => write!(formatter, "dec({inner})"),
@@ -410,13 +410,12 @@ impl Display for Expr {
             Expr::BitOr(left, right) => write!(formatter, "{left} | {right}"),
             Expr::BitXor(left, right) => write!(formatter, "{left} ^ {right}"),
             Expr::Contains(left, right) => write!(formatter, "({left} contains {right})"),
-            Expr::ToUpper(param) => write!(formatter, "uppercase({param})"),
-            Expr::ToLower(param) => write!(formatter, "lowercase({param})"),
+            Expr::UpperCase(param) => write!(formatter, "uppercase({param})"),
+            Expr::LowerCase(param) => write!(formatter, "lowercase({param})"),
             Expr::Trim(param) => write!(formatter, "trim({param})"),
             Expr::Floor(param) => write!(formatter, "floor({param})"),
             Expr::Round(param) => write!(formatter, "round({param})"),
             Expr::Fract(param) => write!(formatter, "fract({param})"),
-
             Expr::Year(param) => write!(formatter, "year({param})"),
             Expr::Month(param) => write!(formatter, "month({param})"),
             Expr::Week(param) => write!(formatter, "week({param})"),

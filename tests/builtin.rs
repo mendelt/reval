@@ -4,17 +4,17 @@ use crate::common::{check_float, eval_expr};
 use rust_decimal::Decimal;
 
 #[tokio::test]
-async fn should_to_lower() {
+async fn should_lowercase() {
     assert_eq!(
-        eval_expr(r#"to_lower("String ")"#, ()).await,
+        eval_expr(r#"lowercase("String ")"#, ()).await,
         "string ".into()
     );
 }
 
 #[tokio::test]
-async fn should_to_upper() {
+async fn should_uppercase() {
     assert_eq!(
-        eval_expr(r#"to_upper("String ")"#, ()).await,
+        eval_expr(r#"uppercase("String ")"#, ()).await,
         "STRING ".into()
     );
 }
