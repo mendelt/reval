@@ -21,9 +21,9 @@ impl Expr {
             Expr::If(switch, left, right) => iif(context, facts, switch, left, right).await,
             Expr::Not(value) => not(value.evaluate(context, facts).await?),
             Expr::Neg(value) => neg(value.evaluate(context, facts).await?),
-            Expr::IsSome(value) => is_some(value.evaluate(context, facts).await?),
-            Expr::IsNone(value) => is_none(value.evaluate(context, facts).await?),
-            Expr::DateTime(value) => date_time(value.evaluate(context, facts).await?),
+            Expr::Some(value) => some(value.evaluate(context, facts).await?),
+            Expr::None(value) => none(value.evaluate(context, facts).await?),
+            Expr::DateTime(value) => datetime(value.evaluate(context, facts).await?),
             Expr::Duration(value) => duration(value.evaluate(context, facts).await?),
             Expr::Map(map) => eval_map(map, context, facts).await,
             Expr::Vec(vec) => eval_vec(vec, context, facts).await,
@@ -88,8 +88,8 @@ impl Expr {
                 item.evaluate(context, facts).await?,
             ),
 
-            Expr::ToUpper(value) => to_upper(value.evaluate(context, facts).await?),
-            Expr::ToLower(value) => to_lower(value.evaluate(context, facts).await?),
+            Expr::UpperCase(value) => uppercase(value.evaluate(context, facts).await?),
+            Expr::LowerCase(value) => lowercase(value.evaluate(context, facts).await?),
             Expr::Trim(value) => trim(value.evaluate(context, facts).await?),
             Expr::Round(value) => round(value.evaluate(context, facts).await?),
             Expr::Floor(value) => floor(value.evaluate(context, facts).await?),
@@ -160,14 +160,14 @@ fn neg(value: Value) -> Result<Value> {
     }
 }
 
-fn is_some(value: Value) -> Result<Value> {
+fn some(value: Value) -> Result<Value> {
     match value {
         Value::None => Ok(Value::Bool(false)),
         _ => Ok(Value::Bool(true)),
     }
 }
 
-fn is_none(value: Value) -> Result<Value> {
+fn none(value: Value) -> Result<Value> {
     match value {
         Value::None => Ok(Value::Bool(true)),
         _ => Ok(Value::Bool(false)),
@@ -250,7 +250,7 @@ fn dec(value: Value) -> Result<Value> {
     }
 }
 
-fn date_time(value: Value) -> Result<Value> {
+fn datetime(value: Value) -> Result<Value> {
     match value.clone() {
         Value::String(val) => val
             .parse::<DateTime<Utc>>()
@@ -486,7 +486,7 @@ fn contains(coll: Value, item: Value) -> Result<Value> {
     }
 }
 
-fn to_upper(value: Value) -> Result<Value> {
+fn uppercase(value: Value) -> Result<Value> {
     match value {
         Value::String(value) => Ok(Value::String(value.to_uppercase())),
 
@@ -495,7 +495,7 @@ fn to_upper(value: Value) -> Result<Value> {
     }
 }
 
-fn to_lower(value: Value) -> Result<Value> {
+fn lowercase(value: Value) -> Result<Value> {
     match value {
         Value::String(value) => Ok(Value::String(value.to_lowercase())),
 

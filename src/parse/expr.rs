@@ -263,7 +263,14 @@ mod when_parsing_func {
     fn should_parse_simple_is_none() {
         assert_eq!(
             Expr::parse("is_none(none)").unwrap(),
-            Expr::is_none(Expr::value(None))
+            Expr::none(Expr::value(None))
+        );
+    }
+    #[test]
+    fn should_parse_simple_none() {
+        assert_eq!(
+            Expr::parse("none(none)").unwrap(),
+            Expr::none(Expr::value(None))
         );
     }
 
@@ -271,7 +278,15 @@ mod when_parsing_func {
     fn should_parse_simple_is_some() {
         assert_eq!(
             Expr::parse("is_some(none)").unwrap(),
-            Expr::is_some(Expr::value(None))
+            Expr::some(Expr::value(None))
+        );
+    }
+
+    #[test]
+    fn should_parse_simple_some() {
+        assert_eq!(
+            Expr::parse("some(none)").unwrap(),
+            Expr::some(Expr::value(None))
         );
     }
 
@@ -303,7 +318,7 @@ mod when_parsing_func {
     fn should_parse_datetime_conversion() {
         assert_eq!(
             Expr::parse(r#"date_time("2015-07-30T03:26:13Z")"#).unwrap(),
-            Expr::date_time(Expr::value("2015-07-30T03:26:13Z"))
+            Expr::datetime(Expr::value("2015-07-30T03:26:13Z"))
         );
     }
 
@@ -327,7 +342,15 @@ mod when_parsing_func {
     fn should_parse_to_upper_expr() {
         assert_eq!(
             Expr::parse(r#"to_upper("String")"#).unwrap(),
-            Expr::to_upper(Expr::value("String"))
+            Expr::uppercase(Expr::value("String"))
+        );
+    }
+
+    #[test]
+    fn should_parse_uppercase_expr() {
+        assert_eq!(
+            Expr::parse(r#"uppercase("String")"#).unwrap(),
+            Expr::uppercase(Expr::value("String"))
         );
     }
 
@@ -335,7 +358,15 @@ mod when_parsing_func {
     fn should_parse_to_lower_expr() {
         assert_eq!(
             Expr::parse(r#"to_lower("String")"#).unwrap(),
-            Expr::to_lower(Expr::value("String"))
+            Expr::lowercase(Expr::value("String"))
+        );
+    }
+
+    #[test]
+    fn should_parse_lowercase_expr() {
+        assert_eq!(
+            Expr::parse(r#"lowercase("String")"#).unwrap(),
+            Expr::lowercase(Expr::value("String"))
         );
     }
 
@@ -375,7 +406,7 @@ mod when_parsing_func {
     fn should_parse_year_expr() {
         assert_eq!(
             Expr::parse(r#"year(date_time(i1438226773))"#).unwrap(),
-            Expr::year(Expr::date_time(Expr::value(1438226773)))
+            Expr::year(Expr::datetime(Expr::value(1438226773)))
         );
     }
 
@@ -383,7 +414,7 @@ mod when_parsing_func {
     fn should_parse_month_expr() {
         assert_eq!(
             Expr::parse(r#"month(date_time(i1438226773))"#).unwrap(),
-            Expr::month(Expr::date_time(Expr::value(1438226773)))
+            Expr::month(Expr::datetime(Expr::value(1438226773)))
         );
     }
 
@@ -399,7 +430,7 @@ mod when_parsing_func {
     fn should_parse_day_expr() {
         assert_eq!(
             Expr::parse(r#"day(date_time(i1438226773))"#).unwrap(),
-            Expr::day(Expr::date_time(Expr::value(1438226773)))
+            Expr::day(Expr::datetime(Expr::value(1438226773)))
         );
     }
 
@@ -407,7 +438,7 @@ mod when_parsing_func {
     fn should_parse_hour_expr() {
         assert_eq!(
             Expr::parse(r#"hour(date_time(i1438226773))"#).unwrap(),
-            Expr::hour(Expr::date_time(Expr::value(1438226773)))
+            Expr::hour(Expr::datetime(Expr::value(1438226773)))
         );
     }
 
@@ -415,7 +446,7 @@ mod when_parsing_func {
     fn should_parse_minute_expr() {
         assert_eq!(
             Expr::parse(r#"minute(date_time(i1438226773))"#).unwrap(),
-            Expr::minute(Expr::date_time(Expr::value(1438226773)))
+            Expr::minute(Expr::datetime(Expr::value(1438226773)))
         );
     }
 
@@ -423,7 +454,7 @@ mod when_parsing_func {
     fn should_parse_second_expr() {
         assert_eq!(
             Expr::parse(r#"second(date_time(i1438226773))"#).unwrap(),
-            Expr::second(Expr::date_time(Expr::value(1438226773)))
+            Expr::second(Expr::datetime(Expr::value(1438226773)))
         );
     }
 }
