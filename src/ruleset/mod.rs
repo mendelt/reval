@@ -9,8 +9,8 @@ pub use self::{
 };
 use crate::{
     error::Result,
-    expr::EvaluationContext,
-    function::UserFunctions,
+    expr::context::EvaluationContext,
+    function::{FunctionCache, UserFunctions},
     symbol::Symbols,
     value::{ser::ValueSerializer, Value},
 };
@@ -30,13 +30,17 @@ impl RuleSet {
     }
 
     pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Outcome>> {
-        let mut context = EvaluationContext::init(&self.symbols, &self.functions);
+        let context = EvaluationContext::init(&self.symbols, &self.functions);
+        let mut function_cache = FunctionCache::new();
 
         let mut results = Vec::new();
 
         for rule in self.rules.iter() {
             results.push(Outcome {
-                value: rule.expr().evaluate(&mut context, facts).await,
+                value: rule
+                    .expr()
+                    .eval_int(&context, &mut function_cache, facts)
+                    .await,
                 rule: &rule.name,
             });
         }
