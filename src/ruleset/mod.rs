@@ -1,8 +1,12 @@
 //! Manage and evaluate a set of rules or expressions using RuleSets
 
-pub mod builder;
-pub mod rule;
+mod builder;
+mod rule;
 
+pub use self::{
+    builder::{ruleset, Builder},
+    rule::Rule,
+};
 use crate::{
     error::Result,
     expr::EvaluationContext,
@@ -11,8 +15,6 @@ use crate::{
     value::{ser::ValueSerializer, Value},
 };
 use serde::Serialize;
-
-use self::rule::{Outcome, Rule};
 
 pub struct RuleSet {
     rules: Vec<Rule>,
@@ -33,9 +35,20 @@ impl RuleSet {
         let mut results = Vec::new();
 
         for rule in self.rules.iter() {
-            results.push(rule.evaluate(&mut context, facts).await);
+            results.push(Outcome {
+                value: rule.expr().evaluate(&mut context, facts).await,
+                rule: &rule.name,
+            });
         }
 
         Ok(results)
     }
+}
+
+/// The outcome from evaluating a rule.
+/// Contains the resulting value from evaluating the rule expression plus
+/// metadata. For now the metadata is limited to the name of the rule
+pub struct Outcome<'a> {
+    pub value: Result<Value>,
+    pub rule: &'a str,
 }

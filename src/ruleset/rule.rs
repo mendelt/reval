@@ -1,4 +1,4 @@
-use crate::{expr::EvaluationContext, expr::Expr, value::Value, Result};
+use crate::expr::Expr;
 
 /// A rule is an expression with a name
 #[derive(Debug, Clone, PartialEq)]
@@ -22,18 +22,6 @@ impl Rule {
         }
     }
 
-    /// Evaluate a rule on some data using the user-functions provided by the context
-    pub async fn evaluate<'a>(
-        &self,
-        context: &mut EvaluationContext<'a>,
-        facts: &Value,
-    ) -> Outcome {
-        Outcome {
-            value: self.expr.evaluate(context, facts).await,
-            rule: &self.name,
-        }
-    }
-
     /// Return the name of the rule
     pub fn name(&self) -> &str {
         &self.name
@@ -47,12 +35,4 @@ impl Rule {
     pub fn expr(&self) -> &Expr {
         &self.expr
     }
-}
-
-/// The outcome from evaluating a rule.
-/// Contains the resulting value from evaluating the rule expression plus
-/// metadata. For now the metadata is limited to the name of the rule
-pub struct Outcome<'a> {
-    pub value: Result<Value>,
-    pub rule: &'a str,
 }

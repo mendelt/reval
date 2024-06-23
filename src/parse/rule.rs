@@ -1,4 +1,4 @@
-use crate::{expr::Expr, parse::Error, ruleset::rule::Rule};
+use crate::{expr::Expr, parse::Error, ruleset::Rule};
 use itertools::Itertools;
 
 impl Rule {

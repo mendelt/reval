@@ -107,7 +107,7 @@ pub mod prelude {
     pub use crate::{
         expr::Expr,
         function::{FunctionResult, UserFunction},
-        ruleset::{builder::ruleset, rule::Rule, RuleSet},
+        ruleset::{ruleset, Builder, Rule, RuleSet},
         value::Value,
     };
 }
