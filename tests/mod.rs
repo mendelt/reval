@@ -2,6 +2,7 @@ mod builtin;
 mod common;
 mod datetime;
 mod iif;
+mod symbols;
 
 use crate::common::eval_expr;
 use chrono::{prelude::*, TimeDelta};
