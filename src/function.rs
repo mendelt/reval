@@ -8,12 +8,6 @@ use async_trait::async_trait;
 use std::collections::BTreeMap;
 use std::result;
 
-lazy_static::lazy_static!(
-    pub(crate) static ref EMPTY_FUNCTIONS: UserFunctions = {
-        Default::default()
-    };
-);
-
 /// User functions should implement this trait
 #[async_trait]
 pub trait UserFunction {
