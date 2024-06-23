@@ -5,7 +5,7 @@ use crate::{
     Error, Result,
 };
 use async_trait::async_trait;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::result;
 
 lazy_static::lazy_static!(
@@ -33,10 +33,12 @@ pub trait UserFunction {
 /// Result type returned from UserFunction
 pub type FunctionResult = result::Result<Value, anyhow::Error>;
 
+pub(crate) type FunctionCache = BTreeMap<String, Value>;
+
 /// Stores user-functions so they can be easilly called
 #[derive(Default)]
 pub(crate) struct UserFunctions {
-    functions: HashMap<&'static str, BoxedFunction>,
+    functions: BTreeMap<&'static str, BoxedFunction>,
 }
 
 impl UserFunctions {
@@ -79,7 +81,7 @@ impl UserFunctions {
         &self,
         name: &str,
         param: Value,
-        results_cache: &mut HashMap<String, Value>,
+        results_cache: &mut FunctionCache,
     ) -> Result<Value> {
         let function = self.get(name)?;
 

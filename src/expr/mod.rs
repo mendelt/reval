@@ -1,11 +1,10 @@
-mod context;
+pub(crate) mod context;
 mod eval;
 pub(crate) mod keywords;
 
 pub mod index;
 
-use crate::value::Value;
-pub use context::EvaluationContext;
+use crate::{error::Result, function::FunctionCache, value::Value};
 pub use index::Index;
 use itertools::Itertools;
 use std::{collections::HashMap, fmt::Display};
@@ -153,6 +152,11 @@ pub enum Expr {
 }
 
 impl Expr {
+    pub async fn evaluate(&self, facts: &Value) -> Result<Value> {
+        self.eval_int(&Default::default(), &mut FunctionCache::new(), facts)
+            .await
+    }
+
     /// Value expression constructor
     pub fn value(value: impl Into<Value>) -> Self {
         Expr::Value(value.into())
