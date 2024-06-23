@@ -13,7 +13,7 @@ impl Expr {
         match self {
             Expr::Value(value) => Ok(value.clone()),
             Expr::Reference(name) => reference(facts, name),
-            Expr::Symbol(name) => symbol(name, context),
+            Expr::Symbol(name) => symbol(name, context, facts).await,
             Expr::Index(value, idx) => index(value.evaluate(context, facts).await?, idx),
             Expr::Function(name, value) => {
                 let param = value.evaluate(context, facts).await?;
@@ -118,8 +118,9 @@ fn reference(facts: &Value, name: &str) -> Result<Value> {
     .cloned()
 }
 
-fn symbol(name: &str, context: &EvaluationContext<'_>) -> Result<Value> {
-    context.get_symbol(name).cloned()
+async fn symbol(name: &str, context: &mut EvaluationContext<'_>, facts: &Value) -> Result<Value> {
+    let symbol_expr = context.get_symbol(name)?.clone();
+    symbol_expr.evaluate(context, facts).await
 }
 
 fn index(value: Value, index: &Index) -> Result<Value> {
