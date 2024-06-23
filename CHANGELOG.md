@@ -5,12 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<<<<<<< HEAD
-## [unreleased]
-
-### Changed
-
 ## [Unreleased]
+
+### Added
+- Symbols are reusable named expressions
 
 ### Changed
 - Implement `datetime` and `duration` functions for the DateTime and Duration types to evaluate to the unmodified value
@@ -18,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - json rules parsing, all rules now need to be written using the DSL
+- `EvaluationContext`
+- evaluate method from `Rule`, rules now need to be evaluated as part of a `RuleSet`
 
 ## [0.7.8]
 
