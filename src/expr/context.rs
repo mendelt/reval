@@ -1,4 +1,5 @@
 use crate::{
+    expr::Expr,
     function::{UserFunctions, EMPTY_FUNCTIONS},
     symbol::{Symbols, EMPTY_SYMBOLS},
     value::Value,
@@ -31,7 +32,7 @@ impl<'a> EvaluationContext<'a> {
             .await
     }
 
-    pub(crate) fn get_symbol(&self, symbol: &str) -> Result<&Value> {
+    pub(crate) fn get_symbol(&self, symbol: &str) -> Result<&Expr> {
         self.symbols.get(symbol)
     }
 }

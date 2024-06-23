@@ -1,9 +1,9 @@
 use crate::{
     error::{Error, Result},
+    expr::Expr,
     function::{UserFunction, UserFunctions},
     ruleset::{rule::Rule, RuleSet},
     symbol::Symbols,
-    value::Value,
 };
 
 /// Start building a ruleset
@@ -63,14 +63,14 @@ impl Builder {
         Ok(self)
     }
 
-    pub fn with_symbol(mut self, symbol: impl ToString, value: Value) -> Self {
+    pub fn with_symbol(mut self, symbol: impl ToString, value: Expr) -> Self {
         self.symbols.insert(symbol, value);
         self
     }
 
     pub fn with_symbols(
         mut self,
-        values: impl IntoIterator<Item = (impl ToString, Value)>,
+        values: impl IntoIterator<Item = (impl ToString, Expr)>,
     ) -> Self {
         self.symbols.append(values);
         self
@@ -89,6 +89,7 @@ impl Builder {
 #[cfg(test)]
 pub mod when_building_ruleset {
     use super::*;
+    use crate::value::Value;
 
     /// Test helper that creates an empty rule
     fn rule(name: &str) -> Rule {
