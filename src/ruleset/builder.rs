@@ -68,10 +68,7 @@ impl Builder {
         self
     }
 
-    pub fn with_symbols(
-        mut self,
-        values: impl IntoIterator<Item = (impl ToString, Expr)>,
-    ) -> Self {
+    pub fn with_symbols(mut self, values: impl IntoIterator<Item = (impl ToString, Expr)>) -> Self {
         self.symbols.append(values);
         self
     }

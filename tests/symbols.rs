@@ -17,7 +17,14 @@ async fn should_evaluate_simple_symbol() {
         )
         .unwrap()
         .build();
-    assert_eq!(ruleset.evaluate(&()).await.unwrap()[0].value.as_ref().unwrap().clone(), 4.into());
+    assert_eq!(
+        ruleset.evaluate(&()).await.unwrap()[0]
+            .value
+            .as_ref()
+            .unwrap()
+            .clone(),
+        4.into()
+    );
 }
 
 #[tokio::test]
@@ -36,7 +43,14 @@ async fn should_evaluate_complex_symbol_expression() {
         )
         .unwrap()
         .build();
-    assert_eq!(ruleset.evaluate(&()).await.unwrap()[0].value.as_ref().unwrap().clone(), 12.into());
+    assert_eq!(
+        ruleset.evaluate(&()).await.unwrap()[0]
+            .value
+            .as_ref()
+            .unwrap()
+            .clone(),
+        12.into()
+    );
 }
 
 #[tokio::test]
@@ -55,7 +69,14 @@ async fn should_evaluate_complex_expression_in_symbol() {
         )
         .unwrap()
         .build();
-    assert_eq!(ruleset.evaluate(&()).await.unwrap()[0].value.as_ref().unwrap().clone(), 23.into());
+    assert_eq!(
+        ruleset.evaluate(&()).await.unwrap()[0]
+            .value
+            .as_ref()
+            .unwrap()
+            .clone(),
+        23.into()
+    );
 }
 
 #[tokio::test]
@@ -74,5 +95,12 @@ async fn should_evaluate_symbol_reference_in_symbol() {
         )
         .unwrap()
         .build();
-    assert_eq!(ruleset.evaluate(&()).await.unwrap()[0].value.as_ref().unwrap().clone(), 8.into());
+    assert_eq!(
+        ruleset.evaluate(&()).await.unwrap()[0]
+            .value
+            .as_ref()
+            .unwrap()
+            .clone(),
+        8.into()
+    );
 }

@@ -32,8 +32,13 @@ impl Symbols {
     }
 }
 
-impl<T:IntoIterator<Item = (impl ToString, Expr)>> From<T> for Symbols {
+impl<T: IntoIterator<Item = (impl ToString, Expr)>> From<T> for Symbols {
     fn from(symbols: T) -> Self {
-        Self(symbols.into_iter().map(|(name, expr)|(name.to_string(),expr)).collect())
+        Self(
+            symbols
+                .into_iter()
+                .map(|(name, expr)| (name.to_string(), expr))
+                .collect(),
+        )
     }
 }
