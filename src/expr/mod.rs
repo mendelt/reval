@@ -1,10 +1,9 @@
-pub(crate) mod context;
 mod eval;
 pub(crate) mod keywords;
 
 pub mod index;
 
-use crate::{error::Result, function::FunctionCache, value::Value};
+use crate::{error::Result, function::FunctionCache, prelude::RuleSet, value::Value};
 pub use index::Index;
 use itertools::Itertools;
 use std::{collections::HashMap, fmt::Display};
@@ -151,9 +150,15 @@ pub enum Expr {
     Second(Box<Expr>),
 }
 
+lazy_static::lazy_static!(
+    pub(crate) static ref EMPTY_RULES: RuleSet = {
+        Default::default()
+    };
+);
+
 impl Expr {
     pub async fn evaluate(&self, facts: &Value) -> Result<Value> {
-        self.eval_int(&Default::default(), &mut FunctionCache::new(), facts)
+        self.eval_int(&EMPTY_RULES, &mut FunctionCache::new(), facts)
             .await
     }
 

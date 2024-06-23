@@ -1,7 +1,7 @@
 //! Evaluate Expressions
 
-use super::{context::EvaluationContext, Expr, Index};
-use crate::{error::Result, function::FunctionCache, value::Value, Error};
+use super::{Expr, Index};
+use crate::{error::Result, function::FunctionCache, ruleset::RuleSet, value::Value, Error};
 use async_recursion::async_recursion;
 use chrono::{prelude::*, TimeDelta};
 use rust_decimal::prelude::*;
@@ -11,7 +11,7 @@ impl Expr {
     #[async_recursion]
     pub(crate) async fn eval_int(
         &self,
-        context: &EvaluationContext,
+        context: &RuleSet,
         function_cache: &mut FunctionCache,
         facts: &Value,
     ) -> Result<Value> {
@@ -139,7 +139,7 @@ fn reference(facts: &Value, name: &str) -> Result<Value> {
 
 async fn symbol(
     name: &str,
-    context: &EvaluationContext<'_>,
+    context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
 ) -> Result<Value> {
@@ -159,7 +159,7 @@ fn index(value: Value, index: &Index) -> Result<Value> {
 }
 
 async fn iif(
-    context: &EvaluationContext<'_>,
+    context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
     switch: &Expr,
@@ -209,7 +209,7 @@ fn none(value: Value) -> Result<Value> {
 
 async fn eval_map(
     map: &HashMap<String, Expr>,
-    context: &EvaluationContext<'_>,
+    context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
 ) -> Result<Value> {
@@ -227,7 +227,7 @@ async fn eval_map(
 
 async fn eval_vec(
     vec: &Vec<Expr>,
-    context: &EvaluationContext<'_>,
+    context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
 ) -> Result<Value> {
@@ -370,7 +370,7 @@ fn sub(left: Value, right: Value) -> Result<Value> {
 }
 
 async fn eq<'a>(
-    context: &EvaluationContext<'a>,
+    context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
     left: &Expr,
@@ -442,7 +442,7 @@ fn lte(left: Value, right: Value) -> Result<Value> {
 
 /// Lazilly evaluate an and expression
 async fn and<'a>(
-    context: &EvaluationContext<'a>,
+    context: &RuleSet,
     function_cache: &mut FunctionCache,
 
     facts: &Value,
@@ -463,7 +463,7 @@ async fn and<'a>(
 
 /// Lazilly evaluate an or expression
 async fn or<'a>(
-    context: &EvaluationContext<'a>,
+    context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
     left: &Expr,
@@ -483,7 +483,7 @@ async fn or<'a>(
 
 /// Helper function that evaluates an expression and checks if its a boolean
 async fn eval_to_bool<'a>(
-    context: &EvaluationContext<'a>,
+    context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
     expr: &Expr,

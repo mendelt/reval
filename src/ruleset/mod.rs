@@ -9,13 +9,14 @@ pub use self::{
 };
 use crate::{
     error::Result,
-    expr::context::EvaluationContext,
+    expr::Expr,
     function::{FunctionCache, UserFunctions},
     symbol::Symbols,
     value::{ser::ValueSerializer, Value},
 };
 use serde::Serialize;
 
+#[derive(Default)]
 pub struct RuleSet {
     rules: Vec<Rule>,
     functions: UserFunctions,
@@ -30,22 +31,30 @@ impl RuleSet {
     }
 
     pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Outcome>> {
-        let context = EvaluationContext::init(&self.symbols, &self.functions);
         let mut function_cache = FunctionCache::new();
-
         let mut results = Vec::new();
 
         for rule in self.rules.iter() {
             results.push(Outcome {
-                value: rule
-                    .expr()
-                    .eval_int(&context, &mut function_cache, facts)
-                    .await,
+                value: rule.expr().eval_int(self, &mut function_cache, facts).await,
                 rule: &rule.name,
             });
         }
 
         Ok(results)
+    }
+
+    pub(crate) async fn call_function(
+        &self,
+        name: &str,
+        params: Value,
+        function_cache: &mut FunctionCache,
+    ) -> Result<Value> {
+        self.functions.call(name, params, function_cache).await
+    }
+
+    pub(crate) fn get_symbol(&self, symbol: &str) -> Result<&Expr> {
+        self.symbols.get(symbol)
     }
 }
 

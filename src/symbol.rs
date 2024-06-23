@@ -1,14 +1,8 @@
 use crate::{expr::Expr, Error, Result};
 use std::collections::BTreeMap;
 
-lazy_static::lazy_static!(
-    pub(crate) static ref EMPTY_SYMBOLS: Symbols = {
-        Default::default()
-    };
-);
-
 /// Store symbols for use in rules
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Symbols(BTreeMap<String, Expr>);
 
 impl Symbols {
