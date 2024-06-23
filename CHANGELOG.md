@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Symbols are reusable named expressions
+
 ### Changed
 - Implement `datetime` and `duration` functions for the DateTime and Duration types to evaluate to the unmodified value
 - Do not feature gate the serde serializer for `Value`s
 
 ### Removed
 - json rules parsing, all rules now need to be written using the DSL
+- `EvaluationContext`
+- evaluate method from `Rule`, rules now need to be evaluated as part of a `RuleSet`
 
 ## [0.7.9]
 
