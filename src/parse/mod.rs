@@ -3,6 +3,7 @@
 mod expr;
 mod helpers;
 mod rule;
+mod symbols;
 mod unescape;
 
 #[derive(Debug, PartialEq, Eq, thiserror::Error)]
@@ -12,4 +13,7 @@ pub enum Error {
 
     #[error("Error parsing expression {0}")]
     ExprParseError(String),
+
+    #[error("Not a valid symbols file, expected a map definition")]
+    SymbolsFileNotValid,
 }

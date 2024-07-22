@@ -193,11 +193,11 @@ mod when_parsing_vec_value {
 #[cfg(test)]
 mod when_parsing_map_value {
     use super::*;
-    use std::collections::HashMap;
+    use std::collections::BTreeMap;
 
     #[test]
     fn should_parse_empty_map() {
-        assert_eq!(Expr::parse("{}").unwrap(), Expr::Map(HashMap::new()))
+        assert_eq!(Expr::parse("{}").unwrap(), Expr::Map(BTreeMap::new()))
     }
 
     #[test]
