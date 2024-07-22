@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Bump lalrpop dependency to 0.20.2
+
 ### Fixed
 - Do not panic on division by zero
 
