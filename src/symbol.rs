@@ -2,8 +2,8 @@ use crate::{expr::Expr, Error, Result};
 use std::collections::BTreeMap;
 
 /// Store symbols for use in rules
-#[derive(Clone, Default)]
-pub struct Symbols(BTreeMap<String, Expr>);
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct Symbols(pub(crate) BTreeMap<String, Expr>);
 
 impl Symbols {
     pub fn insert(&mut self, symbol: impl ToString, value: Expr) {

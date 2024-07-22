@@ -5,7 +5,7 @@ use crate::{error::Result, function::FunctionCache, ruleset::RuleSet, value::Val
 use async_recursion::async_recursion;
 use chrono::{prelude::*, TimeDelta};
 use rust_decimal::prelude::*;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 impl Expr {
     #[async_recursion]
@@ -208,12 +208,12 @@ fn none(value: Value) -> Result<Value> {
 }
 
 async fn eval_map(
-    map: &HashMap<String, Expr>,
+    map: &BTreeMap<String, Expr>,
     context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
 ) -> Result<Value> {
-    let mut result = HashMap::<String, Value>::new();
+    let mut result = BTreeMap::<String, Value>::new();
 
     for (key, expr) in map {
         result.insert(

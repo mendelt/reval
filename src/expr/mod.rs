@@ -6,7 +6,7 @@ pub mod index;
 use crate::{error::Result, function::FunctionCache, prelude::RuleSet, value::Value};
 pub use index::Index;
 use itertools::Itertools;
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::BTreeMap, fmt::Display};
 
 /// The Reval expression abstract syntax tree
 #[derive(Clone, Debug, PartialEq)]
@@ -30,7 +30,7 @@ pub enum Expr {
     If(Box<Expr>, Box<Expr>, Box<Expr>),
 
     /// Construct a map from expression results
-    Map(HashMap<String, Expr>),
+    Map(BTreeMap<String, Expr>),
 
     /// Construct a vector from expression results
     Vec(Vec<Expr>),

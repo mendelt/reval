@@ -68,9 +68,9 @@ impl Builder {
         self
     }
 
-    pub fn with_symbols(mut self, values: impl IntoIterator<Item = (impl ToString, Expr)>) -> Self {
-        self.symbols.append(values);
-        self
+    pub fn with_symbols(mut self, symbols: Symbols) -> Result<Self> {
+        self.symbols.append(symbols.0);
+        Ok(self)
     }
 
     /// Finalize the builder and create the RuleSet

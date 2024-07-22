@@ -108,6 +108,7 @@ pub mod prelude {
         expr::Expr,
         function::{FunctionResult, UserFunction},
         ruleset::{ruleset, Builder, Rule, RuleSet},
+        symbol::Symbols,
         value::Value,
     };
 }

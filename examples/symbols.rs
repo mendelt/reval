@@ -1,0 +1,29 @@
+//! This example shows how to load and use symbols, small named expressions that can be reused between rules
+
+use reval::prelude::*;
+
+#[tokio::main]
+async fn main() {
+    let symbols = r#"{symbol_2: i4}"#;
+
+    // Set up a simple rule that passes the decimal value out without change
+    let rule = "
+// decimal
+:symbol_1 * :symbol_2
+";
+
+    // Set up the ruleset builder, add the rule and build the `RuleSet`
+    let ruleset = ruleset()
+        .with_symbol("symbol_1", Expr::parse("i2").unwrap())
+        .with_symbols(Symbols::parse(&symbols).unwrap())
+        .unwrap()
+        .with_rule(Rule::parse(rule).unwrap())
+        .unwrap()
+        .build();
+
+    // Evaluate the ruleset on the input data and check if the rule returns
+    // `false`
+    for outcome in ruleset.evaluate(&()).await.unwrap() {
+        assert_eq!(outcome.value.unwrap(), 8.into());
+    }
+}
