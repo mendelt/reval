@@ -289,18 +289,14 @@ fn mult(left: Value, right: Value) -> Result<Value> {
 
 fn div(left: Value, right: Value) -> Result<Value> {
     match (left, right) {
-        (Value::Int(left), Value::Int(right)) => {
-            match left.checked_div(right) {
-                Some(result) => Ok(Value::Int(result)),
-                None => Err(Error::DivisionByZero)
-            }
+        (Value::Int(left), Value::Int(right)) => match left.checked_div(right) {
+            Some(result) => Ok(Value::Int(result)),
+            None => Err(Error::DivisionByZero),
         },
         (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left / right)),
-        (Value::Decimal(left), Value::Decimal(right)) => {
-            match left.checked_div(right){
-                Some(result) => Ok(Value::Decimal(result)),
-                None => Err(Error::DivisionByZero)
-            }
+        (Value::Decimal(left), Value::Decimal(right)) => match left.checked_div(right) {
+            Some(result) => Ok(Value::Decimal(result)),
+            None => Err(Error::DivisionByZero),
         },
         (Value::None, _) | (_, Value::None) => Ok(Value::None),
         _ => Err(Error::InvalidType),
