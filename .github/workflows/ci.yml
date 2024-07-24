@@ -9,54 +9,35 @@ env:
 
 jobs:
   rustfmt:
-    name: Rust fmt
+    name: Cargo fmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: stable
-          override: true
-      - run: rustup component add rustfmt
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - run: cargo fmt
 
   check:
-    name: A quick check for warnings
+    name: Cargo check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: stable
-          override: true
-      - name: set rust options to fail on warnings
-        run: echo "RUSTFLAGS=-D warnings" >> $GITHUB_ENV
-      - uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --all-features
+      - run: cargo check
 
   clippy:
-    name: Run clippy
+    name: Cargo clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: stable
-          override: true
-      - name: set rust options to fail on warnings
-        run: echo "RUSTFLAGS=-D warnings" >> $GITHUB_ENV
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --all-features
+      # - run: cargo clippy --tests -- -Dclippy::all -Dclippy::pedantic
+      - run: cargo clippy -- -Dclippy::all
 
   test:
     name: Test
@@ -68,13 +49,8 @@ jobs:
           - beta
           - "1.74.1"
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: ${{ matrix.rust }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all-features
+      - run: cargo test
