@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0]
+
+### Added
+- Reserved 'key' and 'val' to list of reserved keywords for later use
+
+### Fixed
+- Added missing values to the list of reserved keywords
+
+### Removed
+- Symbols file parsing, this will be implemented later, symbols can still be inserted in code
+
 ## [0.8.0-rc.0]
 
 ### Added
@@ -302,7 +313,8 @@ Was yanked and replaced by [0.5.0]
 - async `UserFunction` support
 
 
-[unreleased]: https://github.com/mendelt/reval/compare/v0.8.0-rc.0...HEAD
+[unreleased]: https://github.com/mendelt/reval/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/mendelt/reval/compare/v0.8.0-rc.0...v0.8.0
 [0.8.0-rc.0]: https://github.com/mendelt/reval/compare/v0.7.9...v0.8.0-rc.0
 [0.7.9]: https://github.com/mendelt/reval/compare/v0.7.8...v0.7.9
 [0.7.8]: https://github.com/mendelt/reval/compare/v0.7.7...v0.7.8
