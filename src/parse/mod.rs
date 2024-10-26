@@ -3,7 +3,6 @@
 mod expr;
 mod helpers;
 mod rule;
-mod symbols;
 mod unescape;
 
 #[derive(Debug, PartialEq, Eq, thiserror::Error)]
