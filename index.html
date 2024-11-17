@@ -80,7 +80,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html" class="active"><strong aria-hidden="true">1.</strong> Writing rules</a></li><li class="chapter-item expanded "><a href="json/index.html"><strong aria-hidden="true">2.</strong> Json rules</a></li><li class="chapter-item expanded "><a href="json/reference.html"><strong aria-hidden="true">3.</strong> Json rules Reference</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html" class="active"><strong aria-hidden="true">1.</strong> Writing rules</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -148,17 +148,9 @@ This document is targeted at people writing rules for Reval. It describes the sy
 <h2 id="concepts"><a class="header" href="#concepts">Concepts</a></h2>
 <h3 id="rules"><a class="header" href="#rules">Rules</a></h3>
 <p>Rules are pieces of text describing how to process input data to generate a required output. How the input and output data is structured depends depends on your particular Reval implementation.
-Each rule has a name, this name is used to identify the rule in error messages and other output and should be unique in a ruleset. Each rule also contains an expression, this is the actual rule that will be evaluated to generate the output.</p>
-<p>Rules can be written in one of two languages. The Reval language is the simpelest and most concise language to write rules. A simple rule written in the Reval language looks like this;</p>
+Each rule has a name, this name is used to identify the rule in error messages and other output and should be unique in a ruleset. Each rule also contains an expression, this is the actual rule that will be evaluated to generate the output. A simple rule looks like this;</p>
 <pre><code>// Example rule
 input_field &gt;= i5
-</code></pre>
-<p>Rules can also be written in a language based on Json, this used to be the only way to write rules and is still available for backward compatibility. Parsing Json rules will be deprecated in version <code>0.8.0</code> of Reval and the Json rules parser will be removed in <code>0.9.0</code>.
-The same rule that was specified above looks like this in Json, its quite a bit more verbose and harder to look at;</p>
-<pre><code class="language-json">{
-    &quot;name&quot;: &quot;Example rule&quot;,
-    &quot;expr&quot;: {&quot;gte&quot;: [{&quot;ref&quot;: &quot;input_field&quot;}, {&quot;int&quot;: &quot;5&quot;}]}
-}
 </code></pre>
 <p>The rule has the name <code>&quot;Example rule&quot;</code> and compares the value in <code>input_field</code> with the integer <code>5</code>. It will return <code>true</code> if it is greater than or equal to 5 and <code>false</code> otherwise. This rule will return an error if <code>input_field</code> does not contain a value with an integer type.</p>
 <h3 id="values-and-data-types"><a class="header" href="#values-and-data-types">Values and data types</a></h3>
@@ -189,9 +181,6 @@ The value <code>i5</code> in the example rule is a value that is specified in th
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
 
-                            <a rel="next" href="json/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -200,9 +189,6 @@ The value <code>i5</code> in the example rule is a value that is specified in th
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
 
-                    <a rel="next" href="json/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
             </nav>
 
         </div>
