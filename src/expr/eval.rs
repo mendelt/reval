@@ -52,6 +52,10 @@ impl Expr {
                 left.eval_int(context, function_cache, facts).await?,
                 right.eval_int(context, function_cache, facts).await?,
             ),
+            Expr::Rem(left, right) => rem(
+                left.eval_int(context, function_cache, facts).await?,
+                right.eval_int(context, function_cache, facts).await?,
+            ),
             Expr::Add(left, right) => add(
                 left.eval_int(context, function_cache, facts).await?,
                 right.eval_int(context, function_cache, facts).await?,
@@ -335,6 +339,22 @@ fn div(left: Value, right: Value) -> Result<Value> {
         },
         (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left / right)),
         (Value::Decimal(left), Value::Decimal(right)) => match left.checked_div(right) {
+            Some(result) => Ok(Value::Decimal(result)),
+            None => Err(Error::DivisionByZero),
+        },
+        (Value::None, _) | (_, Value::None) => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn rem(left: Value, right: Value) -> Result<Value> {
+    match (left, right) {
+        (Value::Int(left), Value::Int(right)) => match left.checked_rem(right) {
+            Some(result) => Ok(Value::Int(result)),
+            None => Err(Error::DivisionByZero),
+        },
+        (Value::Float(left), Value::Float(right)) => Ok(Value::Float(left % right)),
+        (Value::Decimal(left), Value::Decimal(right)) => match left.checked_rem(right) {
             Some(result) => Ok(Value::Decimal(result)),
             None => Err(Error::DivisionByZero),
         },

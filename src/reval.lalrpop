@@ -19,6 +19,7 @@ match {
     "-" => OP_SUB,
     "*" => OP_MULT,
     "/" => OP_DIV,
+    "%" => OP_REM,
     "!" => OP_NOT,
     "&" => OP_BIT_AND,
     "|" => OP_BIT_OR,
@@ -115,6 +116,7 @@ AddExpr: Expr = {
 MultExpr: Expr = {
     <l:MultExpr> OP_MULT <r:BitExpr> => Expr::mult(l, r),
     <l:MultExpr> OP_DIV <r:BitExpr> => Expr::div(l, r),
+    <l:MultExpr> OP_REM <r:BitExpr> => Expr::rem(l, r),
     BitExpr
 }
 

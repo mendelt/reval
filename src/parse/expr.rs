@@ -619,10 +619,15 @@ mod when_parsing_calculation_expressions {
     }
 
     #[test]
+    fn should_parse_rem() {
+        assert_eq!(Expr::parse("i1%i15").unwrap().to_string(), "(i1 % i15)");
+    }
+
+    #[test]
     fn should_parse_div_and_mult_left_associatively() {
         assert_eq!(
-            Expr::parse("i1/i15*i25").unwrap().to_string(),
-            "((i1 / i15) * i25)"
+            Expr::parse("i1/i15*i25%i6").unwrap().to_string(),
+            "(((i1 / i15) * i25) % i6)"
         );
     }
 }

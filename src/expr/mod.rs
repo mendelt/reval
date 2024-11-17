@@ -68,6 +68,9 @@ pub enum Expr {
     /// Divide two subexpressions
     Div(Box<Expr>, Box<Expr>),
 
+    /// Remainder of division of two subexpressions
+    Rem(Box<Expr>, Box<Expr>),
+
     /// Add two subexpressions
     Add(Box<Expr>, Box<Expr>),
 
@@ -253,6 +256,12 @@ impl Expr {
         Expr::Div(Box::new(left), Box::new(right))
     }
 
+    /// Remainder-expression constructor
+    #[allow(clippy::should_implement_trait)]
+    pub fn rem(left: Expr, right: Expr) -> Self {
+        Expr::Rem(Box::new(left), Box::new(right))
+    }
+
     /// Add-expression constructor
     #[allow(clippy::should_implement_trait)]
     pub fn add(left: Expr, right: Expr) -> Self {
@@ -416,6 +425,7 @@ impl Display for Expr {
             Expr::Duration(inner) => write!(formatter, "duration({inner})"),
             Expr::Mult(left, right) => write!(formatter, "({left} * {right})"),
             Expr::Div(left, right) => write!(formatter, "({left} / {right})"),
+            Expr::Rem(left, right) => write!(formatter, "({left} % {right})"),
             Expr::Add(left, right) => write!(formatter, "({left} + {right})"),
             Expr::Sub(left, right) => write!(formatter, "({left} - {right})"),
             Expr::Equals(left, right) => write!(formatter, "({left} == {right})"),
@@ -461,10 +471,13 @@ mod when_displaying_expr {
         assert_eq!(
             Expr::mult(
                 Expr::add(Expr::value(3), Expr::value(4)),
-                Expr::div(Expr::value(5), Expr::sub(Expr::value(6), Expr::value(7)))
+                Expr::div(
+                    Expr::value(5),
+                    Expr::sub(Expr::value(6), Expr::rem(Expr::value(7), Expr::value(8)))
+                )
             )
             .to_string(),
-            "((i3 + i4) * (i5 / (i6 - i7)))"
+            "((i3 + i4) * (i5 / (i6 - (i7 % i8))))"
         );
     }
 
