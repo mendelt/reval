@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `%` remainder operator for int, float and dec
 
+### Removed
+- Cleaned up leftover documentation for json format rules
+
 ## [0.8.0]
 
 ### Added

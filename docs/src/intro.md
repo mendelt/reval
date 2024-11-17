@@ -10,21 +10,10 @@ This document is targeted at people writing rules for Reval. It describes the sy
 ### Rules
 
 Rules are pieces of text describing how to process input data to generate a required output. How the input and output data is structured depends depends on your particular Reval implementation.
-Each rule has a name, this name is used to identify the rule in error messages and other output and should be unique in a ruleset. Each rule also contains an expression, this is the actual rule that will be evaluated to generate the output.
-
-Rules can be written in one of two languages. The Reval language is the simpelest and most concise language to write rules. A simple rule written in the Reval language looks like this;
+Each rule has a name, this name is used to identify the rule in error messages and other output and should be unique in a ruleset. Each rule also contains an expression, this is the actual rule that will be evaluated to generate the output. A simple rule looks like this;
 ```
 // Example rule
 input_field >= i5
-```
-
-Rules can also be written in a language based on Json, this used to be the only way to write rules and is still available for backward compatibility. Parsing Json rules will be deprecated in version `0.8.0` of Reval and the Json rules parser will be removed in `0.9.0`.
-The same rule that was specified above looks like this in Json, its quite a bit more verbose and harder to look at;
-```json
-{
-    "name": "Example rule",
-    "expr": {"gte": [{"ref": "input_field"}, {"int": "5"}]}
-}
 ```
 
 The rule has the name `"Example rule"` and compares the value in `input_field` with the integer `5`. It will return `true` if it is greater than or equal to 5 and `false` otherwise. This rule will return an error if `input_field` does not contain a value with an integer type.
