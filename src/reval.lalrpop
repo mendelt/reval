@@ -130,6 +130,12 @@ BitExpr: Expr = {
 ContainsExpr: Expr = {
     <l:IndexExpr> KWD_CONTAINS <r:IndexExpr> => Expr::contains(l, r),
     <l:IndexExpr> KWD_IN <r:IndexExpr> => Expr::contains(r, l),
+    UnaryExpr
+}
+
+UnaryExpr: Expr = {
+    OP_SUB <e:UnaryExpr> => Expr::neg(e),
+    OP_NOT <e:UnaryExpr> => Expr::not(e),
     IndexExpr
 }
 
@@ -160,8 +166,6 @@ Func: Expr = {
     KWD_IS_NONE LPAREN <e:Expr> RPAREN => Expr::none(e),
     KWD_SOME LPAREN <e:Expr> RPAREN => Expr::some(e),
     KWD_NONE LPAREN <e:Expr> RPAREN => Expr::none(e),
-    OP_SUB LPAREN <e:Expr> RPAREN => Expr::neg(e),
-    OP_NOT LPAREN <e:Expr> RPAREN => Expr::not(e),
     KWD_TO_UPPER LPAREN <e:Expr> RPAREN => Expr::uppercase(e),
     KWD_TO_LOWER LPAREN <e:Expr> RPAREN => Expr::lowercase(e),
     KWD_UPPERCASE LPAREN <e:Expr> RPAREN => Expr::uppercase(e),

@@ -248,15 +248,23 @@ mod when_parsing_func {
 
     #[test]
     fn should_parse_simple_not() {
-        assert_eq!(
-            Expr::parse("!(true)").unwrap(),
-            Expr::not(Expr::value(true))
-        );
+        assert_eq!(Expr::parse("!true").unwrap(), Expr::not(Expr::value(true)));
     }
 
     #[test]
     fn should_parse_simple_neg() {
-        assert_eq!(Expr::parse("-(i3)").unwrap(), Expr::neg(Expr::value(3)));
+        assert_eq!(Expr::parse("-i3").unwrap(), Expr::neg(Expr::value(3)));
+    }
+
+    #[test]
+    fn should_parse_neg_in_expr() {
+        assert_eq!(
+            Expr::parse(r#"i5+--i5-i5"#).unwrap(),
+            Expr::sub(
+                Expr::add(Expr::value(5), Expr::neg(Expr::neg(Expr::value(5)))),
+                Expr::value(5)
+            )
+        );
     }
 
     #[test]
@@ -503,7 +511,7 @@ mod when_parsing_logic_expressions {
     }
 
     #[test]
-    fn should_parse_logic_operators_left_left_associatively() {
+    fn should_parse_logic_operators_left_associatively() {
         assert_eq!(
             Expr::parse("true and false or true and false")
                 .unwrap()
