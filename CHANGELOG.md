@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [unreleased]
+## [0.8.1]
 
 ### Added
 - `%` remainder operator for int, float and dec
@@ -324,7 +324,8 @@ Was yanked and replaced by [0.5.0]
 - async `UserFunction` support
 
 
-[unreleased]: https://github.com/mendelt/reval/compare/v0.8.0...HEAD
+[unreleased]: https://github.com/mendelt/reval/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/mendelt/reval/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/mendelt/reval/compare/v0.8.0-rc.0...v0.8.0
 [0.8.0-rc.0]: https://github.com/mendelt/reval/compare/v0.7.9...v0.8.0-rc.0
 [0.7.9]: https://github.com/mendelt/reval/compare/v0.7.8...v0.7.9
