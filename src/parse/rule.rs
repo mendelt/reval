@@ -1,4 +1,11 @@
-use crate::{expr::Expr, parse::Error, ruleset::Rule};
+use std::collections::BTreeMap;
+
+use crate::{
+    expr::Expr,
+    parse::{reval, Error},
+    ruleset::Rule,
+    value::Value,
+};
 use itertools::Itertools;
 
 impl Rule {
@@ -7,15 +14,77 @@ impl Rule {
             .lines()
             .filter_map(|line| line.trim_start().strip_prefix("//").map(str::trim));
 
-        match comment_lines.next() {
+        let mut rule_builder = reval::RuleParser::new()
+            .parse(input)
+            .map_err(|error| Error::RuleParseError(error.to_string()))?;
+
+        let (name, description) = match comment_lines.next() {
             Some(name_line) => {
                 let name = name_line.trim();
+
+                // TODO: make none if no description
                 let description = comment_lines.map(|line| line.trim()).join("\n");
 
-                Ok(Rule::new(name, description, Expr::parse(input)?))
+                (Some(name), Some(description))
             }
-            None => Err(Error::MissingRuleName),
+            None => (None, None),
+        };
+
+        if let Some(name) = name {
+            rule_builder = rule_builder.set_name(name);
         }
+
+        if let Some(description) = description {
+            rule_builder = rule_builder.set_description(&description);
+        }
+
+        rule_builder.build()
+    }
+}
+
+const DESCRIPTION_META: &str = "description";
+const _NAME_META: &str = "name";
+
+/// Build rules from parsed components
+pub(crate) struct RuleBuilder {
+    name: Option<String>,
+    expr: Expr,
+    metadata: BTreeMap<String, Value>,
+}
+
+impl RuleBuilder {
+    pub(crate) fn new(expr: Expr) -> Self {
+        Self {
+            name: None,
+            expr,
+            metadata: BTreeMap::new(),
+        }
+    }
+
+    /// Set the name if it wasnt already set from metadata
+    pub(crate) fn set_name<'a>(mut self, name: &str) -> Self {
+        if self.name.is_none() {
+            self.name = Some(name.to_string())
+        }
+
+        self
+    }
+
+    pub(crate) fn set_description<'a>(mut self, description: &'a str) -> Self {
+        if !self.metadata.contains_key(DESCRIPTION_META) {
+            self.metadata
+                .insert(DESCRIPTION_META.to_string(), description.into());
+        };
+
+        self
+    }
+
+    pub(crate) fn build(self) -> Result<Rule, Error> {
+        Ok(Rule::new(
+            self.name.ok_or(Error::MissingRuleName)?,
+            self.metadata,
+            self.expr,
+        ))
     }
 }
 

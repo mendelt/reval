@@ -1,7 +1,6 @@
 mod eval;
-pub(crate) mod keywords;
-
 pub mod index;
+pub(crate) mod keywords;
 
 use crate::{error::Result, function::FunctionCache, prelude::RuleSet, value::Value};
 pub use index::Index;

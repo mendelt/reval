@@ -1,8 +1,5 @@
 use super::Error;
-use crate::expr::Expr;
-use lalrpop_util::lalrpop_mod;
-
-lalrpop_mod!(pub reval);
+use crate::{expr::Expr, parse::reval};
 
 impl Expr {
     pub fn parse(input: &str) -> Result<Self, Error> {
