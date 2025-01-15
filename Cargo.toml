@@ -17,7 +17,7 @@ anyhow = "1"
 async-recursion = "1"
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
-itertools = "0.13"
+itertools = "0.14"
 lalrpop-util = { version = "0.22", features = ["lexer", "unicode"] }
 lazy_static = "1"
 rust_decimal = "1"
