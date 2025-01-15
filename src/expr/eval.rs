@@ -389,7 +389,7 @@ fn sub(left: Value, right: Value) -> Result<Value> {
     }
 }
 
-async fn eq<'a>(
+async fn eq(
     context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
@@ -461,7 +461,7 @@ fn lte(left: Value, right: Value) -> Result<Value> {
 }
 
 /// Lazilly evaluate an and expression
-async fn and<'a>(
+async fn and(
     context: &RuleSet,
     function_cache: &mut FunctionCache,
 
@@ -482,7 +482,7 @@ async fn and<'a>(
 }
 
 /// Lazilly evaluate an or expression
-async fn or<'a>(
+async fn or(
     context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
@@ -502,7 +502,7 @@ async fn or<'a>(
 }
 
 /// Helper function that evaluates an expression and checks if its a boolean
-async fn eval_to_bool<'a>(
+async fn eval_to_bool(
     context: &RuleSet,
     function_cache: &mut FunctionCache,
     facts: &Value,
