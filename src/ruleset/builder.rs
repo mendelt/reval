@@ -85,12 +85,14 @@ impl Builder {
 
 #[cfg(test)]
 pub mod when_building_ruleset {
+    use std::collections::BTreeMap;
+
     use super::*;
     use crate::value::Value;
 
     /// Test helper that creates an empty rule
     fn rule(name: &str) -> Rule {
-        Rule::new(name, None, Value::None.into())
+        Rule::new(name, BTreeMap::new(), Value::None.into())
     }
 
     #[test]

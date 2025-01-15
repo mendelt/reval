@@ -1,4 +1,4 @@
-use crate::{expr::{Expr, Index}, value::Value, parse::helpers::*};
+use crate::{expr::{Expr, Index}, parse::rule::RuleBuilder, value::Value, parse::helpers::*};
 use std::str::FromStr;
 
 grammar;
@@ -82,6 +82,8 @@ else {
     r"[a-zA-Z][_a-zA-Z0-9]*" => IDENT,
     r"[0-9]+" => INDEX,
 }
+
+pub Rule: RuleBuilder = <e: Expr> => RuleBuilder::new(e);
 
 pub Expr: Expr = IfExpr;
 

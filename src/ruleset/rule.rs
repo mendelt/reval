@@ -1,23 +1,20 @@
-use crate::expr::Expr;
+use crate::{expr::Expr, value::Value};
+use std::collections::BTreeMap;
 
 /// A rule is an expression with a name
 #[derive(Debug, Clone, PartialEq)]
 pub struct Rule {
     pub(super) name: String,
-    description: Option<String>,
+    metadata: BTreeMap<String, Value>,
     expr: Expr,
 }
 
 impl Rule {
     /// Construct a new rule from a name and an expression
-    pub fn new(
-        name: impl Into<String>,
-        description: impl Into<Option<String>>,
-        expr: Expr,
-    ) -> Self {
+    pub fn new(name: impl Into<String>, metadata: BTreeMap<String, Value>, expr: Expr) -> Self {
         Self {
             name: name.into(),
-            description: description.into(),
+            metadata,
             expr,
         }
     }
@@ -29,7 +26,10 @@ impl Rule {
 
     /// Return an optional description of the rule
     pub fn description(&self) -> Option<&str> {
-        self.description.as_deref()
+        match self.metadata.get("description") {
+            Some(Value::String(description)) => Some(description.as_str()),
+            _ => None,
+        }
     }
 
     pub fn expr(&self) -> &Expr {
