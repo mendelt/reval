@@ -6,7 +6,7 @@ mod rule;
 mod unescape;
 
 use lalrpop_util::lalrpop_mod;
-lalrpop_mod!(pub reval);
+lalrpop_mod!(reval);
 
 #[derive(Debug, PartialEq, Eq, thiserror::Error)]
 pub enum Error {
