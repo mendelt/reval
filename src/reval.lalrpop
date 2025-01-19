@@ -24,6 +24,7 @@ match {
     "&" => OP_BIT_AND,
     "|" => OP_BIT_OR,
     "^" => OP_BIT_XOR,
+    "@" => OP_META,
     "and" => KWD_AND,
     "or" => KWD_OR,
     "if" => KWD_IF,
@@ -58,6 +59,7 @@ match {
     "second" => KWD_SECOND,
     "," => COMMA,
     ":" => COLON,
+    ";" => SEMICOLON,
     "." => DOT,
     "(" => LPAREN,
     ")" => RPAREN,
@@ -83,7 +85,9 @@ else {
     r"[0-9]+" => INDEX,
 }
 
-pub Rule: RuleBuilder = <e: Expr> => RuleBuilder::new(e);
+pub Rule: RuleBuilder = <m:(<MetaItem>)*> <e: Expr> =>? Ok(RuleBuilder::parse(m, e)?);
+
+MetaItem: (String, Expr) = OP_META <k:IDENT> COLON <e:Expr> SEMICOLON => (k.to_string(), e);
 
 pub Expr: Expr = IfExpr;
 

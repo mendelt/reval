@@ -1,12 +1,10 @@
-use std::collections::BTreeMap;
-
 use crate::{
     expr::Expr,
-    parse::{reval, Error},
+    parse::{helpers::RevalParseError, reval, Error},
     ruleset::Rule,
     value::Value,
 };
-use itertools::Itertools;
+use std::collections::BTreeMap;
 
 impl Rule {
     pub fn parse(input: &str) -> Result<Self, Error> {
@@ -20,12 +18,15 @@ impl Rule {
 
         let (name, description) = match comment_lines.next() {
             Some(name_line) => {
-                let name = name_line.trim();
+                let name = name_line;
 
-                // TODO: make none if no description
-                let description = comment_lines.map(|line| line.trim()).join("\n");
+                // let description = comment_lines.map(str::trim).join("\n");
+                let desc_first = comment_lines.next();
+                let description = desc_first.map(|first| {
+                    comment_lines.fold(first.to_string(), |acc, next| format!("{acc}\n{next}"))
+                });
 
-                (Some(name), Some(description))
+                (Some(name), description)
             }
             None => (None, None),
         };
@@ -43,7 +44,7 @@ impl Rule {
 }
 
 const DESCRIPTION_META: &str = "description";
-const _NAME_META: &str = "name";
+const NAME_META: &str = "name";
 
 /// Build rules from parsed components
 pub(crate) struct RuleBuilder {
@@ -53,12 +54,32 @@ pub(crate) struct RuleBuilder {
 }
 
 impl RuleBuilder {
-    pub(crate) fn new(expr: Expr) -> Self {
-        Self {
-            name: None,
-            expr,
-            metadata: BTreeMap::new(),
+    pub(crate) fn parse(meta: Vec<(String, Expr)>, expr: Expr) -> Result<Self, RevalParseError> {
+        let mut metadata: BTreeMap<String, Value> = BTreeMap::new();
+        let mut name = None;
+
+        for (key, expr) in meta {
+            match (&key[..], flatten(expr)) {
+                (NAME_META, Ok(Value::String(name_value))) => {
+                    name = Some(name_value);
+                }
+                (NAME_META, Ok(_)) => {
+                    return Err(RevalParseError::InvalidNameValue);
+                }
+                (_, Ok(value)) => {
+                    metadata.insert(key, value);
+                }
+                (_, Err(_)) => {
+                    return Err(RevalParseError::InvalidMetadata(key));
+                }
+            }
         }
+
+        Ok(Self {
+            name,
+            expr,
+            metadata,
+        })
     }
 
     /// Set the name if it wasnt already set from metadata
@@ -86,6 +107,35 @@ impl RuleBuilder {
             self.expr,
         ))
     }
+}
+
+#[derive(Debug, PartialEq, Eq, thiserror::Error)]
+enum FlattenError {
+    #[error("Invalid metadata expression")]
+    InvalidMetadata,
+}
+
+fn flatten(expr: Expr) -> Result<Value, FlattenError> {
+    match expr {
+        Expr::Value(value) => Ok(value),
+        Expr::Vec(values) => Ok(Value::Vec(
+            values
+                .into_iter()
+                .map(flatten)
+                .collect::<Result<Vec<Value>, FlattenError>>()?,
+        )),
+        Expr::Map(values) => Ok(Value::Map(
+            values
+                .into_iter()
+                .map(flatten_keyvalue)
+                .collect::<Result<BTreeMap<String, Value>, FlattenError>>()?,
+        )),
+        _ => Err(FlattenError::InvalidMetadata),
+    }
+}
+
+fn flatten_keyvalue((key, expr): (String, Expr)) -> Result<(String, Value), FlattenError> {
+    Ok((key, flatten(expr)?))
 }
 
 #[cfg(test)]
@@ -116,6 +166,11 @@ mod when_parsing_rules {
             Rule::parse("//name\n//descr1\ni3").unwrap().description(),
             Some("descr1")
         );
+    }
+
+    #[test]
+    fn should_return_none_when_no_description_specified() {
+        assert_eq!(Rule::parse("//rule name\ni3").unwrap().description(), None);
     }
 
     #[test]
