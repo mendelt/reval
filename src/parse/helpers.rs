@@ -53,4 +53,10 @@ pub(crate) enum RevalParseError {
 
     #[error("Error parsing decimal")]
     ParsingDecimal(#[from] rust_decimal::Error),
+
+    #[error("Invalid metadata expression: {0}")]
+    InvalidMetadata(String),
+
+    #[error("Invalid value for rule name, must be a String value")]
+    InvalidNameValue,
 }
