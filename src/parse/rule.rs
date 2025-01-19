@@ -62,7 +62,7 @@ impl RuleBuilder {
     }
 
     /// Set the name if it wasnt already set from metadata
-    pub(crate) fn set_name<'a>(mut self, name: &str) -> Self {
+    pub(crate) fn set_name(mut self, name: &str) -> Self {
         if self.name.is_none() {
             self.name = Some(name.to_string())
         }
@@ -70,7 +70,7 @@ impl RuleBuilder {
         self
     }
 
-    pub(crate) fn set_description<'a>(mut self, description: &'a str) -> Self {
+    pub(crate) fn set_description(mut self, description: &str) -> Self {
         if !self.metadata.contains_key(DESCRIPTION_META) {
             self.metadata
                 .insert(DESCRIPTION_META.to_string(), description.into());
