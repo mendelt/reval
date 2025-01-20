@@ -184,11 +184,17 @@ mod when_parsing_rules {
     }
 
     #[test]
-    fn should_parse_multiline_expression() {
+    fn should_parse_multiline_description() {
         assert_eq!(
-            Rule::parse("//name\n// descr1\n// descr2  \ni3")
-                .unwrap()
-                .description(),
+            Rule::parse(
+                r#"
+//name
+// descr1
+// descr2  
+i3"#
+            )
+            .unwrap()
+            .description(),
             Some("descr1\ndescr2")
         );
     }
@@ -196,10 +202,192 @@ mod when_parsing_rules {
     #[test]
     fn should_parse_comments_in_between_expression() {
         assert_eq!(
-            Rule::parse("//name\n// descr1  \t\ni3\n// descr2")
-                .unwrap()
-                .description(),
+            Rule::parse(
+                r#"
+//name
+// descr1  
+i3
+// descr2"#
+            )
+            .unwrap()
+            .description(),
             Some("descr1\ndescr2")
         );
+    }
+
+    #[test]
+    fn should_parse_metadata_field() {
+        assert_eq!(
+            Rule::parse(
+                r#"
+//name
+@meta: "Meta field 1";
+i3"#
+            )
+            .unwrap()
+            .get_metadata("meta"),
+            Some(&Value::from("Meta field 1"))
+        );
+    }
+
+    #[test]
+    fn should_parse_multiple_metadata_fields() {
+        let rule = Rule::parse(
+            r#"
+//name
+@meta1: "Meta field 1";
+@meta2: "Meta field 2";
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(
+            rule.get_metadata("meta1"),
+            Some(&Value::from("Meta field 1"))
+        );
+
+        assert_eq!(
+            rule.get_metadata("meta2"),
+            Some(&Value::from("Meta field 2"))
+        );
+    }
+
+    #[test]
+    fn should_parse_metadata_case_sensitive() {
+        let rule = Rule::parse(
+            r#"
+//name
+@meta: "Meta field lower";
+@Meta: "Meta field capitalized";
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(
+            rule.get_metadata("meta"),
+            Some(&Value::from("Meta field lower"))
+        );
+
+        assert_eq!(
+            rule.get_metadata("Meta"),
+            Some(&Value::from("Meta field capitalized"))
+        );
+    }
+
+    #[test]
+    fn should_parse_metadata_int() {
+        let rule = Rule::parse(
+            r#"
+//name
+@meta: i15;
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(rule.get_metadata("meta"), Some(&Value::from(15)));
+    }
+
+    #[test]
+    fn should_parse_metadata_float() {
+        let rule = Rule::parse(
+            r#"
+//name
+@meta: f1.2;
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(rule.get_metadata("meta"), Some(&Value::from(1.2f64)));
+    }
+
+    #[test]
+    fn should_parse_metadata_vec() {
+        let rule = Rule::parse(
+            r#"
+//name
+@meta: ["meta1", "meta2"];
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(
+            rule.get_metadata("meta").unwrap(),
+            &Value::Vec(vec!["meta1".into(), "meta2".into(),].into_iter().collect())
+        );
+    }
+
+    #[test]
+    fn should_parse_metadata_map() {
+        let rule = Rule::parse(
+            r#"
+//name
+@meta: {meta1: i1, meta2: i2};
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(
+            rule.get_metadata("meta").unwrap(),
+            &Value::Map(
+                [
+                    ("meta1".to_string(), 1.into()),
+                    ("meta2".to_string(), 2.into())
+                ]
+                .into_iter()
+                .collect()
+            )
+        );
+    }
+
+    #[test]
+    fn should_parse_name_from_metadata() {
+        let rule = Rule::parse(
+            r#"
+@name: "rule name";
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(rule.name(), "rule name");
+    }
+
+    #[test]
+    fn should_parse_description_from_metadata() {
+        let rule = Rule::parse(
+            r#"
+@name: "rule name";
+@description: "some rule description";
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(rule.description(), Some("some rule description"));
+    }
+
+    #[test]
+    fn should_overwrite_rulename_with_metadata() {
+        let rule = Rule::parse(
+            r#"
+//name
+@name: "new name";
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(rule.name(), "new name");
+    }
+
+    #[test]
+    fn should_overwrite_rule_description_with_metadata() {
+        let rule = Rule::parse(
+            r#"
+//name
+//description
+@description: "new description";
+i3"#,
+        )
+        .unwrap();
+
+        assert_eq!(rule.description(), Some("new description"));
     }
 }
