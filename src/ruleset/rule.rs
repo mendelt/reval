@@ -24,6 +24,11 @@ impl Rule {
         &self.name
     }
 
+    /// Read a metadata field by name
+    pub fn get_metadata(&self, field: &str) -> Option<&Value> {
+        self.metadata.get(field)
+    }
+
     /// Return an optional description of the rule
     pub fn description(&self) -> Option<&str> {
         match self.metadata.get("description") {
