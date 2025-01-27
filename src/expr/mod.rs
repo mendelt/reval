@@ -159,8 +159,9 @@ lazy_static::lazy_static!(
 );
 
 impl Expr {
+    /// Evaluate the Expr, passing in a set of values
     pub async fn evaluate(&self, facts: &Value) -> Result<Value> {
-        self.eval_int(&EMPTY_RULES, &mut FunctionCache::new(), facts)
+        self.eval_rec(&EMPTY_RULES, &mut FunctionCache::new(), facts)
             .await
     }
 

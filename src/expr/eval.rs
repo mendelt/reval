@@ -8,8 +8,9 @@ use rust_decimal::prelude::*;
 use std::collections::BTreeMap;
 
 impl Expr {
+    /// Recursively evaluate an expression
     #[async_recursion]
-    pub(crate) async fn eval_int(
+    pub(crate) async fn eval_rec(
         &self,
         context: &RuleSet,
         function_cache: &mut FunctionCache,
@@ -20,49 +21,49 @@ impl Expr {
             Expr::Reference(name) => reference(facts, name),
             Expr::Symbol(name) => symbol(name, context, function_cache, facts).await,
             Expr::Index(value, idx) => {
-                index(value.eval_int(context, function_cache, facts).await?, idx)
+                index(value.eval_rec(context, function_cache, facts).await?, idx)
             }
             Expr::Function(name, value) => {
-                let param = value.eval_int(context, function_cache, facts).await?;
+                let param = value.eval_rec(context, function_cache, facts).await?;
                 context.call_function(name, param, function_cache).await
             }
             Expr::If(switch, left, right) => {
                 iif(context, function_cache, facts, switch, left, right).await
             }
-            Expr::Not(value) => not(value.eval_int(context, function_cache, facts).await?),
-            Expr::Neg(value) => neg(value.eval_int(context, function_cache, facts).await?),
-            Expr::Some(value) => some(value.eval_int(context, function_cache, facts).await?),
-            Expr::None(value) => none(value.eval_int(context, function_cache, facts).await?),
+            Expr::Not(value) => not(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Neg(value) => neg(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Some(value) => some(value.eval_rec(context, function_cache, facts).await?),
+            Expr::None(value) => none(value.eval_rec(context, function_cache, facts).await?),
             Expr::DateTime(value) => {
-                datetime(value.eval_int(context, function_cache, facts).await?)
+                datetime(value.eval_rec(context, function_cache, facts).await?)
             }
             Expr::Duration(value) => {
-                duration(value.eval_int(context, function_cache, facts).await?)
+                duration(value.eval_rec(context, function_cache, facts).await?)
             }
             Expr::Map(map) => eval_map(map, context, function_cache, facts).await,
             Expr::Vec(vec) => eval_vec(vec, context, function_cache, facts).await,
-            Expr::Int(value) => int(value.eval_int(context, function_cache, facts).await?),
-            Expr::Float(value) => float(value.eval_int(context, function_cache, facts).await?),
-            Expr::Dec(value) => dec(value.eval_int(context, function_cache, facts).await?),
+            Expr::Int(value) => int(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Float(value) => float(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Dec(value) => dec(value.eval_rec(context, function_cache, facts).await?),
             Expr::Mult(left, right) => mult(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::Div(left, right) => div(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::Rem(left, right) => rem(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::Add(left, right) => add(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::Sub(left, right) => sub(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::Equals(left, right) => eq(context, function_cache, facts, left, right)
                 .await
@@ -71,61 +72,61 @@ impl Expr {
                 .await
                 .map(|val| Value::Bool(!val)),
             Expr::GreaterThan(left, right) => gt(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::GreaterThanEquals(left, right) => gte(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::LessThan(left, right) => lt(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::LessThanEquals(left, right) => lte(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
 
             Expr::And(left, right) => and(context, function_cache, facts, left, right).await,
             Expr::Or(left, right) => or(context, function_cache, facts, left, right).await,
 
             Expr::BitAnd(left, right) => bitwise_and(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::BitOr(left, right) => bitwise_or(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
             Expr::BitXor(left, right) => bitwise_xor(
-                left.eval_int(context, function_cache, facts).await?,
-                right.eval_int(context, function_cache, facts).await?,
+                left.eval_rec(context, function_cache, facts).await?,
+                right.eval_rec(context, function_cache, facts).await?,
             ),
 
             Expr::Contains(coll, item) => contains(
-                coll.eval_int(context, function_cache, facts).await?,
-                item.eval_int(context, function_cache, facts).await?,
+                coll.eval_rec(context, function_cache, facts).await?,
+                item.eval_rec(context, function_cache, facts).await?,
             ),
 
             Expr::UpperCase(value) => {
-                uppercase(value.eval_int(context, function_cache, facts).await?)
+                uppercase(value.eval_rec(context, function_cache, facts).await?)
             }
             Expr::LowerCase(value) => {
-                lowercase(value.eval_int(context, function_cache, facts).await?)
+                lowercase(value.eval_rec(context, function_cache, facts).await?)
             }
-            Expr::Trim(value) => trim(value.eval_int(context, function_cache, facts).await?),
-            Expr::Round(value) => round(value.eval_int(context, function_cache, facts).await?),
-            Expr::Floor(value) => floor(value.eval_int(context, function_cache, facts).await?),
-            Expr::Fract(value) => fract(value.eval_int(context, function_cache, facts).await?),
+            Expr::Trim(value) => trim(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Round(value) => round(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Floor(value) => floor(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Fract(value) => fract(value.eval_rec(context, function_cache, facts).await?),
 
-            Expr::Year(value) => year(value.eval_int(context, function_cache, facts).await?),
-            Expr::Month(value) => month(value.eval_int(context, function_cache, facts).await?),
-            Expr::Week(value) => week(value.eval_int(context, function_cache, facts).await?),
-            Expr::Day(value) => day(value.eval_int(context, function_cache, facts).await?),
-            Expr::Hour(value) => hour(value.eval_int(context, function_cache, facts).await?),
-            Expr::Minute(value) => minute(value.eval_int(context, function_cache, facts).await?),
-            Expr::Second(value) => second(value.eval_int(context, function_cache, facts).await?),
+            Expr::Year(value) => year(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Month(value) => month(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Week(value) => week(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Day(value) => day(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Hour(value) => hour(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Minute(value) => minute(value.eval_rec(context, function_cache, facts).await?),
+            Expr::Second(value) => second(value.eval_rec(context, function_cache, facts).await?),
         }
     }
 }
@@ -149,7 +150,7 @@ async fn symbol(
 ) -> Result<Value> {
     context
         .get_symbol(name)?
-        .eval_int(context, function_cache, facts)
+        .eval_rec(context, function_cache, facts)
         .await
 }
 
@@ -170,9 +171,9 @@ async fn iif(
     left: &Expr,
     right: &Expr,
 ) -> Result<Value> {
-    match switch.eval_int(context, function_cache, facts).await? {
-        Value::Bool(true) => left.eval_int(context, function_cache, facts).await,
-        Value::Bool(false) => right.eval_int(context, function_cache, facts).await,
+    match switch.eval_rec(context, function_cache, facts).await? {
+        Value::Bool(true) => left.eval_rec(context, function_cache, facts).await,
+        Value::Bool(false) => right.eval_rec(context, function_cache, facts).await,
         _ => Err(Error::InvalidType),
     }
 }
@@ -222,7 +223,7 @@ async fn eval_map(
     for (key, expr) in map {
         result.insert(
             key.clone(),
-            expr.eval_int(context, function_cache, facts).await?,
+            expr.eval_rec(context, function_cache, facts).await?,
         );
     }
 
@@ -237,7 +238,7 @@ async fn eval_vec(
 ) -> Result<Value> {
     let mut result = Vec::<Value>::new();
     for expr in vec {
-        result.push(expr.eval_int(context, function_cache, facts).await?)
+        result.push(expr.eval_rec(context, function_cache, facts).await?)
     }
     Ok(result.into())
 }
@@ -396,14 +397,14 @@ async fn eq(
     left: &Expr,
     right: &Expr,
 ) -> Result<bool> {
-    let left = left.eval_int(context, function_cache, facts).await?;
+    let left = left.eval_rec(context, function_cache, facts).await?;
 
     if left == Value::None {
         // Nothing equals Value::None, not even Value::None, so early return
         return Ok(false);
     }
 
-    let right = right.eval_int(context, function_cache, facts).await?;
+    let right = right.eval_rec(context, function_cache, facts).await?;
 
     Ok(left == right)
 }
@@ -508,7 +509,7 @@ async fn eval_to_bool(
     facts: &Value,
     expr: &Expr,
 ) -> Result<bool> {
-    TryInto::<bool>::try_into(expr.eval_int(context, function_cache, facts).await?)
+    TryInto::<bool>::try_into(expr.eval_rec(context, function_cache, facts).await?)
         .map_err(|_| Error::InvalidType)
 }
 
