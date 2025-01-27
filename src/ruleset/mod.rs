@@ -36,7 +36,7 @@ impl RuleSet {
 
         for rule in self.rules.iter() {
             results.push(Outcome {
-                value: rule.expr().eval_int(self, &mut function_cache, facts).await,
+                value: rule.expr().eval_rec(self, &mut function_cache, facts).await,
                 rule: &rule.name,
             });
         }
