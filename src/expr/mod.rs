@@ -2,7 +2,7 @@ mod eval;
 pub mod index;
 pub(crate) mod keywords;
 
-use crate::{error::Result, function::FunctionCache, prelude::RuleSet, value::Value};
+use crate::value::Value;
 pub use index::Index;
 use itertools::Itertools;
 use std::{collections::BTreeMap, fmt::Display};
@@ -152,19 +152,7 @@ pub enum Expr {
     Second(Box<Expr>),
 }
 
-lazy_static::lazy_static!(
-    pub(crate) static ref EMPTY_RULES: RuleSet = {
-        Default::default()
-    };
-);
-
 impl Expr {
-    /// Evaluate the Expr, passing in a set of values
-    pub async fn evaluate(&self, facts: &Value) -> Result<Value> {
-        self.eval_rec(&EMPTY_RULES, &mut FunctionCache::new(), facts)
-            .await
-    }
-
     /// Value expression constructor
     pub fn value(value: impl Into<Value>) -> Self {
         Expr::Value(value.into())
