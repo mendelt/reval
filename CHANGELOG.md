@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Rule metadata
+
 ### Changed
+- Rule name and description can now be specified as metadata fields
 - Update dependencies
 - Change msrv to 1.81.0
 
