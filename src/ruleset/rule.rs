@@ -29,6 +29,12 @@ impl Rule {
         self.metadata.get(field)
     }
 
+    pub fn iter_metadata(&self) -> impl Iterator<Item = (&str, &Value)> {
+        self.metadata
+            .iter()
+            .map(|(key, value)| (key.as_ref(), value))
+    }
+
     /// Return an optional description of the rule
     pub fn description(&self) -> Option<&str> {
         match self.metadata.get("description") {
