@@ -40,7 +40,7 @@ impl RuleSet {
                     .expr()
                     .eval_rule(self, &mut function_cache, facts)
                     .await,
-                rule: &rule.name,
+                rule,
             });
         }
 
@@ -63,8 +63,8 @@ impl RuleSet {
 
 /// The outcome from evaluating a rule.
 /// Contains the resulting value from evaluating the rule expression plus
-/// metadata. For now the metadata is limited to the name of the rule
+/// a reference to the rule that was evaluated to produce the data
 pub struct Outcome<'a> {
     pub value: Result<Value>,
-    pub rule: &'a str,
+    pub rule: &'a Rule,
 }
