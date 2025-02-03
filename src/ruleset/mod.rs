@@ -9,7 +9,6 @@ pub use self::{
 };
 use crate::{
     error::Result,
-    expr::Expr,
     function::{FunctionCache, UserFunctions},
     symbol::Symbols,
     value::{ser::ValueSerializer, Value},
@@ -56,7 +55,7 @@ impl RuleSet {
         self.functions.call(name, params, function_cache).await
     }
 
-    pub(crate) fn get_symbol(&self, symbol: &str) -> Result<&Expr> {
+    pub(crate) fn get_symbol(&self, symbol: &str) -> Result<&Value> {
         self.symbols.get(symbol)
     }
 }

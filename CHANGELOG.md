@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Return a reference to the full rule in the Outcome of evaluating a rule instead of just the name.
+- Symbols are simplified to be `Value`s instead of dynamically evaluated `Expr`essions
 
 ## [0.9.0]
 

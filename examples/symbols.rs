@@ -12,7 +12,7 @@ async fn main() {
 
     // Set up the ruleset builder, add the rule and build the `RuleSet`
     let ruleset = ruleset()
-        .with_symbol("symbol", Expr::parse("i2").unwrap())
+        .with_symbol("symbol", 12.into())
         .with_rule(Rule::parse(rule).unwrap())
         .unwrap()
         .build();

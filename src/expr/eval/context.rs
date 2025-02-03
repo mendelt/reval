@@ -43,7 +43,7 @@ impl EvalContext<'_> {
         .cloned()
     }
 
-    pub(super) async fn symbol(&mut self, name: &str) -> Result<Value> {
-        self.ruleset.get_symbol(name)?.eval_rec(self).await
+    pub(super) fn symbol(&mut self, name: &str) -> Result<Value> {
+        self.ruleset.get_symbol(name).cloned()
     }
 }

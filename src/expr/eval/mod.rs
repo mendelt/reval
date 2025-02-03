@@ -43,7 +43,7 @@ impl Expr {
         match self {
             Expr::Value(value) => Ok(value.clone()),
             Expr::Reference(name) => context.reference(name),
-            Expr::Symbol(name) => context.symbol(name).await,
+            Expr::Symbol(name) => context.symbol(name),
             Expr::Index(value, idx) => index(value.eval_rec(context).await?, idx),
             Expr::Function(name, value) => {
                 let param = value.eval_rec(context).await?;

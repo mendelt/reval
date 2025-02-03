@@ -1,9 +1,9 @@
 use crate::{
     error::{Error, Result},
-    expr::Expr,
     function::{UserFunction, UserFunctions},
     ruleset::{rule::Rule, RuleSet},
     symbol::Symbols,
+    value::Value,
 };
 
 /// Start building a ruleset
@@ -63,7 +63,7 @@ impl Builder {
         Ok(self)
     }
 
-    pub fn with_symbol(mut self, symbol: impl ToString, value: Expr) -> Self {
+    pub fn with_symbol(mut self, symbol: impl ToString, value: Value) -> Self {
         self.symbols.insert(symbol, value);
         self
     }
