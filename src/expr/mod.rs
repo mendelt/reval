@@ -115,6 +115,9 @@ pub enum Expr {
     /// Checks if a string starts with a prefix
     Starts(Box<Expr>, Box<Expr>),
 
+    /// Checks if a string starts with any prefix from a list
+    StartsAny(Box<Expr>, Box<Expr>),
+
     /// Convert a string to upper case
     UpperCase(Box<Expr>),
 
@@ -325,6 +328,10 @@ impl Expr {
         Expr::Starts(Box::new(list), Box::new(key))
     }
 
+    pub fn starts_any(str_expr: Expr, prefixes: Expr) -> Self {
+        Expr::StartsAny(Box::new(str_expr), Box::new(prefixes))
+    }
+
     pub fn uppercase(param: Expr) -> Self {
         Expr::UpperCase(Box::new(param))
     }
@@ -436,6 +443,7 @@ impl Display for Expr {
             Expr::BitXor(left, right) => write!(formatter, "{left} ^ {right}"),
             Expr::Contains(left, right) => write!(formatter, "({left} contains {right})"),
             Expr::Starts(left, right) => write!(formatter, "({left} starts {right})"),
+            Expr::StartsAny(left, right) => write!(formatter, "({left} starts any {right})"),
             Expr::UpperCase(param) => write!(formatter, "uppercase({param})"),
             Expr::LowerCase(param) => write!(formatter, "lowercase({param})"),
             Expr::Trim(param) => write!(formatter, "trim({param})"),

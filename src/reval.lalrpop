@@ -25,6 +25,7 @@ match {
     "|" => OP_BIT_OR,
     "^" => OP_BIT_XOR,
     "@" => OP_META,
+    "any" => KWD_ANY,
     "and" => KWD_AND,
     "or" => KWD_OR,
     "if" => KWD_IF,
@@ -137,6 +138,7 @@ BitExpr: Expr = {
 ContainsExpr: Expr = {
     <l:IndexExpr> KWD_CONTAINS <r:IndexExpr> => Expr::contains(l, r),
     <l:IndexExpr> KWD_IN <r:IndexExpr> => Expr::contains(r, l),
+    <l:IndexExpr> KWD_STARTS KWD_ANY <r:IndexExpr> => Expr::starts_any(l, r),
     <l:IndexExpr> KWD_STARTS <r:IndexExpr> => Expr::starts(l, r),
     UnaryExpr
 }

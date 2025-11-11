@@ -124,6 +124,9 @@ impl Expr {
             Expr::Starts(coll, item) => {
                 starts(coll.eval_rec(context).await?, item.eval_rec(context).await?)
             }
+            Expr::StartsAny(str_expr, prefixes) => {
+                starts_any(str_expr.eval_rec(context).await?, prefixes.eval_rec(context).await?)
+            }
 
             Expr::UpperCase(value) => uppercase(value.eval_rec(context).await?),
             Expr::LowerCase(value) => lowercase(value.eval_rec(context).await?),
@@ -509,6 +512,24 @@ fn contains(coll: Value, item: Value) -> Result<Value> {
 fn starts(coll: Value, item: Value) -> Result<Value> {
     match (coll, item) {
         (Value::String(coll), Value::String(item)) => Ok(Value::Bool(coll.starts_with(&item))),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn starts_any(str_val: Value, prefixes: Value) -> Result<Value> {
+    match (str_val, prefixes) {
+        (Value::String(s), Value::Vec(vec)) => {
+            for prefix in vec {
+                if let Value::String(prefix_str) = prefix {
+                    if s.starts_with(&prefix_str) {
+                        return Ok(Value::Bool(true));
+                    }
+                } else {
+                    return Err(Error::InvalidType);
+                }
+            }
+            Ok(Value::Bool(false))
+        }
         _ => Err(Error::InvalidType),
     }
 }

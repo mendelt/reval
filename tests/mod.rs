@@ -128,6 +128,45 @@ async fn should_eval_starts_expr_on_strings() {
 }
 
 #[tokio::test]
+async fn should_eval_starts_any_expr_on_strings() {
+    assert_eq!(
+        eval_expr(
+            r#""foo" starts any ["fo", "ba"]"#,
+            Event::List { list: Vec::new() },
+        )
+        .await,
+        true.into(),
+    );
+
+    assert_eq!(
+        eval_expr(
+            r#""bar" starts any ["fo", "ba"]"#,
+            Event::List { list: Vec::new() },
+        )
+        .await,
+        true.into(),
+    );
+
+    assert_eq!(
+        eval_expr(
+            r#""baz" starts any ["fo", "ba"]"#,
+            Event::List { list: Vec::new() },
+        )
+        .await,
+        true.into(),
+    );
+
+    assert_eq!(
+        eval_expr(
+            r#""xyz" starts any ["fo", "ba"]"#,
+            Event::List { list: Vec::new() },
+        )
+        .await,
+        false.into(),
+    );
+}
+
+#[tokio::test]
 async fn should_eval_bitwise_and() {
     assert_eq!(eval_expr("0b010111 & 0b011101", ()).await, 0b010101.into());
     assert_eq!(eval_expr("true & false", ()).await, false.into());
