@@ -112,6 +112,9 @@ pub enum Expr {
     /// Checks if a vec contains an item or if a map contains a key
     Contains(Box<Expr>, Box<Expr>),
 
+    /// Checks if a string starts with a prefix
+    Starts(Box<Expr>, Box<Expr>),
+
     /// Convert a string to upper case
     UpperCase(Box<Expr>),
 
@@ -318,6 +321,10 @@ impl Expr {
         Expr::Contains(Box::new(list), Box::new(key))
     }
 
+    pub fn starts(list: Expr, key: Expr) -> Self {
+        Expr::Starts(Box::new(list), Box::new(key))
+    }
+
     pub fn uppercase(param: Expr) -> Self {
         Expr::UpperCase(Box::new(param))
     }
@@ -428,6 +435,7 @@ impl Display for Expr {
             Expr::BitOr(left, right) => write!(formatter, "{left} | {right}"),
             Expr::BitXor(left, right) => write!(formatter, "{left} ^ {right}"),
             Expr::Contains(left, right) => write!(formatter, "({left} contains {right})"),
+            Expr::Starts(left, right) => write!(formatter, "({left} starts {right})"),
             Expr::UpperCase(param) => write!(formatter, "uppercase({param})"),
             Expr::LowerCase(param) => write!(formatter, "lowercase({param})"),
             Expr::Trim(param) => write!(formatter, "trim({param})"),

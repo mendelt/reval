@@ -39,6 +39,7 @@ match {
     "dec" => KWD_DEC,
     "contains" => KWD_CONTAINS,
     "in" => KWD_IN,
+    "starts" => KWD_STARTS,
     "date_time" => KWD_DATE_TIME,
     "datetime" => KWD_DATETIME,
     "duration" => KWD_DURATION,
@@ -136,6 +137,7 @@ BitExpr: Expr = {
 ContainsExpr: Expr = {
     <l:IndexExpr> KWD_CONTAINS <r:IndexExpr> => Expr::contains(l, r),
     <l:IndexExpr> KWD_IN <r:IndexExpr> => Expr::contains(r, l),
+    <l:IndexExpr> KWD_STARTS <r:IndexExpr> => Expr::starts(l, r),
     UnaryExpr
 }
 

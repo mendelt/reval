@@ -107,6 +107,27 @@ async fn should_eval_contains_expr_on_int() {
 }
 
 #[tokio::test]
+async fn should_eval_starts_expr_on_strings() {
+    assert_eq!(
+        eval_expr(
+            r#""this is a string" starts "this""#,
+            Event::List { list: Vec::new() },
+        )
+        .await,
+        true.into(),
+    );
+
+    assert_eq!(
+        eval_expr(
+            r#""this is a string" starts "is""#,
+            Event::List { list: Vec::new() },
+        )
+        .await,
+        false.into(),
+    );
+}
+
+#[tokio::test]
 async fn should_eval_bitwise_and() {
     assert_eq!(eval_expr("0b010111 & 0b011101", ()).await, 0b010101.into());
     assert_eq!(eval_expr("true & false", ()).await, false.into());

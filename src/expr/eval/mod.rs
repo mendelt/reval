@@ -121,6 +121,9 @@ impl Expr {
             Expr::Contains(coll, item) => {
                 contains(coll.eval_rec(context).await?, item.eval_rec(context).await?)
             }
+            Expr::Starts(coll, item) => {
+                starts(coll.eval_rec(context).await?, item.eval_rec(context).await?)
+            }
 
             Expr::UpperCase(value) => uppercase(value.eval_rec(context).await?),
             Expr::LowerCase(value) => lowercase(value.eval_rec(context).await?),
@@ -499,6 +502,13 @@ fn contains(coll: Value, item: Value) -> Result<Value> {
         (Value::Int(flags), Value::Int(flag)) => Ok(Value::Bool((flags & flag) != 0)),
 
         (Value::None, _) => Ok(Value::Bool(false)),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn starts(coll: Value, item: Value) -> Result<Value> {
+    match (coll, item) {
+        (Value::String(coll), Value::String(item)) => Ok(Value::Bool(coll.starts_with(&item))),
         _ => Err(Error::InvalidType),
     }
 }
