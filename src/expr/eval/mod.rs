@@ -101,10 +101,8 @@ impl Expr {
                 left.eval_rec(context).await?,
                 right.eval_rec(context).await?,
             ),
-
             Expr::And(left, right) => and(context, left, right).await,
             Expr::Or(left, right) => or(context, left, right).await,
-
             Expr::BitAnd(left, right) => bitwise_and(
                 left.eval_rec(context).await?,
                 right.eval_rec(context).await?,
@@ -117,18 +115,23 @@ impl Expr {
                 left.eval_rec(context).await?,
                 right.eval_rec(context).await?,
             ),
-
             Expr::Contains(coll, item) => {
                 contains(coll.eval_rec(context).await?, item.eval_rec(context).await?)
             }
-
+            Expr::Starts(string, substr) => starts(
+                string.eval_rec(context).await?,
+                substr.eval_rec(context).await?,
+            ),
+            Expr::Ends(string, substr) => ends(
+                string.eval_rec(context).await?,
+                substr.eval_rec(context).await?,
+            ),
             Expr::UpperCase(value) => uppercase(value.eval_rec(context).await?),
             Expr::LowerCase(value) => lowercase(value.eval_rec(context).await?),
             Expr::Trim(value) => trim(value.eval_rec(context).await?),
             Expr::Round(value) => round(value.eval_rec(context).await?),
             Expr::Floor(value) => floor(value.eval_rec(context).await?),
             Expr::Fract(value) => fract(value.eval_rec(context).await?),
-
             Expr::Year(value) => year(value.eval_rec(context).await?),
             Expr::Month(value) => month(value.eval_rec(context).await?),
             Expr::Week(value) => week(value.eval_rec(context).await?),
@@ -499,6 +502,28 @@ fn contains(coll: Value, item: Value) -> Result<Value> {
         (Value::Int(flags), Value::Int(flag)) => Ok(Value::Bool((flags & flag) != 0)),
 
         (Value::None, _) => Ok(Value::Bool(false)),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn starts(string: Value, substr: Value) -> Result<Value> {
+    match (string, substr) {
+        (Value::String(string), Value::String(prefix)) => {
+            Ok(Value::Bool(string.starts_with(&prefix)))
+        }
+
+        (Value::None, _) => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn ends(string: Value, substr: Value) -> Result<Value> {
+    match (string, substr) {
+        (Value::String(string), Value::String(suffix)) => {
+            Ok(Value::Bool(string.ends_with(&suffix)))
+        }
+
+        (Value::None, _) => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }
 }

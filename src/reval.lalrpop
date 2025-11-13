@@ -57,6 +57,8 @@ match {
     "hour" => KWD_HOUR,
     "minute" => KWD_MINUTE,
     "second" => KWD_SECOND,
+    "starts" => KWD_STARTS,
+    "ends" => KWD_ENDS,
     "," => COMMA,
     ":" => COLON,
     ";" => SEMICOLON,
@@ -127,15 +129,18 @@ MultExpr: Expr = {
 }
 
 BitExpr: Expr = {
-    <l:BitExpr> OP_BIT_AND <r:ContainsExpr> => Expr::bitwise_and(l, r),
-    <l:BitExpr> OP_BIT_OR <r:ContainsExpr> => Expr::bitwise_or(l, r),
-    <l:BitExpr> OP_BIT_XOR <r:ContainsExpr> => Expr::bitwise_xor(l, r),
-    ContainsExpr
+    <l:BitExpr> OP_BIT_AND <r:SubStringExpr> => Expr::bitwise_and(l, r),
+    <l:BitExpr> OP_BIT_OR <r:SubStringExpr> => Expr::bitwise_or(l, r),
+    <l:BitExpr> OP_BIT_XOR <r:SubStringExpr> => Expr::bitwise_xor(l, r),
+    SubStringExpr
 }
 
-ContainsExpr: Expr = {
+SubStringExpr: Expr = {
     <l:IndexExpr> KWD_CONTAINS <r:IndexExpr> => Expr::contains(l, r),
     <l:IndexExpr> KWD_IN <r:IndexExpr> => Expr::contains(r, l),
+    <l:IndexExpr> KWD_STARTS <r:IndexExpr> => Expr::starts(l, r),
+    <l:IndexExpr> KWD_ENDS <r:IndexExpr> => Expr::ends(l, r),
+
     UnaryExpr
 }
 

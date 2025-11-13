@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Added
+- `starts` operator to check if a string starts with a substring
+- `ends` operator to check if a string ends with a substring
+
 ### Changed
 - Bumped minimum required Rust version to 1.82.0 because of indexmap dependency of lalrpop
 

@@ -112,6 +112,12 @@ pub enum Expr {
     /// Checks if a vec contains an item or if a map contains a key
     Contains(Box<Expr>, Box<Expr>),
 
+    /// Checks if a string starts with a prefix
+    Starts(Box<Expr>, Box<Expr>),
+
+    /// Checks if a string ends with a suffix
+    Ends(Box<Expr>, Box<Expr>),
+
     /// Convert a string to upper case
     UpperCase(Box<Expr>),
 
@@ -318,6 +324,14 @@ impl Expr {
         Expr::Contains(Box::new(list), Box::new(key))
     }
 
+    pub fn starts(prefix: Expr, string: Expr) -> Self {
+        Expr::Starts(Box::new(prefix), Box::new(string))
+    }
+
+    pub fn ends(suffix: Expr, string: Expr) -> Self {
+        Expr::Ends(Box::new(suffix), Box::new(string))
+    }
+
     pub fn uppercase(param: Expr) -> Self {
         Expr::UpperCase(Box::new(param))
     }
@@ -441,6 +455,8 @@ impl Display for Expr {
             Expr::Hour(param) => write!(formatter, "hour({param})"),
             Expr::Minute(param) => write!(formatter, "minute({param})"),
             Expr::Second(param) => write!(formatter, "second({param})"),
+            Expr::Starts(expr, expr1) => write!(formatter, "starts({expr}, {expr1})"),
+            Expr::Ends(expr, expr1) => write!(formatter, "ends({expr}, {expr1})"),
         }
     }
 }
