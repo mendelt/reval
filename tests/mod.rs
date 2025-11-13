@@ -107,6 +107,30 @@ async fn should_eval_contains_expr_on_int() {
 }
 
 #[tokio::test]
+async fn should_eval_starts() {
+    assert_eq!(
+        eval_expr(r#""hello world" starts "hello""#, ()).await,
+        true.into()
+    );
+    assert_eq!(
+        eval_expr(r#""hello world" starts "world""#, ()).await,
+        false.into()
+    );
+}
+
+#[tokio::test]
+async fn should_eval_ends() {
+    assert_eq!(
+        eval_expr(r#""hello world" ends "world""#, ()).await,
+        true.into()
+    );
+    assert_eq!(
+        eval_expr(r#""hello world" ends "hello""#, ()).await,
+        false.into()
+    );
+}
+
+#[tokio::test]
 async fn should_eval_bitwise_and() {
     assert_eq!(eval_expr("0b010111 & 0b011101", ()).await, 0b010101.into());
     assert_eq!(eval_expr("true & false", ()).await, false.into());

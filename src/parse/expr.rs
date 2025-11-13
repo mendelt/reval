@@ -666,6 +666,28 @@ mod when_parsing_contains_expressions {
     fn should_not_chain_in() {
         assert!(Expr::parse("i3 in \"value\" in list").is_err())
     }
+
+    #[test]
+    fn should_parse_starts() {
+        assert_eq!(
+            Expr::parse(r#""pre" starts "prefix""#).unwrap(),
+            Expr::starts(
+                Expr::value("pre".to_string()),
+                Expr::value("prefix".to_string())
+            )
+        );
+    }
+
+    #[test]
+    fn should_parse_ends() {
+        assert_eq!(
+            Expr::parse(r#""fix" ends "suffix""#).unwrap(),
+            Expr::ends(
+                Expr::value("fix".to_string()),
+                Expr::value("suffix".to_string())
+            )
+        );
+    }
 }
 
 #[cfg(test)]
