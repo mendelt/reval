@@ -1,7 +1,7 @@
 use unicode_xid::UnicodeXID;
 
 /// Reserved keywords
-const KEYWORDS: [&str; 40] = [
+const KEYWORDS: [&str; 41] = [
     "and",
     "or",
     "if",
@@ -41,6 +41,7 @@ const KEYWORDS: [&str; 40] = [
     "key",
     "val",
     "for",
+    "do",
     "filter",
 ];
 

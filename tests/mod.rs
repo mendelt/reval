@@ -1,6 +1,7 @@
 mod builtin;
 mod common;
 mod datetime;
+mod for_map_filter;
 mod iif;
 mod symbols;
 
