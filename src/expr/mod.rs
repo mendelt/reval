@@ -157,6 +157,12 @@ pub enum Expr {
 
     /// Extract years from a datetime or duration, or construct a duration in hours
     Second(Box<Expr>),
+
+    /// Map items in a list by evaluating an expression for each item
+    ForMap(String, Box<Expr>, Box<Expr>),
+
+    /// Filter items in a list by evaluating a predicate expression for each item
+    ForFilter(String, Box<Expr>, Box<Expr>),
 }
 
 impl From<Value> for Expr {
@@ -231,6 +237,10 @@ impl Display for Expr {
             Expr::Second(param) => write!(formatter, "second({param})"),
             Expr::Starts(expr, expr1) => write!(formatter, "starts({expr}, {expr1})"),
             Expr::Ends(expr, expr1) => write!(formatter, "ends({expr}, {expr1})"),
+            Expr::ForFilter(bind, list, pred) => {
+                write!(formatter, "for {bind} in {list} filter {pred}")
+            }
+            Expr::ForMap(bind, list, expr) => write!(formatter, "for {bind} in {list} map {expr}"),
         }
     }
 }

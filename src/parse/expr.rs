@@ -865,3 +865,32 @@ mod when_parsing_comments {
         );
     }
 }
+
+#[cfg(test)]
+mod when_parsing_for_map_filter {
+    use super::*;
+
+    #[test]
+    fn should_parse_for_map_expression() {
+        assert_eq!(
+            Expr::parse("for item in list map item + i3").unwrap(),
+            Expr::for_map(
+                "item",
+                Expr::reff("list"),
+                Expr::add(Expr::reff("item"), Expr::value(3))
+            )
+        );
+    }
+
+    #[test]
+    fn should_parse_for_filter_expression() {
+        assert_eq!(
+            Expr::parse("for item in list filter item > i3").unwrap(),
+            Expr::for_filter(
+                "item",
+                Expr::reff("list"),
+                Expr::gt(Expr::reff("item"), Expr::value(3))
+            )
+        );
+    }
+}

@@ -30,8 +30,8 @@ impl Expr {
     async fn eval_rec(&self, context: &EvalContext) -> Result<Value> {
         match self {
             Expr::Value(value) => Ok(value.clone()),
-            Expr::Reference(name) => context.reference(name),
-            Expr::Symbol(name) => context.symbol(name),
+            Expr::Reference(name) => context.get_reference(name),
+            Expr::Symbol(name) => context.get_symbol(name),
             Expr::Index(value, idx) => index(value.eval_rec(context).await?, idx),
             Expr::Function(name, value) => {
                 let param = value.eval_rec(context).await?;
@@ -127,6 +127,12 @@ impl Expr {
             Expr::Hour(value) => hour(value.eval_rec(context).await?),
             Expr::Minute(value) => minute(value.eval_rec(context).await?),
             Expr::Second(value) => second(value.eval_rec(context).await?),
+            Expr::ForMap(bind, list_expr, operation) => {
+                for_map(context, bind, list_expr.eval_rec(context).await?, operation).await
+            }
+            Expr::ForFilter(bind, list_expr, predicate) => {
+                for_filter(context, bind, list_expr.eval_rec(context).await?, predicate).await
+            }
         }
     }
 }
@@ -644,6 +650,82 @@ fn second(value: Value) -> Result<Value> {
         Value::DateTime(inner) => Ok(Value::Int(inner.second() as i128)),
         Value::Duration(inner) => Ok(Value::Int(inner.num_seconds() as i128)),
 
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+async fn for_map(
+    context: &EvalContext<'_>,
+    bind: &str,
+    list: Value,
+    operation: &Expr,
+) -> Result<Value> {
+    match list {
+        Value::Vec(vec) => {
+            let mut result = Vec::<Value>::new();
+
+            for item in vec {
+                let scope = context.start_scope([(&bind, item.clone())]);
+
+                let mapped_value = operation.eval_rec(&scope).await?;
+                result.push(mapped_value);
+            }
+
+            Ok(Value::Vec(result))
+        }
+        Value::Map(map) => {
+            let mut result = BTreeMap::<String, Value>::new();
+
+            for (key, item) in map {
+                let scope = context.start_scope([(&bind, item.clone())]);
+
+                let mapped_value = operation.eval_rec(&scope).await?;
+                result.insert(key.clone(), mapped_value);
+            }
+
+            Ok(Value::Map(result))
+        }
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+async fn for_filter(
+    context: &EvalContext<'_>,
+    bind: &str,
+    list: Value,
+    predicate: &Expr,
+) -> Result<Value> {
+    match list {
+        Value::Vec(vec) => {
+            let mut result = Vec::<Value>::new();
+
+            for item in vec {
+                let scope = context.start_scope([(&bind, item.clone())]);
+
+                let pred_value = predicate.eval_rec(&scope).await?;
+                if let Value::Bool(true) = pred_value {
+                    result.push(item.clone());
+                }
+            }
+
+            Ok(Value::Vec(result))
+        }
+        Value::Map(map) => {
+            let mut result = BTreeMap::<String, Value>::new();
+
+            for (key, item) in map {
+                let scope = context.start_scope([(&bind, item.clone())]);
+
+                let pred_value = predicate.eval_rec(&scope).await?;
+                if let Value::Bool(true) = pred_value {
+                    result.insert(key.clone(), item.clone());
+                }
+            }
+
+            Ok(Value::Map(result))
+        }
         Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }

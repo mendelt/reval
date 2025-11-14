@@ -36,6 +36,9 @@ pub enum Error {
     #[error("Unknown field reference {0}")]
     UnknownRef(String),
 
+    #[error("Unknown symbol {0}")]
+    UnknownSymbol(String),
+
     #[error("Unknown index {0}")]
     UnknownIndex(String),
 

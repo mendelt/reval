@@ -46,7 +46,7 @@ impl RuleSet {
         self.functions.call(name, params).await
     }
 
-    pub(crate) fn get_symbol(&self, symbol: &str) -> Result<&Value> {
+    pub(crate) fn get_symbol(&self, symbol: &str) -> Option<&Value> {
         self.symbols.get(symbol)
     }
 }
