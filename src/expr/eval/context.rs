@@ -1,17 +1,29 @@
 use crate::{
     error::{Error, Result},
     ruleset::RuleSet,
+    symbol::Symbols,
     value::Value,
 };
 
+#[derive(Clone)]
 pub(super) struct EvalContext<'a> {
+    /// The ruleset that we're evaluating against
     ruleset: &'a RuleSet,
+
+    /// The tree of values we're evaluating the rules on
     facts: &'a Value,
+
+    /// Scope adds symbols that are only valid at the current level of evaluation
+    scope: Symbols,
 }
 
 impl<'a> EvalContext<'a> {
     pub(super) fn new(ruleset: &'a RuleSet, facts: &'a Value) -> Self {
-        Self { ruleset, facts }
+        Self {
+            ruleset,
+            facts,
+            scope: Symbols::default(),
+        }
     }
 }
 
@@ -31,7 +43,25 @@ impl EvalContext<'_> {
         .cloned()
     }
 
-    pub(super) fn symbol(&self, name: &str) -> Result<Value> {
-        self.ruleset.get_symbol(name).cloned()
+    pub(super) fn get_symbol(&self, name: &str) -> Result<Value> {
+        self.scope
+            .get(name)
+            .cloned()
+            .or_else(|| self.ruleset.get_symbol(name).cloned())
+            .ok_or_else(|| Error::InvalidSymbol(name.to_string()))
+    }
+
+    pub(super) fn start_scope(
+        &self,
+        values: impl IntoIterator<Item = (impl ToString, Value)>,
+    ) -> EvalContext<'_> {
+        let mut new_scope = self.scope.clone();
+        new_scope.append(values);
+
+        EvalContext {
+            ruleset: self.ruleset,
+            facts: self.facts,
+            scope: new_scope,
+        }
     }
 }

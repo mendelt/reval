@@ -59,6 +59,9 @@ match {
     "second" => KWD_SECOND,
     "starts" => KWD_STARTS,
     "ends" => KWD_ENDS,
+    "for" => KWD_FOR,
+    "map" => KWD_MAP,
+    "filter" => KWD_FILTER,
     "," => COMMA,
     ":" => COLON,
     ";" => SEMICOLON,
@@ -91,16 +94,17 @@ pub Rule: RuleBuilder = <m:(<MetaItem>)*> <e: Expr> =>? Ok(RuleBuilder::parse(m,
 
 MetaItem: (String, Expr) = OP_META <k:IDENT> COLON <e:Expr> SEMICOLON => (k.to_string(), e);
 
-pub Expr: Expr = IfExpr;
+pub Expr: Expr = {
+    KWD_IF <iif:Expr> KWD_THEN <thn:Expr> KWD_ELSE <els:Expr> => Expr::iif(iif, thn, els),
+    KWD_FOR <bind:IDENT> KWD_IN <list:Expr> KWD_MAP <op:Expr> => Expr::for_map(bind, list, op),
+    KWD_FOR <bind:IDENT> KWD_IN <list:Expr> KWD_FILTER <filt:Expr> => Expr::for_filter(bind, list, filt),
 
-IfExpr: Expr = {
-    KWD_IF <iif:IfExpr> KWD_THEN <thn:IfExpr> KWD_ELSE <els:IfExpr> => Expr::iif(iif, thn, els),
-    LogExpr
+    LogicExpr
 }
 
-LogExpr: Expr = {
-    <l:LogExpr> KWD_AND <r:EqExpr> => Expr::and(l, r),
-    <l:LogExpr> KWD_OR <r:EqExpr> => Expr::or(l, r),
+LogicExpr: Expr = {
+    <l:LogicExpr> KWD_AND <r:EqExpr> => Expr::and(l, r),
+    <l:LogicExpr> KWD_OR <r:EqExpr> => Expr::or(l, r),
     EqExpr
 }
 
