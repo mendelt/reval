@@ -512,7 +512,7 @@ fn starts(string: Value, substr: Value) -> Result<Value> {
             Ok(Value::Bool(string.starts_with(&prefix)))
         }
 
-        (Value::None, _) => Ok(Value::None),
+        (Value::None, _) => Ok(Value::Bool(false)),
         _ => Err(Error::InvalidType),
     }
 }
@@ -523,7 +523,7 @@ fn ends(string: Value, substr: Value) -> Result<Value> {
             Ok(Value::Bool(string.ends_with(&suffix)))
         }
 
-        (Value::None, _) => Ok(Value::None),
+        (Value::None, _) => Ok(Value::Bool(false)),
         _ => Err(Error::InvalidType),
     }
 }
