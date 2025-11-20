@@ -519,6 +519,39 @@ mod when_parsing_logic_expressions {
 }
 
 #[cfg(test)]
+mod when_evaluating_logic_expressions {
+    use super::*;
+
+    #[tokio::test]
+    async fn should_evaluate_long_and_chain_without_stack_overflow() {
+        const NUM_CONDITIONS: usize = 100;
+        let mut expr_str = String::with_capacity(NUM_CONDITIONS * 9);
+        for i in 0..NUM_CONDITIONS {
+            expr_str.push_str(if i == 0 { "true" } else { " and true" });
+        }
+
+        let expr = Expr::parse(&expr_str).unwrap();
+        let result = expr.evaluate(&crate::value::Value::None).await;
+
+        assert!(matches!(result, Ok(crate::value::Value::Bool(true))));
+    }
+
+    #[tokio::test]
+    async fn should_evaluate_long_or_chain_without_stack_overflow() {
+        const NUM_CONDITIONS: usize = 100;
+        let mut expr_str = String::with_capacity(NUM_CONDITIONS * 8);
+        for i in 0..NUM_CONDITIONS {
+            expr_str.push_str(if i == 0 { "true" } else { " or true" });
+        }
+
+        let expr = Expr::parse(&expr_str).unwrap();
+        let result = expr.evaluate(&crate::value::Value::None).await;
+
+        assert!(matches!(result, Ok(crate::value::Value::Bool(true))));
+    }
+}
+
+#[cfg(test)]
 mod when_parsing_bitwise_expressions {
     use super::*;
 

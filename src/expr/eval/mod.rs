@@ -436,27 +436,43 @@ fn lte(left: Value, right: Value) -> Result<Value> {
 }
 
 /// Lazilly evaluate an and expression
-async fn and(context: &mut EvalContext<'_>, left: &Expr, right: &Expr) -> Result<Value> {
-    Ok(if !eval_to_bool(context, left).await? {
-        // If left evaluates to false bypass right and return false immediately
-        false
-    } else {
-        // If left evaluates to true return the result of evaluating right
-        eval_to_bool(context, right).await?
+async fn and(context: &mut EvalContext<'_>, mut left: &Expr, right: &Expr) -> Result<Value> {
+    let mut operands = Vec::with_capacity(2);
+    operands.push(right);
+
+    while let Expr::And(l, r) = left {
+        operands.push(r);
+        left = l;
     }
-    .into())
+    operands.push(left);
+
+    for operand in operands.iter().rev() {
+        if !eval_to_bool(context, operand).await? {
+            // If left evaluates to false bypass right and return false immediately
+            return Ok(false.into());
+        }
+    }
+    Ok(true.into())
 }
 
 /// Lazilly evaluate an or expression
-async fn or(context: &mut EvalContext<'_>, left: &Expr, right: &Expr) -> Result<Value> {
-    Ok(if eval_to_bool(context, left).await? {
-        // If left evaluates to true bypass right and return true immediately
-        true
-    } else {
-        // If left evaluates to false return the result of evaluating right
-        eval_to_bool(context, right).await?
+async fn or(context: &mut EvalContext<'_>, mut left: &Expr, right: &Expr) -> Result<Value> {
+    let mut operands = Vec::with_capacity(2);
+    operands.push(right);
+
+    while let Expr::Or(l, r) = left {
+        operands.push(r);
+        left = l;
     }
-    .into())
+    operands.push(left);
+
+    for operand in operands.iter().rev() {
+        if eval_to_bool(context, operand).await? {
+            // If left evaluates to true bypass right and return true immediately
+            return Ok(true.into());
+        }
+    }
+    Ok(false.into())
 }
 
 /// Helper function that evaluates an expression and checks if its a boolean
