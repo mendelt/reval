@@ -383,6 +383,14 @@ impl Expr {
     pub fn second(param: Expr) -> Self {
         Expr::Second(Box::new(param))
     }
+
+    pub fn for_do(_bind: &str, _list: Expr, _op: Expr) -> Self {
+        todo!()
+    }
+
+    pub fn for_filter(_bind: &str, _list: Expr, _filt: Expr) -> Self {
+        todo!()
+    }
 }
 
 impl From<Value> for Expr {
