@@ -24,12 +24,12 @@ pub struct RuleSet {
 
 impl RuleSet {
     /// Evaluate the rules in the RuleSet against a piece of data
-    pub async fn evaluate(&self, facts: &impl Serialize) -> Result<Vec<Outcome>> {
+    pub async fn evaluate(&self, facts: &impl Serialize) -> Result<Vec<Outcome<'_>>> {
         self.evaluate_value(&facts.serialize(ValueSerializer)?)
             .await
     }
 
-    pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Outcome>> {
+    pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Outcome<'_>>> {
         let mut function_cache = FunctionCache::new();
         let mut results = Vec::new();
 
