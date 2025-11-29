@@ -132,7 +132,7 @@ mod when_managing_user_functions {
         // Add a function with the same name
         assert!(matches!(
             functions.add_function(func("test_function")),
-            Err(Error::DuplicateFunctionName(name)) if name == "test_function".to_string()
+            Err(Error::DuplicateFunctionName(name)) if name == "test_function"
         ));
     }
 
@@ -143,7 +143,7 @@ mod when_managing_user_functions {
         // Add a function with the same name
         assert!(matches!(
             functions.add_function(func("if")),
-            Err(Error::InvalidFunctionName(name)) if name == "if".to_string()
+            Err(Error::InvalidFunctionName(name)) if name == "if"
         ));
     }
 

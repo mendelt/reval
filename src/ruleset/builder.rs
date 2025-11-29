@@ -114,7 +114,7 @@ pub mod when_building_ruleset {
 
         assert!(matches!(
             builder.with_rule(rule("test rule 1")),
-            Err(Error::DuplicateRuleName(name)) if name == "test rule 1".to_string()
+            Err(Error::DuplicateRuleName(name)) if name == "test rule 1"
         ));
     }
 }
