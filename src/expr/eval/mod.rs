@@ -5,7 +5,6 @@ mod context;
 use crate::{
     error::{Error, Result},
     expr::{Expr, Index},
-    function::FunctionCache,
     ruleset::RuleSet,
     value::Value,
 };
@@ -18,28 +17,17 @@ use std::collections::BTreeMap;
 impl Expr {
     /// Evaluate the Expr, passing in a set of values
     pub async fn evaluate(&self, facts: &Value) -> Result<Value> {
-        self.eval_rec(&mut EvalContext::new(
-            &EMPTY_RULES,
-            &mut FunctionCache::new(),
-            facts,
-        ))
-        .await
+        self.eval_rec(&EvalContext::new(&EMPTY_RULES, facts)).await
     }
 
     /// Evaluate the expression in the context of a rule
-    pub(crate) async fn eval_rule(
-        &self,
-        ruleset: &RuleSet,
-        function_cache: &mut FunctionCache,
-        facts: &Value,
-    ) -> Result<Value> {
-        self.eval_rec(&mut EvalContext::new(ruleset, function_cache, facts))
-            .await
+    pub(crate) async fn eval_rule(&self, ruleset: &RuleSet, facts: &Value) -> Result<Value> {
+        self.eval_rec(&EvalContext::new(ruleset, facts)).await
     }
 
     /// Recursively evaluate an expression
     #[async_recursion]
-    async fn eval_rec(&self, context: &mut EvalContext) -> Result<Value> {
+    async fn eval_rec(&self, context: &EvalContext) -> Result<Value> {
         match self {
             Expr::Value(value) => Ok(value.clone()),
             Expr::Reference(name) => context.reference(name),
@@ -158,12 +146,7 @@ fn index(value: Value, index: &Index) -> Result<Value> {
     }
 }
 
-async fn iif(
-    context: &mut EvalContext<'_>,
-    switch: &Expr,
-    left: &Expr,
-    right: &Expr,
-) -> Result<Value> {
+async fn iif(context: &EvalContext<'_>, switch: &Expr, left: &Expr, right: &Expr) -> Result<Value> {
     match switch.eval_rec(context).await? {
         Value::Bool(true) => left.eval_rec(context).await,
         Value::Bool(false) => right.eval_rec(context).await,
@@ -205,7 +188,7 @@ fn none(value: Value) -> Result<Value> {
     }
 }
 
-async fn eval_map(map: &BTreeMap<String, Expr>, context: &mut EvalContext<'_>) -> Result<Value> {
+async fn eval_map(map: &BTreeMap<String, Expr>, context: &EvalContext<'_>) -> Result<Value> {
     let mut result = BTreeMap::<String, Value>::new();
 
     for (key, expr) in map {
@@ -215,7 +198,7 @@ async fn eval_map(map: &BTreeMap<String, Expr>, context: &mut EvalContext<'_>) -
     Ok(result.into())
 }
 
-async fn eval_vec(vec: &Vec<Expr>, context: &mut EvalContext<'_>) -> Result<Value> {
+async fn eval_vec(vec: &Vec<Expr>, context: &EvalContext<'_>) -> Result<Value> {
     let mut result = Vec::<Value>::new();
     for expr in vec {
         result.push(expr.eval_rec(context).await?)
@@ -370,7 +353,7 @@ fn sub(left: Value, right: Value) -> Result<Value> {
     }
 }
 
-async fn eq(context: &mut EvalContext<'_>, left: &Expr, right: &Expr) -> Result<bool> {
+async fn eq(context: &EvalContext<'_>, left: &Expr, right: &Expr) -> Result<bool> {
     let left = left.eval_rec(context).await?;
 
     if left == Value::None {
@@ -436,7 +419,7 @@ fn lte(left: Value, right: Value) -> Result<Value> {
 }
 
 /// Lazilly evaluate an and expression
-async fn and(context: &mut EvalContext<'_>, left: &Expr, right: &Expr) -> Result<Value> {
+async fn and(context: &EvalContext<'_>, left: &Expr, right: &Expr) -> Result<Value> {
     Ok(if !eval_to_bool(context, left).await? {
         // If left evaluates to false bypass right and return false immediately
         false
@@ -448,7 +431,7 @@ async fn and(context: &mut EvalContext<'_>, left: &Expr, right: &Expr) -> Result
 }
 
 /// Lazilly evaluate an or expression
-async fn or(context: &mut EvalContext<'_>, left: &Expr, right: &Expr) -> Result<Value> {
+async fn or(context: &EvalContext<'_>, left: &Expr, right: &Expr) -> Result<Value> {
     Ok(if eval_to_bool(context, left).await? {
         // If left evaluates to true bypass right and return true immediately
         true
@@ -460,7 +443,7 @@ async fn or(context: &mut EvalContext<'_>, left: &Expr, right: &Expr) -> Result<
 }
 
 /// Helper function that evaluates an expression and checks if its a boolean
-async fn eval_to_bool(context: &mut EvalContext<'_>, expr: &Expr) -> Result<bool> {
+async fn eval_to_bool(context: &EvalContext<'_>, expr: &Expr) -> Result<bool> {
     TryInto::<bool>::try_into(expr.eval_rec(context).await?).map_err(|_| Error::InvalidType)
 }
 

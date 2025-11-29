@@ -9,7 +9,7 @@ pub use self::{
 };
 use crate::{
     error::Result,
-    function::{FunctionCache, UserFunctions},
+    function::UserFunctions,
     symbol::Symbols,
     value::{ser::ValueSerializer, Value},
 };
@@ -30,15 +30,11 @@ impl RuleSet {
     }
 
     pub async fn evaluate_value(&self, facts: &Value) -> Result<Vec<Outcome<'_>>> {
-        let mut function_cache = FunctionCache::new();
         let mut results = Vec::new();
 
         for rule in self.rules.iter() {
             results.push(Outcome {
-                value: rule
-                    .expr()
-                    .eval_rule(self, &mut function_cache, facts)
-                    .await,
+                value: rule.expr().eval_rule(self, facts).await,
                 rule,
             });
         }
@@ -46,13 +42,8 @@ impl RuleSet {
         Ok(results)
     }
 
-    pub(crate) async fn call_function(
-        &self,
-        name: &str,
-        params: Value,
-        function_cache: &mut FunctionCache,
-    ) -> Result<Value> {
-        self.functions.call(name, params, function_cache).await
+    pub(crate) async fn call_function(&self, name: &str, params: Value) -> Result<Value> {
+        self.functions.call(name, params).await
     }
 
     pub(crate) fn get_symbol(&self, symbol: &str) -> Result<&Value> {

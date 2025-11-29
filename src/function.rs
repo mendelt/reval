@@ -6,7 +6,6 @@ use crate::{
 };
 use async_trait::async_trait;
 use std::collections::BTreeMap;
-use std::result;
 
 /// User functions should implement this trait
 #[async_trait]
@@ -16,18 +15,10 @@ pub trait UserFunction {
 
     /// The name of the user-function
     fn name(&self) -> &'static str;
-
-    /// Indicates if results of this function can be cached,
-    /// true by default
-    fn cacheable(&self) -> bool {
-        true
-    }
 }
 
 /// Result type returned from UserFunction
-pub type FunctionResult = result::Result<Value, anyhow::Error>;
-
-pub(crate) type FunctionCache = BTreeMap<String, Value>;
+pub type FunctionResult = std::result::Result<Value, anyhow::Error>;
 
 /// Stores user-functions so they can be easilly called
 #[derive(Default)]
@@ -71,39 +62,15 @@ impl UserFunctions {
         Ok(())
     }
 
-    pub(crate) async fn call(
-        &self,
-        name: &str,
-        param: Value,
-        results_cache: &mut FunctionCache,
-    ) -> Result<Value> {
-        let function = self.get(name)?;
-
-        if function.cacheable() {
-            let cache_key = format!("{name}-{param:?}");
-
-            match results_cache.get(&cache_key) {
-                Some(value) => Ok(value.clone()),
-                None => {
-                    let result = call_function(function, param, name).await?;
-                    results_cache.insert(cache_key, result.clone());
-                    Ok(result)
-                }
-            }
-        } else {
-            call_function(function, param, name).await
-        }
+    pub(crate) async fn call(&self, name: &str, param: Value) -> Result<Value> {
+        self.get(name)?
+            .call(param)
+            .await
+            .map_err(|err| Error::UserFunctionError {
+                function: name.to_owned(),
+                error: err,
+            })
     }
-}
-
-async fn call_function(function: &BoxedFunction, params: Value, name: &str) -> Result<Value> {
-    function
-        .call(params)
-        .await
-        .map_err(|err| Error::UserFunctionError {
-            function: name.to_owned(),
-            error: err,
-        })
 }
 
 /// Convenience type for passing around boxed user-function implementations
