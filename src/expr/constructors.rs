@@ -229,11 +229,11 @@ impl Expr {
         Expr::Second(Box::new(param))
     }
 
-    pub fn for_map(bind: impl ToString, list: Expr, operation: Expr) -> Self {
-        Expr::ForMap(bind.to_string(), Box::new(list), Box::new(operation))
+    pub fn for_map(bind: &str, list: Expr, op: Expr) -> Self {
+        Expr::ForMap(bind.to_string(), Box::new(list), Box::new(op))
     }
 
-    pub fn for_filter(bind: impl ToString, list: Expr, predicate: Expr) -> Self {
-        Expr::ForFilter(bind.to_string(), Box::new(list), Box::new(predicate))
+    pub fn for_filter(bind: &str, list: Expr, pred: Expr) -> Self {
+        Expr::ForFilter(bind.to_string(), Box::new(list), Box::new(pred))
     }
 }

@@ -1,4 +1,4 @@
-use crate::{value::Value, Error, Result};
+use crate::value::Value;
 use std::collections::BTreeMap;
 
 /// Store symbols for use in rules
@@ -19,10 +19,8 @@ impl Symbols {
         self.0.append(&mut symbols)
     }
 
-    pub fn get(&self, symbol: &str) -> Result<&Value> {
-        self.0
-            .get(symbol)
-            .ok_or(Error::InvalidSymbol(symbol.to_string()))
+    pub fn get(&self, symbol: &str) -> Option<&Value> {
+        self.0.get(symbol)
     }
 }
 
