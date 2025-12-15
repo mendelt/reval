@@ -127,6 +127,8 @@ impl Expr {
             Expr::Hour(value) => hour(value.eval_rec(context).await?),
             Expr::Minute(value) => minute(value.eval_rec(context).await?),
             Expr::Second(value) => second(value.eval_rec(context).await?),
+            Expr::Any(inner) => any(inner.eval_rec(context).await?),
+            Expr::All(inner) => all(inner.eval_rec(context).await?),
             Expr::ForMap(bind, list_expr, operation) => {
                 for_map(context, bind, list_expr.eval_rec(context).await?, operation).await
             }
@@ -650,6 +652,40 @@ fn second(value: Value) -> Result<Value> {
         Value::DateTime(inner) => Ok(Value::Int(inner.second() as i128)),
         Value::Duration(inner) => Ok(Value::Int(inner.num_seconds() as i128)),
 
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn any(value: Value) -> Result<Value> {
+    match value {
+        Value::Vec(vec) => {
+            for item in vec {
+                match item {
+                    Value::Bool(true) => return Ok(Value::Bool(true)),
+                    Value::Bool(false) => continue,
+                    _ => return Err(Error::InvalidType),
+                }
+            }
+            Ok(Value::Bool(false))
+        }
+        Value::None => Ok(Value::None),
+        _ => Err(Error::InvalidType),
+    }
+}
+
+fn all(value: Value) -> Result<Value> {
+    match value {
+        Value::Vec(vec) => {
+            for item in vec {
+                match item {
+                    Value::Bool(true) => continue,
+                    Value::Bool(false) => return Ok(Value::Bool(false)),
+                    _ => return Err(Error::InvalidType),
+                }
+            }
+            Ok(Value::Bool(true))
+        }
         Value::None => Ok(Value::None),
         _ => Err(Error::InvalidType),
     }

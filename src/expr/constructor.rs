@@ -229,6 +229,14 @@ impl Expr {
         Expr::Second(Box::new(param))
     }
 
+    pub fn all(inner: Expr) -> Self {
+        Expr::All(Box::new(inner))
+    }
+
+    pub fn any(inner: Expr) -> Self {
+        Expr::Any(Box::new(inner))
+    }
+
     pub fn for_map(bind: impl ToString, list: Expr, operation: Expr) -> Self {
         Expr::ForMap(bind.to_string(), Box::new(list), Box::new(operation))
     }
