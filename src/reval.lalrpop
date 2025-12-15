@@ -62,6 +62,8 @@ match {
     "for" => KWD_FOR,
     "map" => KWD_MAP,
     "filter" => KWD_FILTER,
+    "any" => KWD_ANY,
+    "all" => KWD_ALL,
     "," => COMMA,
     ":" => COLON,
     ";" => SEMICOLON,
@@ -144,7 +146,6 @@ SubStringExpr: Expr = {
     <l:IndexExpr> KWD_IN <r:IndexExpr> => Expr::contains(r, l),
     <l:IndexExpr> KWD_STARTS <r:IndexExpr> => Expr::starts(l, r),
     <l:IndexExpr> KWD_ENDS <r:IndexExpr> => Expr::ends(l, r),
-
     UnaryExpr
 }
 
@@ -196,6 +197,8 @@ Func: Expr = {
     KWD_HOUR LPAREN <e:Expr> RPAREN => Expr::hour(e),
     KWD_MINUTE LPAREN <e:Expr> RPAREN => Expr::minute(e),
     KWD_SECOND LPAREN <e:Expr> RPAREN => Expr::second(e),
+    KWD_ANY LPAREN <e:Expr> RPAREN => Expr::any(e),
+    KWD_ALL LPAREN <e:Expr> RPAREN => Expr::all(e),
     <f:IDENT> LPAREN <e:Expr> RPAREN => Expr::func(f, e),
 }
 
