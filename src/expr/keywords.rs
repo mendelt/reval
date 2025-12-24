@@ -43,7 +43,7 @@ const KEYWORDS: [&str; 43] = [
     "key",
     "val",
     "for",
-    "do",
+    "map",
     "filter",
 ];
 
