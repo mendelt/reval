@@ -1,0 +1,4 @@
+@name: "should round decimal up";
+@expect: d51;
+
+round(d50.51)

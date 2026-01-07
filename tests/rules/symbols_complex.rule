@@ -1,0 +1,6 @@
+@name: "should evaluate complex symbol expression";
+@symbol1: i4;
+@symbol2: i8;
+@expect: i12;
+
+:symbol1 + :symbol2

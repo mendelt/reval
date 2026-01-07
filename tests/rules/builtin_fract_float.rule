@@ -1,0 +1,4 @@
+@name: "should fract float";
+@expect: f0.20000000000000018;
+
+fract(f2.2)

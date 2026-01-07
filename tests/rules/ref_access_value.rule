@@ -1,0 +1,7 @@
+@name: "should be able to reference value passed in";
+@input: {
+    value: i3
+};
+@expect: i3;
+
+value

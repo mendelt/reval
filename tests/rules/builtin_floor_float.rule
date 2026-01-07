@@ -1,0 +1,4 @@
+@name: "should floor float";
+@expect: f6.0;
+
+floor(f6.6)

@@ -1,0 +1,4 @@
+@name: "should uppercase string";
+@expect: "STRING";
+
+uppercase("StrInG")

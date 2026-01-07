@@ -1,0 +1,5 @@
+@name: "should evaluate simple symbol";
+@symbol_name: i4;
+@expect: i4;
+
+@symbol_name

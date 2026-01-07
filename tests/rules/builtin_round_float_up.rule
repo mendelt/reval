@@ -1,0 +1,4 @@
+@name: "should round float up";
+@expect: f51.0;
+
+round(f50.5)

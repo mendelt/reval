@@ -1,50 +1,71 @@
-mod builtin;
 mod common;
 mod datetime;
 mod for_map_filter;
 mod iif;
-mod symbols;
 
-use crate::common::eval_expr;
+use crate::common::{eval_expr, parse_rule};
 use chrono::{prelude::*, TimeDelta};
-use common::{simple_event, Event};
+use common::Event;
+use reval::prelude::*;
+use rstest::rstest;
+use rstest_reuse::{apply, template};
 
+#[template]
+#[rstest]
+#[case::builtin_lowercase("builtin_lowercase")]
+#[case::builtin_uppercase("builtin_uppercase")]
+#[case::builtin_trim("builtin_trim")]
+#[case::builtin_contains_list_1("builtin_contains_list_1")]
+#[case::builtin_contains_list_2("builtin_contains_list_2")]
+#[case::builtin_round_float_down("builtin_round_float_down")]
+#[case::builtin_round_float_up("builtin_round_float_up")]
+#[case::builtin_round_decimal_down("builtin_round_decimal_down")]
+#[case::builtin_round_decimal_up("builtin_round_decimal_up")]
+#[case::builtin_floor_float("builtin_floor_float")]
+#[case::builtin_fract_float("builtin_fract_float")]
+#[case::ref_access_value("ref_access_value")]
+#[case::symbols_simple("symbols_simple")]
+#[case::symbols_complex("symbols_complex")]
+fn cases(#[case] filename: &str) {}
+
+#[apply(cases)]
 #[tokio::test]
-async fn should_ref_input() {
-    // Reference the event field from the input and return it
-    assert_eq!(eval_expr("event", simple_event()).await, "Simple".into())
+
+async fn should_parse_expr(#[case] filename: &str) {
+    let _rule = parse_rule(filename);
 }
 
+#[apply(cases)]
 #[tokio::test]
-async fn should_eval_eq_on_input_event() {
-    assert_eq!(
-        eval_expr(r#"event == "Simple""#, simple_event()).await,
-        true.into()
-    )
-}
+async fn should_evaluate_expr(#[case] filename: &str) {
+    let rule = parse_rule(filename);
 
-#[tokio::test]
-async fn should_eval_contains_expr_on_list() {
+    let expected = rule
+        .get_metadata("expect")
+        .cloned()
+        .expect("No expect metadata found");
+
+    let input = rule.get_metadata("input").cloned().unwrap_or(Value::None);
+
+    let ruleset = ruleset()
+        .with_rule(rule)
+        .expect("Error building ruleset")
+        .build();
+
+    let outcomes = ruleset
+        .evaluate_value(&input)
+        .await
+        .expect("Failed to evaluate rule");
+
     assert_eq!(
-        eval_expr(
-            r#"list contains "2""#,
-            Event::List {
-                list: vec!["1".to_string(), "2".to_string(), "3".to_string()]
-            },
-        )
-        .await,
-        true.into(),
+        outcomes.len(),
+        1,
+        "Expected one outcome from rule evaluation"
     );
-    assert_eq!(
-        eval_expr(
-            r#"list contains "2""#,
-            Event::List {
-                list: vec!["1".to_string(), "4".to_string(), "3".to_string()]
-            },
-        )
-        .await,
-        false.into(),
-    )
+
+    let value = outcomes[0].value.as_ref().expect("Error executing rule");
+
+    assert_eq!(value, &expected, "Expected rule to evaluate to true");
 }
 
 #[tokio::test]

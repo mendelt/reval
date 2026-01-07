@@ -1,0 +1,7 @@
+@name: "contains should return false when list does not contain an item";
+@input: {
+    list: [i1, i5, i12]
+};
+@expect: false;
+
+list contains i45
