@@ -2,7 +2,7 @@
 name = "reval"
 version = "0.11.0-rc.0"
 edition = "2021"
-rust-version = "1.82.0"
+rust-version = "1.86.0"
 authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
 license = "MIT/Apache-2.0"
 description = "Simple Rust expression evaluator"
@@ -17,8 +17,8 @@ anyhow = "1"
 async-recursion = "1"
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
-itertools = "0.14"
-lalrpop-util = { version = "0.22", features = ["lexer", "unicode"] }
+itertools = "0.15"
+lalrpop-util = { version = "0.23", features = ["lexer", "unicode"] }
 lazy_static = "1"
 rust_decimal = "1"
 serde = { version = "1", features = ["derive"] }
@@ -30,7 +30,7 @@ tokio = { version = "1", features = ["full"] }
 tokio-test = "0.4"
 
 [build-dependencies]
-lalrpop = "0.22.1"
+lalrpop = "0.23"
 
 [[test]]
 name = "integration"
